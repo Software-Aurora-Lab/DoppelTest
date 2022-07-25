@@ -131,9 +131,9 @@ class ApolloContainer:
     def restart_modules(self):
         self.__modules_operation('restart')
 
-    def start_recorder(self):
+    def start_recorder(self, record_id: str):
         self.logger.info(f"Starting recorder")
-        cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}"
+        cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
