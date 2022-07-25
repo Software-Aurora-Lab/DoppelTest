@@ -68,7 +68,6 @@ class CyberBridge:
         return result
 
     def add_subscriber(self, topic: Channel, cb):
-        # topic_msg_type = topic_pb_dict[topic][0]
         topic_msg_type = topic.msg_type
 
         data = BridgeOp.AddReader
@@ -88,7 +87,6 @@ class CyberBridge:
         if channel.channel in self.publishable_channel:
             return
 
-        # topic_msg_type = topic_pb_dict[topic][0]
         topic_msg_type = channel.msg_type
 
         data = BridgeOp.AddWriter
@@ -122,10 +120,6 @@ class CyberBridge:
         offset += 4
         msg = data[offset:offset+message_size]
 
-        # msg_constructor = topic_pb_dict[topic][1]
-        # parsed_msg = msg_constructor()
-        # parsed_msg.ParseFromString(msg)
-
         for subscriber in self.subscribers[topic]:
             subscriber(msg)
 
@@ -146,8 +140,8 @@ class CyberBridge:
                 try:
                     self.on_read(data)
                 except Exception as e:
-                    print(len(data))
-                    raise e
+                    # random bridge errors
+                    pass
         self.spinning = True
         self.t = Thread(target=forever)
         self.t.start()
