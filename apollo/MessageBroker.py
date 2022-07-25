@@ -10,7 +10,6 @@ from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle,
 from scenario.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Channel, Topics
 from utils import get_logger
-from utils.ThreadSafeVariable import ThreadSafeVariable
 
 PERCEPTION_FREQUENCY = 10
 
@@ -41,13 +40,13 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
 
 class MessageBroker:
     runners: List[ApolloRunner]
-    spinning: ThreadSafeVariable
+    spinning: bool
     logger: Logger
     t: Thread
 
     def __init__(self, runners: List[ApolloRunner]) -> None:
         self.runners = runners
-        self.spinning = ThreadSafeVariable(False)
+        self.spinning = False
         self.logger = get_logger('MessageBroker')
 
     def broadcast(self, channel: Channel, data: bytes):
@@ -56,20 +55,20 @@ class MessageBroker:
 
     def spin(self):
         self.logger.info('Starting to spin')
-        if self.spinning.get():
+        if self.spinning:
             # already spinning
             return
 
         def forever():
             header_sequence_num = 0
-            while self.spinning.get():
+            while self.spinning:
                 # retrieve localization of running instances
                 locations = dict()
                 for runner in self.runners:
-                    if runner.is_running.get():
-                        loc = runner.localization.get()
+                    if runner.is_running:
+                        loc = runner.localization
                         if loc and loc.header.module_name == 'SimControl':
-                            locations[runner.nid] = runner.localization.get()
+                            locations[runner.nid] = runner.localization
 
                 # convert localization into obstacles
                 obs = dict()
@@ -78,7 +77,7 @@ class MessageBroker:
 
                 # publish obstacle to all running instances
                 for runner in self.runners:
-                    if runner.is_running.get():
+                    if runner.is_running:
                         perception_obs = [obs[x]
                                           for x in obs if x != runner.nid]
                         header = Header(
@@ -97,13 +96,13 @@ class MessageBroker:
                 time.sleep(1/PERCEPTION_FREQUENCY)
 
         self.t = Thread(target=forever)
-        self.spinning.set(True)
+        self.spinning = True
         self.t.start()
 
     def stop(self):
         self.logger.info('Stopping')
-        if not self.spinning.get():
+        if not self.spinning:
             # Not running
             return
-        self.spinning.set(False)
+        self.spinning = False
         self.t.join()

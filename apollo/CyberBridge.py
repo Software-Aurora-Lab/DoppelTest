@@ -10,7 +10,6 @@ from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle,
 from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import RoutingRequest
-from utils.ThreadSafeVariable import ThreadSafeVariable
 
 
 def to_bytes(s: str):
@@ -48,7 +47,7 @@ class Topics:
 
 class CyberBridge:
     publishable_channel: Set[str]
-    spinning: ThreadSafeVariable
+    spinning: bool
     t: Thread
 
     def __init__(self, host: str, port=9090) -> None:
@@ -56,7 +55,7 @@ class CyberBridge:
         self.conn.connect((host, port))
         self.subscribers = defaultdict(lambda: list())
         self.publishable_channel = set()
-        self.spinning = ThreadSafeVariable(False)
+        self.spinning = False
 
     @staticmethod
     def __prepare_bytes(data: bytes):
@@ -138,21 +137,21 @@ class CyberBridge:
         self.conn.send(msg)
 
     def spin(self):
-        if self.spinning.get():
+        if self.spinning:
             return
 
         def forever():
-            while self.spinning.get():
+            while self.spinning:
                 data = self.conn.recv(65527)
                 try:
                     self.on_read(data)
                 except Exception as e:
                     print(len(data))
                     raise e
-        self.spinning.set(True)
+        self.spinning = True
         self.t = Thread(target=forever)
         self.t.start()
 
     def stop(self):
-        self.spinning.set(False)
+        self.spinning = False
         self.t.join()
