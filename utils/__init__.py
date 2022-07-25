@@ -27,7 +27,7 @@ def get_logger(name, filename=None) -> logging.Logger:
 
 
 def zero_velocity(points: PointENU):
-    return math.sqrt(points.x ** 2 + points.y ** 2) == 0.0
+    return round(math.sqrt(points.x ** 2 + points.y ** 2), 2) == 0.00
 
 
 def random_numeric_id(length=5):
