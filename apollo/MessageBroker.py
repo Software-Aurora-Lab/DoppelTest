@@ -10,12 +10,7 @@ from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle,
 from scenario.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Channel, Topics
 from utils import get_logger
-
-PERCEPTION_FREQUENCY = 10
-
-APOLLO_VEHICLE_LENGTH = 4.70
-APOLLO_VEHICLE_WIDTH = 2.06
-APOLLO_VEHICLE_HEIGHT = 2.05
+from utils.config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, PERCEPTION_FREQUENCY
 
 
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:
