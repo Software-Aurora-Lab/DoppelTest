@@ -156,7 +156,6 @@ class ApolloRunner:
                 LaneWaypoint(
                     id=self.start.lane_id,
                     s=self.start.s,
-                    # pose=PointENU(x=586943.596784519, y=4141245.338975925)
                 ),
                 LaneWaypoint(
                     id=self.destination.lane_id,
