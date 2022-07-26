@@ -4,18 +4,19 @@ import logging
 import random
 
 from modules.common.proto.geometry_pb2 import PointENU
+from utils.config import STREAM_LOGGING_LEVEL
 
 
 def get_logger(name, filename=None) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.handlers.clear()
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     if not os.path.exists("Logs"):
         os.makedirs("Logs")
     fh = logging.FileHandler(f"Logs/{filename if filename else name}.log")
     fh.setLevel(logging.ERROR)
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    ch.setLevel(STREAM_LOGGING_LEVEL)
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     fh.setFormatter(formatter)
