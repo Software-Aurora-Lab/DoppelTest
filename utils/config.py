@@ -9,4 +9,4 @@ APOLLO_VEHICLE_HEIGHT = 2.05
 
 APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/apollo'
 
-STREAM_LOGGING_LEVEL = logging.DEBUG
+STREAM_LOGGING_LEVEL = logging.INFO
