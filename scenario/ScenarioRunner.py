@@ -1,5 +1,4 @@
 
-from dataclasses import dataclass
 from logging import Logger
 import threading
 import time
@@ -9,7 +8,7 @@ from apollo.ApolloContainer import ApolloContainer
 
 from scenario import Scenario, ScenarioGene
 from scenario.ApolloRunner import ApolloRunner, PositionEstimate
-from utils import get_logger, random_numeric_id
+from utils import get_logger, get_scenario_logger, random_numeric_id
 from utils.config import APOLLO_ROOT
 
 
@@ -49,6 +48,7 @@ class ScenarioRunner:
             t.join()
 
     def initialize_scenario(self, gene: ScenarioGene):
+        self.logger.info('Initializing scenario')
         self.runners = list()
         nids = random_numeric_id(len(self.containers))
         for index, routing in enumerate(self.scenario.routings):
@@ -85,13 +85,20 @@ class ScenarioRunner:
         mbk.spin()
 
         runner_time = 0
+        scenario_logger = get_scenario_logger()
         while True:
             exit_reasons = list()
             for ar in self.runners:
                 if ar.should_send_routing(runner_time):
                     ar.send_routing()
                 exit_reasons.append(ar.get_exit_reason())
+
+            if runner_time % 100 == 0:
+                scenario_logger.info(
+                    f'Scenario time: {round(runner_time / 1000, 1)}')
+
             if all(exit_reasons):
+                scenario_logger.info("\n")
                 self.logger.info(f'Stop reasons: {exit_reasons}')
                 break
             time.sleep(0.1)

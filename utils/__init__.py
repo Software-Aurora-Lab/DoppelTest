@@ -27,6 +27,19 @@ def get_logger(name, filename=None) -> logging.Logger:
     return logger
 
 
+def get_scenario_logger() -> logging.Logger:
+    logger = logging.getLogger('Scenario')
+    logger.handlers.clear()
+    logger.setLevel(logging.INFO)
+    ch = logging.StreamHandler()
+    ch.terminator = '\r'
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+    return logger
+
+
 def zero_velocity(points: PointENU):
     return round(math.sqrt(points.x ** 2 + points.y ** 2), 2) == 0.00
 
