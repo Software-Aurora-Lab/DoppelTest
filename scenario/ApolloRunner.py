@@ -66,8 +66,8 @@ class ApolloRunner:
             if prev_ != None and \
                 prev_.header.module_name == "SimControl" and \
                     next_.header.module_name == "SimControl":
-                prev_stop = zero_velocity(prev_.pose.angular_velocity)
-                next_stop = zero_velocity(next_.pose.angular_velocity)
+                prev_stop = zero_velocity(prev_.pose.linear_velocity)
+                next_stop = zero_velocity(next_.pose.linear_velocity)
 
                 if prev_stop and next_stop:
                     tdelta = next_.header.timestamp_sec - prev_.header.timestamp_sec
