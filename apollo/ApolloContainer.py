@@ -42,9 +42,9 @@ class ApolloContainer:
         return ctn.attrs['NetworkSettings']['IPAddress']
 
     def start_instance(self, restart=False):
-        self.logger.info(f'Starting container')
+        self.logger.debug(f'Starting container')
         if not restart and self.is_running():
-            self.logger.info(f'Already running at {self.ip}')
+            self.logger.debug(f'Already running at {self.ip}')
             return
         cmd = f'{self.apollo_root}/docker/scripts/dev_start.sh -l -y'
         result = subprocess.run(
@@ -55,7 +55,7 @@ class ApolloContainer:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        self.logger.info(f'Started running at {self.ip}')
+        self.logger.debug(f'Started running at {self.ip}')
 
     def __dreamview_operation(self, op: str):
         ops = {
@@ -64,7 +64,7 @@ class ApolloContainer:
             'restart': ('Restarting', 'restart', f'Restarted Dreamview at http://{self.ip}:{self.port}')
         }
         s0, s1, s2 = ops[op]
-        self.logger.info(f'{s0} Dreamview')
+        self.logger.debug(f'{s0} Dreamview')
         cmd = f"docker exec {self.container_name} ./scripts/bootstrap.sh {s1}"
         subprocess.run(cmd.split(), stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
@@ -72,8 +72,10 @@ class ApolloContainer:
             self.dreamview = None
         else:
             self.dreamview = Dreamview(self.ip, self.port)
+            self.logger.info(
+                f'Dreamview running at http://{self.ip}:{self.port}')
 
-        self.logger.info(s2)
+        self.logger.debug(s2)
 
     def start_dreamview(self):
         self.__dreamview_operation('start')
@@ -86,16 +88,16 @@ class ApolloContainer:
 
     def start_bridge(self):
         if not self.__is_bridge_started():
-            self.logger.info('Starting bridge')
+            self.logger.debug('Starting bridge')
             cmd = f"docker exec -d {self.container_name} ./scripts/bridge.sh"
             subprocess.run(cmd.split())
         else:
-            self.logger.info('Bridge already running')
+            self.logger.debug('Bridge already running')
 
         while True:
             try:
                 self.bridge = CyberBridge(self.ip, self.bridge_port)
-                self.logger.info('Bridge connected')
+                self.logger.debug('Bridge connected')
                 break
             except ConnectionRefusedError:
                 time.sleep(1)
@@ -116,11 +118,11 @@ class ApolloContainer:
         }
         s0, s1, s2 = ops[op]
 
-        self.logger.info(f"{s0} required modules")
+        self.logger.debug(f"{s0} required modules")
         cmd = f"docker exec {self.container_name} ./scripts/bootstrap_maggie.sh {s1}"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.logger.info(f'Modules {s2}')
+        self.logger.debug(f'Modules {s2}')
 
     def start_modules(self):
         self.__modules_operation('start')
@@ -132,7 +134,7 @@ class ApolloContainer:
         self.__modules_operation('restart')
 
     def start_recorder(self, record_id: str):
-        self.logger.info(f"Starting recorder")
+        self.logger.debug(f"Starting recorder")
         cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
         subprocess.run(
             cmd.split(),
@@ -140,7 +142,7 @@ class ApolloContainer:
         )
 
     def stop_recorder(self):
-        self.logger.info(f"Stopping recorder")
+        self.logger.debug(f"Stopping recorder")
         cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node stop"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE

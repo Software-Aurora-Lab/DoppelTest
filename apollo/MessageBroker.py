@@ -49,7 +49,7 @@ class MessageBroker:
             runner.container.bridge.publish(channel, data)
 
     def spin(self):
-        self.logger.info('Starting to spin')
+        self.logger.debug('Starting to spin')
         if self.spinning:
             # already spinning
             return
@@ -95,7 +95,7 @@ class MessageBroker:
         self.t.start()
 
     def stop(self):
-        self.logger.info('Stopping')
+        self.logger.debug('Stopping')
         if not self.spinning:
             # Not running
             return

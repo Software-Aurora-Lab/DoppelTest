@@ -66,8 +66,8 @@ class ApolloRunner:
             if prev_ != None and \
                 prev_.header.module_name == "SimControl" and \
                     next_.header.module_name == "SimControl":
-                prev_stop = zero_velocity(prev_.pose.linear_velocity)
-                next_stop = zero_velocity(next_.pose.linear_velocity)
+                prev_stop = zero_velocity(prev_.pose.angular_velocity)
+                next_stop = zero_velocity(next_.pose.angular_velocity)
 
                 if prev_stop and next_stop:
                     tdelta = next_.header.timestamp_sec - prev_.header.timestamp_sec
@@ -91,7 +91,7 @@ class ApolloRunner:
             Reset data, stop running modules, stop sim control
             send localization, restart sim control, restart running modules
         '''
-        self.logger.info(
+        self.logger.debug(
             f'Initializing container {self.container.container_name}')
 
         self.register_publishers()
@@ -113,14 +113,14 @@ class ApolloRunner:
 
         self.register_subscribers()
 
-        self.logger.info(
+        self.logger.debug(
             f'Initialized container {self.container.container_name}')
 
     def should_send_routing(self, t: float):
         return t >= self.start_time and not self.routing_started
 
     def send_initial_localization(self):
-        self.logger.info('Sending initial localization')
+        self.logger.debug('Sending initial localization')
         coord, heading = get_coordinate_for(get_lane_by_id(
             self.map, self.start.lane_id), self.start.s)
 
@@ -142,7 +142,7 @@ class ApolloRunner:
             time.sleep(0.5)
 
     def send_routing(self):
-        self.logger.info(
+        self.logger.debug(
             f'Sending routing request to {self.container.container_name}')
         self.routing_started = True
 
@@ -191,4 +191,4 @@ class ApolloRunner:
         self.container.dreamview.stop_sim_control()
         self.container.stop_modules()
         self.is_running = False
-        self.logger.info(f"STOPPED [{stop_reason}]")
+        self.logger.debug(f"STOPPED [{stop_reason}]")
