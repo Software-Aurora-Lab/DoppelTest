@@ -29,6 +29,7 @@ class ScenarioRunner:
         self.logger = get_logger(f"ScenarioRunner")
 
     def start_instances(self):
+        self.logger.info('Starting instances')
         for ctn in self.containers:
             ctn.start_instance()
 
@@ -75,17 +76,20 @@ class ScenarioRunner:
 
         self.gene = gene
 
-    def run(self):
+    def run(self, scenario_name: str):
         if not self.gene:
             self.logger.error('Gene has not been initialized.')
             return
-        self.logger.info('Started running scenario.')
+        self.logger.info(f'Started scenario {scenario_name}')
 
         mbk = MessageBroker(self.runners)
         mbk.spin()
 
         runner_time = 0
         scenario_logger = get_scenario_logger()
+        # starting scenario
+        for container in self.containers:
+            container.start_recorder(scenario_name)
         while True:
             exit_reasons = list()
             for ar in self.runners:
@@ -101,9 +105,14 @@ class ScenarioRunner:
                 scenario_logger.info("\n")
                 self.logger.info(f'Stop reasons: {exit_reasons}')
                 break
+            elif runner_time / 1000 > 90:
+                self.logger.info(f'Stopped. Scenario over 90 seconds')
+                break
             time.sleep(0.1)
             runner_time += 100
-
+        # scenario ended
+        for container in self.containers:
+            container.stop_recorder()
         mbk.stop()
         for runner in self.runners:
             runner.stop('MAIN')
