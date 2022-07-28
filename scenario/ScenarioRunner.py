@@ -99,7 +99,7 @@ class ScenarioRunner:
 
             if runner_time % 100 == 0:
                 scenario_logger.info(
-                    f'Scenario time: {round(runner_time / 1000, 1)}')
+                    f'Scenario time: {round(runner_time / 1000, 1)}. Status: {exit_reasons}')
 
             if all(exit_reasons):
                 scenario_logger.info("\n")

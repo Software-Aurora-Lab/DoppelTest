@@ -45,6 +45,7 @@ while True:
     if all(exit_reasons):
         print(exit_reasons)
         break
+    print(exit_reasons)
     time.sleep(0.1)
     runner_time += 100
 

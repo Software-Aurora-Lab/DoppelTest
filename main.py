@@ -16,10 +16,13 @@ gene3 = ScenarioGene([1000, 1000], [(190, 20), (13.04, 20)])
 scenario_runner = ScenarioRunner(scene)
 scenario_runner.start_instances()
 
+counter = 0
 while True:
+    print(counter)
     scenario_runner.initialize_scenario(gene1)
-    scenario_runner.run()
+    scenario_runner.run(f'1.{counter}')
     scenario_runner.initialize_scenario(gene2)
-    scenario_runner.run()
+    scenario_runner.run(f'2.{counter}')
     scenario_runner.initialize_scenario(gene3)
-    scenario_runner.run()
+    scenario_runner.run(f'3.{counter}')
+    counter += 3
