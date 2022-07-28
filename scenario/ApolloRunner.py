@@ -184,7 +184,6 @@ class ApolloRunner:
 
         if self.routing_started and self.stop_time_counter > 10:
             return 'Stopped for 10+ seconds'
-        self.logger.info(self.stop_time_counter)
         return None
 
     def stop(self, stop_reason: str):
