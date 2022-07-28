@@ -147,3 +147,19 @@ class ApolloContainer:
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
+
+    def start_sim_control_standalone(self):
+        self.logger.debug(f"Starting sim_control_standalone")
+        cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh start"
+        subprocess.run(
+            cmd.split(),
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+
+    def stop_sim_control_standalone(self):
+        self.logger.debug(f"Starting sim_control_standalone")
+        cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh stop"
+        subprocess.run(
+            cmd.split(),
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
