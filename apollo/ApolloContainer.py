@@ -104,6 +104,7 @@ class ApolloContainer:
                 time.sleep(1)
 
     def reset_bridge_connection(self):
+        self.logger.debug('Resetting bridge connection')
         if not self.__is_bridge_started():
             return
         if not self.bridge is None:
