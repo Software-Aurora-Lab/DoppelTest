@@ -148,4 +148,4 @@ class CyberBridge:
 
     def stop(self):
         self.spinning = False
-        self.t.join()
+        self.t.join(5)
