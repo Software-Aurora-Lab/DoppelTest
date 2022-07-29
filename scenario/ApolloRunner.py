@@ -65,7 +65,8 @@ class ApolloRunner:
 
             if prev_ != None and \
                 prev_.header.module_name == "SimControlStandalone" and \
-                    next_.header.module_name == "SimControlStandalone":
+                    next_.header.module_name == "SimControlStandalone" and \
+                self.routing_started:
                 prev_stop = zero_velocity(prev_.pose.linear_velocity)
                 next_stop = zero_velocity(next_.pose.linear_velocity)
 
@@ -94,16 +95,10 @@ class ApolloRunner:
         self.logger.debug(
             f'Initializing container {self.container.container_name}')
 
-        self.register_publishers()
-
         # initialize container
-        # self.container.dreamview.stop_sim_control()
-        self.container.stop_sim_control_standalone()
-        self.container.start_sim_control_standalone()
-        self.container.stop_modules()
+        self.container.reset()
+        self.register_publishers()
         self.send_initial_localization()
-        # self.container.dreamview.start_sim_control()
-        self.container.start_modules()
 
         # initialize class variables
         self.is_running = True
@@ -187,6 +182,7 @@ class ApolloRunner:
         return None
 
     def stop(self, stop_reason: str):
+        self.logger.info('Stopping container')
         self.container.bridge.stop()
         # self.container.dreamview.stop_sim_control()
         self.container.stop_sim_control_standalone()
