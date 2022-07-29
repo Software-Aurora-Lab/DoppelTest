@@ -93,6 +93,7 @@ class ApolloContainer:
             subprocess.run(cmd.split())
         else:
             self.logger.debug('Bridge already running')
+            pass
 
         while True:
             try:
@@ -101,6 +102,13 @@ class ApolloContainer:
                 break
             except ConnectionRefusedError:
                 time.sleep(1)
+
+    def reset_bridge_connection(self):
+        if not self.__is_bridge_started():
+            return
+        if not self.bridge is None:
+            self.bridge.conn.close()
+        self.bridge = CyberBridge(self.ip, self.bridge_port)
 
     def __is_bridge_started(self):
         try:
@@ -157,9 +165,17 @@ class ApolloContainer:
         )
 
     def stop_sim_control_standalone(self):
-        self.logger.debug(f"Starting sim_control_standalone")
+        self.logger.debug(f"Stopping sim_control_standalone")
         cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh stop"
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
+
+    def reset(self):
+        self.logger.debug(f'Resetting')
+        self.stop_modules()
+        self.stop_sim_control_standalone()
+        self.reset_bridge_connection()
+        self.start_sim_control_standalone()
+        self.start_modules()
