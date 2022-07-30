@@ -85,14 +85,14 @@ class ApolloRunner:
 
         self.container.bridge.add_subscriber(Topics.Localization, lcb)
         self.container.bridge.add_subscriber(Topics.Planning, pcb)
-        self.container.bridge.spin()
+        # self.container.bridge.spin()
 
     def initialize(self):
         '''
             Reset data, stop running modules, stop sim control
             send localization, restart sim control, restart running modules
         '''
-        self.logger.debug(
+        self.logger.info(
             f'Initializing container {self.container.container_name}')
 
         # initialize container
@@ -109,7 +109,7 @@ class ApolloRunner:
 
         self.register_subscribers()
 
-        self.logger.debug(
+        self.logger.info(
             f'Initialized container {self.container.container_name}')
 
     def should_send_routing(self, t: float):
