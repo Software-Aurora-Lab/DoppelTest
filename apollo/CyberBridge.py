@@ -1,15 +1,17 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from logging import Logger
 import socket
 from threading import Thread
 from typing import Set
 from modules.canbus.proto.chassis_pb2 import Chassis
-from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle, PerceptionObstacles
+from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import RoutingRequest
+
+from utils import get_logger
 
 
 def to_bytes(s: str):
@@ -49,13 +51,16 @@ class CyberBridge:
     publishable_channel: Set[str]
     spinning: bool
     t: Thread
+    logger: Logger
 
     def __init__(self, host: str, port=9090) -> None:
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conn.connect((host, port))
+        self.conn.setblocking(False)
         self.subscribers = defaultdict(lambda: list())
         self.publishable_channel = set()
         self.spinning = False
+        self.logger = get_logger("CyberBridge")
 
     @staticmethod
     def __prepare_bytes(data: bytes):
@@ -111,6 +116,8 @@ class CyberBridge:
         return b0 | b1 << 8 | b2 << 16 | b3 << 24
 
     def receive_publish(self, data: bytes):
+        if not self.spinning:
+            return
         offset = 1
         topic_length = self.__get_32_le(data[offset:offset+4])
         offset += 4
@@ -130,22 +137,25 @@ class CyberBridge:
         msg += self.__prepare_bytes(data)
         self.conn.send(msg)
 
+    def _spin(self):
+        self.logger.info('Started spinning')
+        while self.spinning:
+            try:
+                data = self.conn.recv(65527)
+                self.on_read(data)
+            except Exception as e:
+                pass
+        self.logger.info('Stopped spinning')
+
     def spin(self):
         if self.spinning:
             return
-
-        def forever():
-            while self.spinning:
-                data = self.conn.recv(65527)
-                try:
-                    self.on_read(data)
-                except Exception as e:
-                    # random bridge errors
-                    pass
         self.spinning = True
-        self.t = Thread(target=forever)
+        self.t = Thread(target=self._spin)
         self.t.start()
 
     def stop(self):
+        self.logger.info('Stopping bridge')
         self.spinning = False
-        self.t.join(5)
+        self.t.join()
+        self.logger.info('Bridge stopped')
