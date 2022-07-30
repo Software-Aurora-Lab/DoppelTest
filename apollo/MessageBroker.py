@@ -48,56 +48,53 @@ class MessageBroker:
         for runner in self.runners:
             runner.container.bridge.publish(channel, data)
 
+    def _spin(self):
+        header_sequence_num = 0
+        while self.spinning:
+            # retrieve localization of running instances
+            locations = dict()
+            for runner in self.runners:
+                if runner.is_running:
+                    loc = runner.localization
+                    if loc and loc.header.module_name == 'SimControlStandalone':
+                        locations[runner.nid] = runner.localization
+
+            # convert localization into obstacles
+            obs = dict()
+            for k in locations:
+                obs[k] = localization_to_obstacle(k, locations[k])
+
+            # publish obstacle to all running instances
+            for runner in self.runners:
+                if runner.is_running:
+                    perception_obs = [obs[x]
+                                      for x in obs if x != runner.nid]
+                    header = Header(
+                        timestamp_sec=time.time(),
+                        module_name='MAGGIE',
+                        sequence_num=header_sequence_num
+                    )
+                    bag = PerceptionObstacles(
+                        header=header,
+                        perception_obstacle=perception_obs,
+                    )
+                    runner.container.bridge.publish(
+                        Topics.Obstacles, bag.SerializeToString()
+                    )
+            header_sequence_num += 1
+            time.sleep(1/PERCEPTION_FREQUENCY)
+
     def spin(self):
         self.logger.debug('Starting to spin')
         if self.spinning:
-            # already spinning
             return
-
-        def forever():
-            header_sequence_num = 0
-            while self.spinning:
-                # retrieve localization of running instances
-                locations = dict()
-                for runner in self.runners:
-                    if runner.is_running:
-                        loc = runner.localization
-                        if loc and loc.header.module_name == 'SimControlStandalone':
-                            locations[runner.nid] = runner.localization
-
-                # convert localization into obstacles
-                obs = dict()
-                for k in locations:
-                    obs[k] = localization_to_obstacle(k, locations[k])
-
-                # publish obstacle to all running instances
-                for runner in self.runners:
-                    if runner.is_running:
-                        perception_obs = [obs[x]
-                                          for x in obs if x != runner.nid]
-                        header = Header(
-                            timestamp_sec=time.time(),
-                            module_name='MAGGIE',
-                            sequence_num=header_sequence_num
-                        )
-                        bag = PerceptionObstacles(
-                            header=header,
-                            perception_obstacle=perception_obs,
-                        )
-                        runner.container.bridge.publish(
-                            Topics.Obstacles, bag.SerializeToString()
-                        )
-                header_sequence_num += 1
-                time.sleep(1/PERCEPTION_FREQUENCY)
-
-        self.t = Thread(target=forever)
+        self.t = Thread(target=self._spin)
         self.spinning = True
         self.t.start()
 
     def stop(self):
         self.logger.debug('Stopping')
         if not self.spinning:
-            # Not running
             return
         self.spinning = False
         self.t.join()
