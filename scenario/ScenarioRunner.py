@@ -36,12 +36,12 @@ class ScenarioRunner:
         threads = list()
         for index in range(len(self.containers)):
             t = threading.Thread(
-                target=lambda: self.containers[index].start_dreamview())
+                target=self.containers[index].start_dreamview)
             t.start()
             threads.append(t)
 
             t = threading.Thread(
-                target=lambda: self.containers[index].start_bridge())
+                target=self.containers[index].start_bridge)
             t.start()
             threads.append(t)
 
@@ -65,14 +65,17 @@ class ScenarioRunner:
             self.runners.append(ar)
 
         threads = list()
-        for runner in self.runners:
-            t = threading.Thread(
-                target=lambda: runner.initialize()
-            )
+        for index in range(len(self.runners)):
+            threads.append(threading.Thread(
+                target=self.runners[index].initialize
+            ))
+        for t in threads:
             t.start()
-            threads.append(t)
         for t in threads:
             t.join()
+
+        for runner in self.runners:
+            runner.container.bridge.spin()
 
         self.gene = gene
 
@@ -113,9 +116,10 @@ class ScenarioRunner:
         # scenario ended
         for container in self.containers:
             container.stop_recorder()
-        mbk.stop()
         for runner in self.runners:
             runner.stop('MAIN')
+        mbk.stop()
+
         self.logger.info(
             f'Scenario ended. Length: {round(runner_time/1000, 2)} seconds.')
 
