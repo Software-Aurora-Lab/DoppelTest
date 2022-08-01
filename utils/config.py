@@ -1,5 +1,18 @@
-import logging
+"""
+Global configurations for the framework
 
+PERCEPTION_FREQUENCY: number of cycles per second to publish perception
+
+APOLLO_VEHICLE_LENGTH: length of apollo vehicle
+APOLLO_VEHICLE_WIDTH: width of apollo vehicle
+APOLLO_VEHICLE_HEIGHT: height of apollo vehicle
+
+APOLLO_ROOT: root directory of Baidu Apollo
+
+STREAM_LOGGING_LEVEL: global logging level
+"""
+
+import logging
 
 PERCEPTION_FREQUENCY = 20
 
