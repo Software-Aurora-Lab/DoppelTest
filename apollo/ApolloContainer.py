@@ -8,6 +8,23 @@ from utils import get_logger
 
 
 class ApolloContainer:
+    """
+    Class to represent Apollo container
+
+    Attributes:
+    apollo_root: str
+        Root directory of Baidu Apollo
+    username: str
+        Unique id used to identify container
+    bridge: CyberBridge
+        Used to connect to cyber bridge
+    dreamview: Dreamview
+        Websocket connection to control Dreamview
+    port: int
+        Network port for Dreamview
+    bridge_port: int
+        Network port for cyber bridge
+    """
     apollo_root: str
     username: str
     bridge: CyberBridge
@@ -15,20 +32,39 @@ class ApolloContainer:
     port = 8888
     bridge_port = 9090
 
-    cyber_recorder = '/apollo/bazel-bin/cyber/tools/cyber_recorder/cyber_recorder'
-
     def __init__(self, apollo_root: str, username: str) -> None:
+        """
+        Constructs all the attributes for ApolloContainer object
+
+        Parameters:
+            apollo_root: str
+                Root directory of Baidu Apollo
+            username: str
+                Unique id used to identify container
+        """
         self.apollo_root = apollo_root
         self.username = username
         self.logger = get_logger(f"ApolloContainer[{self.container_name}]")
 
     @property
-    def container_name(self):
+    def container_name(self) -> str:
+        """
+        Gets the name of the container
+
+        Returns:
+            name: str
+                name of the container
+        """
         return f"apollo_dev_{self.username}"
 
     def is_running(self) -> bool:
-        ''' Checks if the Apollo container is running
-        '''
+        """
+        Checks if the container is running
+
+        Returns:
+            status: bool
+                True if running, False otherwise
+        """
         try:
             return docker.from_env().containers.get(self.container_name).status == 'running'
         except:
@@ -36,12 +72,26 @@ class ApolloContainer:
 
     @property
     def ip(self) -> str:
+        """
+        Gets the ip address of the container
+
+        Returns:
+            ip: str
+                ip address of the container
+        """
         assert self.is_running(
         ), f'Instance {self.container_name} is not running.'
         ctn = docker.from_env().containers.get(self.container_name)
         return ctn.attrs['NetworkSettings']['IPAddress']
 
     def start_instance(self, restart=False):
+        """
+        Starts an Apollo instance
+
+        Parameters:
+            restart : bool
+                forcing container to restart
+        """
         self.logger.debug(f'Starting container')
         if not restart and self.is_running():
             self.logger.debug(f'Already running at {self.ip}')
@@ -58,6 +108,13 @@ class ApolloContainer:
         self.logger.debug(f'Started running at {self.ip}')
 
     def __dreamview_operation(self, op: str):
+        """
+        Helper function to start/stop/restart Dreamview
+
+        Parameters:
+            op: str
+                Operation can be one of [start, stop, restart]
+        """
         ops = {
             'start': ('Starting', 'start', f'Running Dreamview at http://{self.ip}:{self.port}'),
             'stop': ('Stopping', 'stop', f'Stopped Dreamview'),
@@ -78,15 +135,27 @@ class ApolloContainer:
         self.logger.debug(s2)
 
     def start_dreamview(self):
+        """
+        Start Dreamview
+        """
         self.__dreamview_operation('start')
 
     def stop_dreamview(self):
+        """
+        Stop Dreamview
+        """
         self.__dreamview_operation('stop')
 
     def restart_dreamview(self):
+        """
+        Restart Dreamview
+        """
         self.__dreamview_operation('restart')
 
     def start_bridge(self):
+        """
+        Start cyber bridge
+        """
         if not self.__is_bridge_started():
             self.logger.debug('Starting bridge')
             cmd = f"docker exec -d {self.container_name} ./scripts/bridge.sh"
@@ -104,6 +173,9 @@ class ApolloContainer:
                 time.sleep(1)
 
     def reset_bridge_connection(self):
+        """
+        Close any existing connection to bridge and reconnect
+        """
         self.logger.debug('Resetting bridge connection')
         if not self.__is_bridge_started():
             return
@@ -111,7 +183,14 @@ class ApolloContainer:
             self.bridge.conn.close()
         self.bridge = CyberBridge(self.ip, self.bridge_port)
 
-    def __is_bridge_started(self):
+    def __is_bridge_started(self) -> bool:
+        """
+        Checks if the bridge has been started already
+
+        Returns:
+            status: bool
+                True if running, False otherwise
+        """
         try:
             b = CyberBridge(self.ip, self.bridge_port)
             b.conn.close()
@@ -120,6 +199,13 @@ class ApolloContainer:
             return False
 
     def __modules_operation(self, op: str):
+        """
+        Helper function to control planning/routing/...
+
+        Parameters
+            op: str
+                Operation can be one of [start, stop, restart]
+        """
         ops = {
             'start': ('Starting', 'start', 'started'),
             'stop': ('Stopping', 'stop', 'stopped'),
@@ -134,15 +220,31 @@ class ApolloContainer:
         self.logger.debug(f'Modules {s2}')
 
     def start_modules(self):
+        """
+        Start all the necessary modules
+        """
         self.__modules_operation('start')
 
     def stop_modules(self):
+        """
+        Stop all the necessary modules
+        """
         self.__modules_operation('stop')
 
     def restart_modules(self):
+        """
+        Restart all the necessary modules
+        """
         self.__modules_operation('restart')
 
     def start_recorder(self, record_id: str):
+        """
+        Starts cyber_recorder
+
+        Parameters:
+            record_id: str
+                The name of the record file
+        """
         self.logger.debug(f"Starting recorder")
         cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
         subprocess.run(
@@ -151,6 +253,9 @@ class ApolloContainer:
         )
 
     def stop_recorder(self):
+        """
+        Stops cyber_recorder
+        """
         self.logger.debug(f"Stopping recorder")
         cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node stop"
         subprocess.run(
@@ -158,6 +263,9 @@ class ApolloContainer:
         )
 
     def start_sim_control_standalone(self):
+        """
+        Starts SimControlStandalone module
+        """
         self.logger.debug(f"Starting sim_control_standalone")
         cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh start"
         subprocess.run(
@@ -166,6 +274,9 @@ class ApolloContainer:
         )
 
     def stop_sim_control_standalone(self):
+        """
+        Stops SimControlStandalone module
+        """
         self.logger.debug(f"Stopping sim_control_standalone")
         cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh stop"
         subprocess.run(
@@ -174,6 +285,9 @@ class ApolloContainer:
         )
 
     def reset(self):
+        """
+        Resets the container
+        """
         self.logger.debug(f'Resetting')
         self.stop_modules()
         self.stop_sim_control_standalone()
