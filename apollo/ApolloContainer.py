@@ -177,6 +177,7 @@ class ApolloContainer:
         self.logger.debug(f'Resetting')
         self.stop_modules()
         self.stop_sim_control_standalone()
+        self.start_bridge()
         self.reset_bridge_connection()
         self.start_sim_control_standalone()
         self.start_modules()
