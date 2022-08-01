@@ -1,4 +1,5 @@
 from logging import Logger
+import math
 from threading import Thread
 from typing import List
 import time
@@ -11,6 +12,32 @@ from scenario.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Channel, Topics
 from utils import get_logger
 from utils.config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, PERCEPTION_FREQUENCY
+
+
+def generate_polygon(position: Point3D, theta: float, length: float, width: float):
+    """
+    Generate polygon
+    """
+    points = []
+    half_l = length / 2.0
+    half_w = width / 2.0
+    sin_h = math.sin(theta)
+    cos_h = math.cos(theta)
+    vectors = [(half_l * cos_h - half_w * sin_h,
+                half_l * sin_h + half_w * cos_h),
+               (-half_l * cos_h - half_w * sin_h,
+                - half_l * sin_h + half_w * cos_h),
+               (-half_l * cos_h + half_w * sin_h,
+                - half_l * sin_h - half_w * cos_h),
+               (half_l * cos_h + half_w * sin_h,
+                half_l * sin_h - half_w * cos_h)]
+    for x, y in vectors:
+        p = Point3D()
+        p.x = position.x + x
+        p.y = position.y + y
+        p.z = position.z
+        points.append(p)
+    return points
 
 
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:
@@ -28,7 +55,10 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         width=APOLLO_VEHICLE_WIDTH,
         height=APOLLO_VEHICLE_HEIGHT,
         type=PerceptionObstacle.VEHICLE,
-        sub_type=PerceptionObstacle.ST_CAR
+        sub_type=PerceptionObstacle.ST_CAR,
+        timestamp=data.header.timestamp_sec,
+        polygon_point=generate_polygon(
+            position, data.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
     )
     return obs
 
