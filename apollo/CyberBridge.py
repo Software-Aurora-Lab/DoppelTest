@@ -51,7 +51,6 @@ class CyberBridge:
     publishable_channel: Set[str]
     spinning: bool
     t: Thread
-    logger: Logger
 
     def __init__(self, host: str, port=9090) -> None:
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -60,7 +59,6 @@ class CyberBridge:
         self.subscribers = defaultdict(lambda: list())
         self.publishable_channel = set()
         self.spinning = False
-        self.logger = get_logger("CyberBridge")
 
     @staticmethod
     def __prepare_bytes(data: bytes):
@@ -138,14 +136,12 @@ class CyberBridge:
         self.conn.send(msg)
 
     def _spin(self):
-        self.logger.info('Started spinning')
         while self.spinning:
             try:
                 data = self.conn.recv(65527)
                 self.on_read(data)
             except Exception as e:
                 pass
-        self.logger.info('Stopped spinning')
 
     def spin(self):
         if self.spinning:
@@ -155,7 +151,5 @@ class CyberBridge:
         self.t.start()
 
     def stop(self):
-        self.logger.info('Stopping bridge')
         self.spinning = False
         self.t.join()
-        self.logger.info('Bridge stopped')
