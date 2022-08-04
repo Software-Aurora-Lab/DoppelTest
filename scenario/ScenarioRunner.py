@@ -79,7 +79,7 @@ class ScenarioRunner:
 
         self.gene = gene
 
-    def run(self, scenario_name: str):
+    def run(self, scenario_name: str, upper_limit=90):
         if not self.gene:
             self.logger.error('Gene has not been initialized.')
             return
@@ -108,8 +108,9 @@ class ScenarioRunner:
                 scenario_logger.info("\n")
                 self.logger.info(f'Stop reasons: {exit_reasons}')
                 break
-            elif runner_time / 1000 > 90:
-                self.logger.info(f'Stopped. Scenario over 90 seconds')
+            elif runner_time / 1000 > upper_limit:
+                self.logger.info(
+                    f'Stopped. Scenario over {upper_limit} seconds')
                 break
             time.sleep(0.1)
             runner_time += 100
