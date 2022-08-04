@@ -268,10 +268,13 @@ class ApolloContainer:
         Starts SimControlStandalone module
         """
         self.logger.debug(f"Starting sim_control_standalone")
-        cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh start"
+        # cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh start"
+
+        # cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_test"
+        cmd = f"docker exec -d {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_main"
         result = subprocess.run(
             cmd.split(),
-            capture_output=True
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
     def stop_sim_control_standalone(self):
