@@ -22,6 +22,3 @@ while True:
     scenario_runner.run('benchmark', 30)
     counter += 1
     print(counter)
-    if counter % 10 == 0:
-        for ctn in scenario_runner.containers:
-            ctn.restart_dreamview()
