@@ -12,6 +12,7 @@ from modules.map.proto.map_pb2 import Map
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import LaneWaypoint, RoutingRequest
 from utils import zero_velocity, get_logger
+from utils.config import USE_SIM_CONTROL_STANDALONE
 
 
 @dataclass
@@ -99,7 +100,8 @@ class ApolloRunner:
         self.container.reset()
         self.register_publishers()
         self.send_initial_localization()
-        self.container.dreamview.start_sim_control()
+        if not USE_SIM_CONTROL_STANDALONE:
+            self.container.dreamview.start_sim_control()
 
         # initialize class variables
         self.is_running = True

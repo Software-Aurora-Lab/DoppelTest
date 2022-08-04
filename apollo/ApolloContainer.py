@@ -5,6 +5,7 @@ from apollo.CyberBridge import CyberBridge
 from apollo.Dreamview import Dreamview
 
 from utils import get_logger
+from utils.config import USE_SIM_CONTROL_STANDALONE
 
 
 class ApolloContainer:
@@ -286,7 +287,10 @@ class ApolloContainer:
 
     def stop_all(self):
         self.bridge.stop()
-        self.dreamview.stop_sim_control()
+        if USE_SIM_CONTROL_STANDALONE:
+            self.stop_sim_control_standalone()
+        else:
+            self.dreamview.stop_sim_control()
         self.stop_modules()
 
     def reset(self):
@@ -294,8 +298,13 @@ class ApolloContainer:
         Resets the container
         """
         self.logger.debug(f'Resetting')
-        self.dreamview.stop_sim_control()
+        if USE_SIM_CONTROL_STANDALONE:
+            self.stop_sim_control_standalone()
+        else:
+            self.dreamview.stop_sim_control()
         self.stop_modules()
         self.start_bridge()
         self.reset_bridge_connection()
         self.start_modules()
+        if USE_SIM_CONTROL_STANDALONE:
+            self.start_sim_control_standalone()
