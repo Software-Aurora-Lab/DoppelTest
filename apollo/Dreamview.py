@@ -18,6 +18,7 @@ class Dreamview:
                 port of Dreamview
         """
         self.url = f"ws://{ip}:{port}/websocket"
+        self.ws = create_connection(self.url)
 
     def send_data(self, data: dict):
         """
@@ -27,9 +28,10 @@ class Dreamview:
             data: dict
                 data to be sent
         """
-        ws = create_connection(self.url)
-        ws.send(json.dumps(data))
-        ws.close()
+        # ws = create_connection(self.url)
+        # ws.send(json.dumps(data))
+        # ws.close()
+        self.ws.send(json.dumps(data))
 
     def start_sim_control(self):
         """

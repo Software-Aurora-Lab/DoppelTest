@@ -64,8 +64,8 @@ class ApolloRunner:
             next_ = data
 
             if prev_ != None and \
-                prev_.header.module_name == "SimControlStandalone" and \
-                    next_.header.module_name == "SimControlStandalone" and \
+                prev_.header.module_name == "SimControl" and \
+                    next_.header.module_name == "SimControl" and \
                 self.routing_started:
                 prev_stop = zero_velocity(prev_.pose.linear_velocity)
                 next_stop = zero_velocity(next_.pose.linear_velocity)
@@ -99,6 +99,7 @@ class ApolloRunner:
         self.container.reset()
         self.register_publishers()
         self.send_initial_localization()
+        self.container.dreamview.start_sim_control()
 
         # initialize class variables
         self.is_running = True
@@ -177,15 +178,16 @@ class ApolloRunner:
             if pdata and pdata.header.HasField('status') and pdata.header.status.error_code in [6000]:
                 return 'PLANNING ERROR'
 
+        if self.routing_started and not self.localization is None and time.time() - self.localization.header.timestamp_sec > 5:
+            raise Exception('localization broken')
+            # return 'More than 5 seconds without localization'
+
         if self.routing_started and self.stop_time_counter > 10:
             return 'Stopped for 10+ seconds'
         return None
 
     def stop(self, stop_reason: str):
         self.logger.info('Stopping container')
-        self.container.bridge.stop()
-        # self.container.dreamview.stop_sim_control()
-        self.container.stop_sim_control_standalone()
-        self.container.stop_modules()
+        self.container.stop_all()
         self.is_running = False
         self.logger.debug(f"STOPPED [{stop_reason}]")

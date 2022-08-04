@@ -81,8 +81,9 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         width=APOLLO_VEHICLE_WIDTH,
         height=APOLLO_VEHICLE_HEIGHT,
         type=PerceptionObstacle.VEHICLE,
-        sub_type=PerceptionObstacle.ST_CAR,
+        # sub_type=PerceptionObstacle.ST_CAR,
         timestamp=data.header.timestamp_sec,
+        tracking_time=1.0,
         polygon_point=generate_polygon(
             position, data.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
     )
@@ -144,7 +145,7 @@ class MessageBroker:
             for runner in self.runners:
                 if runner.is_running:
                     loc = runner.localization
-                    if loc and loc.header.module_name == 'SimControlStandalone':
+                    if loc and loc.header.module_name == 'SimControl':
                         locations[runner.nid] = runner.localization
 
             # convert localization into obstacles

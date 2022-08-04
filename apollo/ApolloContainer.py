@@ -268,9 +268,9 @@ class ApolloContainer:
         """
         self.logger.debug(f"Starting sim_control_standalone")
         cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh start"
-        subprocess.run(
+        result = subprocess.run(
             cmd.split(),
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            capture_output=True
         )
 
     def stop_sim_control_standalone(self):
@@ -284,14 +284,18 @@ class ApolloContainer:
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
+    def stop_all(self):
+        self.bridge.stop()
+        self.dreamview.stop_sim_control()
+        self.stop_modules()
+
     def reset(self):
         """
         Resets the container
         """
         self.logger.debug(f'Resetting')
+        self.dreamview.stop_sim_control()
         self.stop_modules()
-        self.stop_sim_control_standalone()
         self.start_bridge()
         self.reset_bridge_connection()
-        self.start_sim_control_standalone()
         self.start_modules()
