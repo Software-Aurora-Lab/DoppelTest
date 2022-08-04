@@ -109,7 +109,6 @@ class ApolloRunner:
         self.stop_time_counter = 0.0
         self.planning = None
         self.localization = None
-
         self.register_subscribers()
 
         self.logger.info(
@@ -145,6 +144,9 @@ class ApolloRunner:
             f'Sending routing request to {self.container.container_name}')
         self.routing_started = True
 
+        coord, heading = get_coordinate_for(get_lane_by_id(
+            self.map, self.start.lane_id), self.start.s)
+
         rr = RoutingRequest(
             header=Header(
                 timestamp_sec=time.time(),
@@ -153,8 +155,8 @@ class ApolloRunner:
             ),
             waypoint=[
                 LaneWaypoint(
-                    id=self.start.lane_id,
-                    s=self.start.s,
+                    pose=coord,
+                    heading=heading
                 ),
                 LaneWaypoint(
                     id=self.destination.lane_id,
