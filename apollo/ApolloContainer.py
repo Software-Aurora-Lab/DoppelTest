@@ -130,7 +130,7 @@ class ApolloContainer:
             self.dreamview = None
         else:
             self.dreamview = Dreamview(self.ip, self.port)
-            self.logger.info(
+            self.logger.debug(
                 f'Dreamview running at http://{self.ip}:{self.port}')
 
         self.logger.debug(s2)
