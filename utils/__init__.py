@@ -1,3 +1,6 @@
+import glob
+import shutil
+import subprocess
 import math
 import os
 import logging
@@ -5,7 +8,7 @@ import random
 from typing import List
 
 from modules.common.proto.geometry_pb2 import PointENU
-from utils.config import STREAM_LOGGING_LEVEL
+from utils.config import APOLLO_ROOT, RECORDS_DIR, STREAM_LOGGING_LEVEL
 
 
 def get_logger(name, filename=None) -> logging.Logger:
@@ -86,3 +89,35 @@ def random_numeric_id(length=5) -> List[int]:
             list of integer ids in range 100000, 999999
     """
     return random.choices(range(100000, 999999), k=length)
+
+
+def clean_appolo_dir():
+    # remove data dir
+    subprocess.run(f"rm -rf {APOLLO_ROOT}/data".split())
+
+    # remove records dir
+    subprocess.run(f"rm -rf {APOLLO_ROOT}/records".split())
+
+    # remove logs
+    fileList = glob.glob(f'{APOLLO_ROOT}/*.log.*')
+    for filePath in fileList:
+        os.remove(filePath)
+    # create data dir
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/bag".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/log".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/core".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
+
+
+def save_record_files(dest: str):
+    dest = os.path.join(RECORDS_DIR, dest)
+    if not os.path.exists(dest):
+        os.mkdir(dest)
+    else:
+        shutil.rmtree(dest)
+        os.mkdir(dest)
+
+    fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
+    for filePath in fileList:
+        shutil.copy2(filePath, dest)

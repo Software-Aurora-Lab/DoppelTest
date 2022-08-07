@@ -22,6 +22,8 @@ APOLLO_VEHICLE_HEIGHT = 2.05
 
 APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/apollo'
 
+RECORDS_DIR = '/home/yuqi/ResearchWorkspace/MAGGIE/records'
+
 STREAM_LOGGING_LEVEL = logging.INFO
 
 USE_SIM_CONTROL_STANDALONE = True
