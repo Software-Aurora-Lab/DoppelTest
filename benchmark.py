@@ -1,24 +1,42 @@
 
 from modules.map.proto.map_pb2 import Map
-from scenario import Scenario, ScenarioGene
-from scenario.ScenarioRunner import ScenarioRunner
+from apollo.ApolloContainer import ApolloContainer
+from automation.Chromosome import Chromosome
+from automation.section_ad import AD, ADSection
+from automation.section_pd import PDSection
+from automation.section_tc import TCSection
+from scenario.ApolloRunner import ApolloRunner, PositionEstimate
+from scenario.ChromosomeRunner import ChromosomeRunner
+from utils.config import APOLLO_ROOT
 
 map = Map()
 f = open('./data/maps/borregas_ave_fix/base_map.bin', 'rb')
 map.ParseFromString(f.read())
 
-scene = Scenario(map, [('lane_25', 'lane_27'), ('lane_25', 'lane_27'),
-                 ('lane_25', 'lane_27'), ('lane_25', 'lane_27'), ('lane_25', 'lane_27')])
-gene1 = ScenarioGene(
-    [1000, 1000, 1000, 1000, 1000],
-    [(5, 20), (15, 20), (25, 20), (35, 20), (45, 20)])
+chromosome = Chromosome(
+    ADSection(
+        [AD(PositionEstimate('lane_25',  5), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 15), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 25), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 35), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 45), PositionEstimate('lane_27', 20), 1)]
+    ),
+    PDSection([]),
+    TCSection(dict(), dict(), 0, 0, 0)
+)
+
+containers = [ApolloContainer(APOLLO_ROOT, f'ROUTE_{x}') for x in range(5)]
+for ctn in containers:
+    ctn.start_instance()
+    ctn.start_dreamview()
+    print(f'Dreamview running at http://{ctn.ip}:{ctn.port}')
 
 
-scenario_runner = ScenarioRunner(scene)
-scenario_runner.start_instances()
+runner = ChromosomeRunner(map, containers)
 counter = 0
 while True:
-    scenario_runner.initialize_scenario(gene1)
-    scenario_runner.run('benchmark', 30)
-    counter += 1
     print(counter)
+    runner.set_chromosome(chromosome)
+    runner.init_scenario()
+    runner.run_scenario()
+    counter += 1
