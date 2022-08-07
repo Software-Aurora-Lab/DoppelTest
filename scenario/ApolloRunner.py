@@ -93,7 +93,7 @@ class ApolloRunner:
             Reset data, stop running modules, stop sim control
             send localization, restart sim control, restart running modules
         '''
-        self.logger.info(
+        self.logger.debug(
             f'Initializing container {self.container.container_name}')
 
         # initialize container
@@ -111,7 +111,9 @@ class ApolloRunner:
         self.localization = None
         self.register_subscribers()
 
-        self.logger.info(
+        self.container.bridge.spin()
+
+        self.logger.debug(
             f'Initialized container {self.container.container_name}')
 
     def should_send_routing(self, t: float):
@@ -191,7 +193,7 @@ class ApolloRunner:
         return None
 
     def stop(self, stop_reason: str):
-        self.logger.info('Stopping container')
+        self.logger.debug('Stopping container')
         self.container.stop_all()
         self.is_running = False
         self.logger.debug(f"STOPPED [{stop_reason}]")
