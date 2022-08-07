@@ -10,7 +10,7 @@ from modules.map.proto.map_junction_pb2 import Junction
 from modules.map.proto.map_crosswalk_pb2 import Crosswalk
 from shapely.geometry import MultiLineString, LineString
 
-from map.utils import get_distance, get_overlap_ids
+from map.utils import get_distance, get_overlap_ids, merge_cw, share_edge
 
 
 class MapAnalyzer:
@@ -35,7 +35,10 @@ class MapAnalyzer:
         self.load_junctions()
         self.load_signals()
         self.load_crosswalks()
-        self.logger.info('Ready')
+        self.logger.info('Loaded {}L, {}J, {}S, {}CW.'.format(
+            len(self.lanes), len(self.junctions), len(
+                self.signals), len(self.crosswalks)
+        ))
 
     def load_lanes(self):
         self.logger.debug('Loading lanes')
@@ -98,6 +101,27 @@ class MapAnalyzer:
         for cw in self.map.crosswalk:
             self.crosswalks[cw.id.id] = cw
 
+        should_analyze = True
+        while should_analyze:
+            should_analyze = False
+            # analyze overlapping junction
+            g = nx.Graph()
+            for cw1 in self.crosswalks:
+                for cw2 in self.crosswalks:
+                    if cw1 == cw2:
+                        continue
+                    if share_edge(self.crosswalks[cw1], self.crosswalks[cw2]):
+                        g.add_edge(cw1, cw2)
+
+            # merge crosswalks
+            for edge in g.edges:
+                cw1, cw2 = edge
+                merged = merge_cw(self.crosswalks[cw1], self.crosswalks[cw2])
+                del self.crosswalks[cw1]
+                del self.crosswalks[cw2]
+                self.crosswalks[merged.id.id] = merged
+                should_analyze = True
+
     def get_signals_wrt(self, signal_id: str) -> List[str]:
         assert signal_id in self.signals
         for u, v in self._signals.out_edges(signal_id):
@@ -119,15 +143,6 @@ class MapAnalyzer:
             s_oids = get_overlap_ids(signal)
             if j_oids & s_oids != set():
                 result.append(signal.id.id)
-        return result
-
-    def get_crosswalk_in_junction(self, junction: Junction) -> List[str]:
-        result = list()
-        j_oids = get_overlap_ids(junction)
-        for cw in self.map.crosswalk:
-            c_oids = get_overlap_ids(cw)
-            if j_oids & c_oids != set():
-                result.append(cw.id.id)
         return result
 
     def get_cw_lanes_overlap(self, cw: Crosswalk) -> List[str]:
