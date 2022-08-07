@@ -8,7 +8,7 @@ from automation.Chromosome import Chromosome
 from modules.map.proto.map_pb2 import Map
 from scenario.ApolloRunner import ApolloRunner
 
-from utils import get_logger, get_scenario_logger, random_numeric_id
+from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files
 
 
 class ChromosomeRunner:
@@ -57,9 +57,10 @@ class ChromosomeRunner:
         for t in threads:
             t.join()
 
+        clean_appolo_dir()
         self.is_initialized = True
 
-    def run_scenario(self, upper_limit=30):
+    def run_scenario(self, run_id: str, upper_limit=30, save_record=False):
         self.logger.info('Running scenario')
         if self.curr_chromosome is None or not self.is_initialized:
             return
@@ -70,6 +71,9 @@ class ChromosomeRunner:
         runner_time = 0
         scenario_logger = get_scenario_logger()
         # starting scenario
+        if save_record:
+            for r in self.__runners:
+                r.container.start_recorder(run_id)
         while True:
             exit_reasons = list()
             for ar in self.__runners:
@@ -91,6 +95,13 @@ class ChromosomeRunner:
                 break
             time.sleep(0.1)
             runner_time += 100
+
+        if save_record:
+            for r in self.__runners:
+                r.container.stop_recorder()
+            # buffer period for recorders to stop
+            time.sleep(2)
+            save_record_files()
         # scenario ended
         for runner in self.__runners:
             runner.stop('MAIN')
