@@ -1,9 +1,15 @@
-from typing import List, Optional, Tuple
+from itertools import combinations
+from typing import List, Optional, Set, Tuple
 from modules.common.proto.geometry_pb2 import PointENU
 from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import Lane
+from modules.map.proto.map_signal_pb2 import Signal
 from shapely.geometry import MultiLineString, LineString
 import math
+
+
+def get_distance(p1: PointENU, p2: PointENU):
+    return abs(math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2))
 
 
 def points_to_segments(points: List[PointENU]):
@@ -19,6 +25,13 @@ def get_lane_by_id(map: Map, id: str) -> Optional[Lane]:
     for l in map.lane:
         if l.id.id == id:
             return l
+    return None
+
+
+def get_signal_by_id(map: Map, id: str) -> Optional[Signal]:
+    for signal in map.signal:
+        if signal.id.id == id:
+            return signal
     return None
 
 
@@ -43,3 +56,7 @@ def get_coordinate_for(lane: Lane, s: float) -> Tuple[PointENU, float]:
     x2, y2 = line.coords[1]
 
     return (PointENU(x=ip.x, y=ip.y), math.atan2(y2-y1, x2-x1))
+
+
+def get_overlap_ids(obj: object) -> Set[str]:
+    return set([x.id for x in obj.overlap_id])
