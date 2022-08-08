@@ -1,4 +1,5 @@
 
+from collections import defaultdict
 from dataclasses import dataclass
 from random import choice, randint, uniform
 from typing import List
@@ -42,7 +43,7 @@ class AD:
         final_lane = choice(reachable[init_lane])
         final = PositionEstimate(
             final_lane, uniform(
-                5.0, ma.get_lane_data(final_lane)['length'])
+                ma.get_lane_data(final_lane)['length']*0.5, ma.get_lane_data(final_lane)['length'])
         )
         return AD(
             initial_position=initial,
@@ -67,8 +68,16 @@ class ADSection:
     def get_one(ma: MapAnalyzer):
         num = randint(2, 5)
         result = list()
+        should_add = True
         while len(result) < num:
-            result.append(AD.get_one(ma))
+            new_ad = AD.get_one(ma)
+            # check if it overlap with any existing one
+            should_add = True
+            for ad in result:
+                if new_ad.initial_position.is_too_close(ad.initial_position):
+                    should_add = False
+            if should_add:
+                result.append(AD.get_one(ma))
         result = ADSection(result)
         result.adjust_time()
         return result
