@@ -72,8 +72,10 @@ class ChromosomeRunner:
         self.is_initialized = True
 
     def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False):
+        num_adc = len(self.curr_chromosome.AD.adcs)
         self.logger.info(
-            f'{len(self.curr_chromosome.AD.adcs)} agents running a scenario.')
+            f'{num_adc} agents running a scenario G{self.curr_chromosome.gid}S{self.curr_chromosome.cid}.'
+        )
         if self.curr_chromosome is None or not self.is_initialized:
             return
 
