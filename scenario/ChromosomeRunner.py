@@ -9,6 +9,7 @@ from modules.map.proto.map_pb2 import Map
 from scenario.ApolloRunner import ApolloRunner
 
 from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files
+from utils.config import RECORDS_DIR
 
 
 class ChromosomeRunner:
@@ -101,7 +102,7 @@ class ChromosomeRunner:
                 r.container.stop_recorder()
             # buffer period for recorders to stop
             time.sleep(2)
-            save_record_files()
+            save_record_files(run_id)
         # scenario ended
         for runner in self.__runners:
             runner.stop('MAIN')
