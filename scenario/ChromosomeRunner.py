@@ -20,6 +20,7 @@ class ChromosomeRunner:
     curr_chromosome: Optional[Chromosome]
     tm: TrafficControlManager
     is_initialized: bool
+    __instance = None
 
     __runners: List[ApolloRunner]
 
@@ -29,6 +30,11 @@ class ChromosomeRunner:
         self.containers = containers
         self.curr_chromosome = None
         self.is_initialized = False
+        ChromosomeRunner.__instance = self
+
+    @staticmethod
+    def get_instance():
+        return ChromosomeRunner.__instance
 
     def set_chromosome(self, c: Chromosome):
         self.logger.info('Setting chromosome')
