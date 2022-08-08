@@ -199,5 +199,4 @@ class RecordAnalyzer:
             'stop_sign': ss_analysis,
             'decisions': list(self.decisions.keys())
         }
-        print(result)
         return result
