@@ -15,11 +15,11 @@ map.ParseFromString(f.read())
 
 chromosome = Chromosome(
     ADSection(
-        [AD(PositionEstimate('lane_25',  5), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 15), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 25), PositionEstimate('lane_27', 20), 1),
+        [AD(PositionEstimate('lane_25', 25), PositionEstimate('lane_27', 20), 1),
          AD(PositionEstimate('lane_25', 35), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 45), PositionEstimate('lane_27', 20), 1)]
+         AD(PositionEstimate('lane_25', 45), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 55), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 65), PositionEstimate('lane_27', 20), 1)]
     ),
     PDSection([]),
     TCSection(dict(), dict(), 0, 0, 0)
@@ -38,5 +38,6 @@ while True:
     print(counter)
     runner.set_chromosome(chromosome)
     runner.init_scenario()
-    runner.run_scenario()
+    runner.run_scenario(run_id='benchmark', upper_limit=55, save_record=True)
     counter += 1
+    break
