@@ -114,4 +114,3 @@ class ChromosomeRunner:
 
         self.is_initialized = False
         self.curr_chromosome = None
-        self.logger.info('Scenario ended')
