@@ -1,13 +1,9 @@
 from collections import defaultdict
 from datetime import datetime
-import math
 from statistics import mean
-import time
-from tracemalloc import start
 from cyber_record.record import Record
 from shapely.geometry import Point
 from apollo.utils import generate_polygon
-from utils import zero_velocity
 from utils.config import APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH
 from shapely.geometry import Polygon
 
@@ -132,7 +128,6 @@ class RecordAnalyzer:
             else:
                 # None got updated
                 continue
-
             if localization and perception:
                 polygon_points = generate_polygon(
                     localization.pose.position, localization.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
