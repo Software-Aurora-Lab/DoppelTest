@@ -3,6 +3,7 @@ import threading
 import time
 from typing import List, Optional
 from apollo.ApolloContainer import ApolloContainer
+from apollo.CyberBridge import Topics
 from apollo.MessageBroker import MessageBroker
 from automation.Chromosome import Chromosome
 from modules.map.proto.map_pb2 import Map
@@ -10,6 +11,7 @@ from scenario.ApolloRunner import ApolloRunner
 
 from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
 from utils.config import RECORDS_DIR
+from scenario.TrafficManager import TrafficControlManager
 
 
 class ChromosomeRunner:
@@ -17,6 +19,7 @@ class ChromosomeRunner:
     map: Map
     containers: List[ApolloContainer]
     curr_chromosome: Optional[Chromosome]
+    tm: TrafficControlManager
     is_initialized: bool
 
     __runners: List[ApolloRunner]
@@ -60,6 +63,7 @@ class ChromosomeRunner:
             t.join()
 
         clean_appolo_dir()
+        self.tm = TrafficControlManager(self.curr_chromosome.TC)
         self.is_initialized = True
 
     def run_scenario(self, run_id: str, upper_limit=30, save_record=False):
@@ -77,6 +81,8 @@ class ChromosomeRunner:
             for r in self.__runners:
                 r.container.start_recorder(run_id)
         while True:
+            tld = self.tm.get_traffic_configuration(runner_time/1000)
+            mbk.broadcast(Topics.TrafficLight, tld.SerializeToString())
             for ar in self.__runners:
                 if ar.should_send_routing(runner_time):
                     ar.send_routing()
