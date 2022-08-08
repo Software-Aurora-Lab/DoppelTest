@@ -124,8 +124,10 @@ class MapAnalyzer:
 
     def get_signals_wrt(self, signal_id: str) -> List[str]:
         assert signal_id in self.signals
+        result = list()
         for u, v in self._signals.out_edges(signal_id):
-            print(u, v, self._signals.edges[(u, v)]['value'])
+            result.append((v, self._signals.edges[(u, v)]['value']))
+        return result
 
     def get_lanes_controlled_by_signal(self, signal: Signal) -> List[Lane]:
         lanes = []
