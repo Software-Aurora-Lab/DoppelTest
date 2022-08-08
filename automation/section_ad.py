@@ -74,7 +74,7 @@ class ADSection:
                 if new_ad.initial_position.is_too_close(ad.initial_position):
                     should_add = False
             if should_add:
-                result.append(AD.get_one(ma))
+                result.append(new_ad)
         result = ADSection(result)
         result.adjust_time()
         return result
