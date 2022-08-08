@@ -25,8 +25,8 @@ class Chromosome:
     PD: PDSection
     TC: TCSection
 
-    gid: str = ''  # generation id
-    cid: str = ''  # chromosome id
+    gid: int = -1  # generation id
+    cid: int = -1  # chromosome id
     fitness: base.Fitness = ChromosomeFitness()
 
     @staticmethod
