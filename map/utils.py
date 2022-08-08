@@ -1,6 +1,5 @@
-from itertools import combinations
 from typing import List, Optional, Set, Tuple
-from modules.common.proto.geometry_pb2 import PointENU, Polygon
+from modules.common.proto.geometry_pb2 import PointENU
 from modules.map.proto.map_pb2 import Map
 from modules.map.proto.map_lane_pb2 import Lane
 from modules.map.proto.map_signal_pb2 import Signal

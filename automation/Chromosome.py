@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 import dataclasses
-from random import random
 from deap import base
 from automation.section_ad import ADSection
 from automation.section_pd import PDSection
 from automation.section_tc import TCSection
-from modules.map.proto.map_pb2 import Map
 from map.MapAnalyzer import MapAnalyzer
 
 # Problem Encoding

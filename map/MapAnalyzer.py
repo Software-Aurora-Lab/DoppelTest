@@ -9,7 +9,7 @@ import networkx as nx
 from modules.map.proto.map_signal_pb2 import Signal
 from modules.map.proto.map_junction_pb2 import Junction
 from modules.map.proto.map_crosswalk_pb2 import Crosswalk
-from shapely.geometry import MultiLineString, LineString
+from shapely.geometry import MultiLineString
 
 from map.utils import get_distance, get_overlap_ids, merge_cw, share_edge
 

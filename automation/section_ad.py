@@ -1,12 +1,9 @@
 
-from collections import defaultdict
 from dataclasses import dataclass
 from random import choice, randint, uniform
 from typing import List
 from map.MapAnalyzer import MapAnalyzer
-
 from scenario.ApolloRunner import PositionEstimate
-from modules.map.proto.map_pb2 import Map
 
 
 @dataclass

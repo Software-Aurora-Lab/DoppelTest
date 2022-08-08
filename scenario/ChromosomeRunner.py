@@ -10,7 +10,6 @@ from modules.map.proto.map_pb2 import Map
 from scenario.ApolloRunner import ApolloRunner
 
 from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
-from utils.config import RECORDS_DIR
 from scenario.TrafficManager import TrafficControlManager
 
 

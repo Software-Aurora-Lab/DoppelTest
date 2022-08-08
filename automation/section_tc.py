@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from random import randint, shuffle
 from typing import Dict
-from modules.map.proto.map_pb2 import Map
 from map.MapAnalyzer import MapAnalyzer
 
 

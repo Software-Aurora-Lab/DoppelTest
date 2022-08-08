@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 from modules.common.proto.geometry_pb2 import PointENU
-from modules.map.proto.map_pb2 import Map
 
 from map.MapAnalyzer import MapAnalyzer
 
