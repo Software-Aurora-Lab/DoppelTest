@@ -20,6 +20,9 @@ class PositionEstimate:
     lane_id: str
     s: float
 
+    def is_too_close(self, rhs):
+        return self.lane_id == rhs.lane_id and abs(self.s-rhs.s) < 10
+
 
 class ApolloRunner:
     logger: Logger
