@@ -1,6 +1,6 @@
 
 import glob
-from random import choices, random, choice, randint
+from random import choices, random, choice, randint, sample
 from unittest import runner
 from modules.map.proto.map_pb2 import Map
 from map.MapAnalyzer import MapAnalyzer
@@ -127,8 +127,8 @@ def cx_ad(ad1: ADSection, ad2: ADSection):
     new_ad1_length = randint(2, 5)
     new_ad2_length = randint(2, 5)
 
-    return ADSection(choices(adcs, k=new_ad1_length)), ADSection(
-        choices(adcs, k=new_ad2_length))
+    return ADSection(sample(adcs, k=new_ad1_length)), ADSection(
+        sample(adcs, k=new_ad2_length))
 
 
 def cx_pd(pd1: PDSection, pd2: PDSection):
@@ -210,8 +210,8 @@ def main():
     runner = ChromosomeRunner(map, containers)
 
     # GA Hyperparameters
-    POP_SIZE = 50
-    OFF_SIZE = 50  # number of offspring to produce
+    POP_SIZE = 5
+    OFF_SIZE = 5  # number of offspring to produce
     CXPB = 0.5  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
