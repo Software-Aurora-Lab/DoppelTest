@@ -24,6 +24,7 @@ class MapAnalyzer:
     _lanes: nx.DiGraph
     _signals: nx.DiGraph
     _junction_lanes: dict
+    __instance = None
 
     def __init__(self, map: Map) -> None:
         self.logger = get_logger('MapAnalyzer')
@@ -42,6 +43,11 @@ class MapAnalyzer:
             len(self.lanes), len(self.junctions), len(
                 self.signals), len(self.crosswalks)
         ))
+        MapAnalyzer.__instance = self
+
+    @staticmethod
+    def get_instance():
+        return MapAnalyzer.__instance
 
     def load_lanes(self):
         self.logger.debug('Loading lanes')
