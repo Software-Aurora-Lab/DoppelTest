@@ -37,12 +37,12 @@ class ChromosomeRunner:
         return ChromosomeRunner.__instance
 
     def set_chromosome(self, c: Chromosome):
-        self.logger.info('Setting chromosome')
+        self.logger.debug('Setting chromosome')
         self.curr_chromosome = c
         self.is_initialized = False
 
     def init_scenario(self):
-        self.logger.info('Initializing Scenario')
+        self.logger.debug('Initializing Scenario')
         nids = random_numeric_id(len(self.curr_chromosome.AD.adcs))
         self.__runners = list()
         for i, c, a in zip(nids, self.containers, self.curr_chromosome.AD.adcs):
@@ -72,9 +72,8 @@ class ChromosomeRunner:
         self.is_initialized = True
 
     def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False):
-        self.logger.info('Running scenario')
         self.logger.info(
-            f'{len(self.curr_chromosome.AD.adcs)} agents running.')
+            f'{len(self.curr_chromosome.AD.adcs)} agents running a scenario.')
         if self.curr_chromosome is None or not self.is_initialized:
             return
 
@@ -116,7 +115,7 @@ class ChromosomeRunner:
             runner.stop('MAIN')
         mbk.stop()
 
-        self.logger.info(
+        self.logger.debug(
             f'Scenario ended. Length: {round(runner_time/1000, 2)} seconds.')
 
         self.is_initialized = False
