@@ -1,7 +1,10 @@
 from dataclasses import dataclass
-from random import shuffle
+from mimetypes import init
+from random import randint, shuffle
 from typing import Dict
 from modules.map.proto.map_pb2 import Map
+from random import random
+from map.MapAnalyzer import MapAnalyzer
 
 
 @dataclass
@@ -28,20 +31,34 @@ class TCSection:
     duration_b: float
 
     @staticmethod
-    def get_one(map: Map):
-        initial = dict()
-        # retrieve all signals on the map
-        signals = list()
+    def generate_config(ma: MapAnalyzer, preference=[]):
+        result = dict()
+        signals = list(ma.signals.keys())
         shuffle(signals)
-        # while there is unassigned signal
-        # pick one signal, assign a color
-        # assign same color to equality group
-        # assign opposite color to inequality group
+        while len(signals) > 0:
+            if len(preference) > 0:
+                curr_sig = preference.pop()
+                signals.remove(curr_sig)
+            else:
+                curr_sig = signals.pop(0)
+            result[curr_sig] = 'GREEN'
+            relevant = ma.get_signals_wrt(curr_sig)
+            for sig, cond in relevant:
+                signals.remove(sig)
+                if cond == 'EQ':
+                    result[sig] = 'GREEN'
+                else:
+                    result[sig] = 'RED'
+        return result
 
-        final = TCSection.invert_color(map, initial)
-        dg = 10
-        dy = 10
-        db = 3
+    @staticmethod
+    def get_one(ma: MapAnalyzer):
+        initial = TCSection.generate_config(ma)
+        final = TCSection.generate_config(
+            ma, list(k for k in initial if initial[k] == 'RED'))
+        dg = randint(10, 30)
+        dy = 3
+        db = 2
         return TCSection(
             initial,
             final,
@@ -49,28 +66,3 @@ class TCSection:
             dy,
             db
         )
-
-    @staticmethod
-    def invert_color(map: Map, configuration: Dict[str, str]):
-        # while there is unassigned signal
-        # pick one signal, invert its color
-        # assign same color to equality group
-        # assign opposite color to inequality group
-        signals = list(configuration.keys())
-        shuffle(signals)
-        result = dict()
-        # while there is uninverted signal
-        while len(signals) > 0:
-            # pick one signal
-            picked = signals.pop()
-
-            # invert its color
-            original = configuration[picked]
-            inverted = 'RED' if original == 'GREEN' else 'GREEN'
-            result[picked] = inverted
-
-            # assign same color to equality group
-
-            # assign opposite color to inequality group
-
-        return result
