@@ -66,7 +66,7 @@ class ChromosomeRunner:
         self.tm = TrafficControlManager(self.curr_chromosome.TC)
         self.is_initialized = True
 
-    def run_scenario(self, run_id: str, upper_limit=30, save_record=False):
+    def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False):
         self.logger.info('Running scenario')
         if self.curr_chromosome is None or not self.is_initialized:
             return
@@ -102,6 +102,7 @@ class ChromosomeRunner:
             # buffer period for recorders to stop
             time.sleep(2)
             save_record_files_and_chromosome(
+                generation_name,
                 run_id, self.curr_chromosome.to_dict())
         # scenario ended
         for runner in self.__runners:
