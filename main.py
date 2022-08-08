@@ -1,4 +1,5 @@
 
+import glob
 from random import choices, random, choice, randint
 from unittest import runner
 from modules.map.proto.map_pb2 import Map
@@ -10,8 +11,9 @@ from automation.section_tc import TCSection
 from apollo.ApolloContainer import ApolloContainer
 from scenario.ChromosomeRunner import ChromosomeRunner
 from utils import get_logger
-from utils.config import APOLLO_ROOT
+from utils.config import APOLLO_ROOT, RECORDS_DIR
 from deap import tools, creator, base, algorithms
+from automation.RecordAnalyzer import RecordAnalyzer
 
 
 # Mutation
@@ -169,7 +171,19 @@ def eval(ind: Chromosome):
         run_id=s_name,
         upper_limit=55, save_record=True
     )
-    return random(), random()
+
+    test_records = glob.glob(f'{RECORDS_DIR}/{g_name}/{s_name}/apollo*')
+    ra = RecordAnalyzer()
+
+    distances = list()
+    decisions = set()
+
+    for f in test_records:
+        result = ra.analyze_record(f)
+        distances.append(result['min_distance'])
+        decisions = decisions.union(set(result['decisions']))
+
+    return min(distances), len(decisions)
 
 
 # Main
@@ -215,6 +229,7 @@ def main():
     hof = tools.ParetoFront()
 
     # Evaluate Initial Population
+    logger.info(f' ====== Analyzing Initial Population ====== ')
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
     fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
     for ind, fit in zip(invalid_ind, fitnesses):
