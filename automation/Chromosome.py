@@ -16,7 +16,7 @@ class ChromosomeFitness(base.Fitness):
     # # of unique decisions triggered during simulation
     # ! # of agents not completing mission
     # ! # of module failure
-    weights = (1.0, -1.0)
+    weights = (-1.0, 1.0)
 
 
 @dataclass
