@@ -31,14 +31,19 @@ class TCSection:
     duration_y: float
     duration_b: float
 
-    @staticmethod
-    def calculate_transition(initial: dict, final: dict):
+    def calculate_transition(self):
         result = dict()
-        for k in initial:
-            if initial[k] == 'GREEN' and final[k] == 'RED':
+        for k in self.initial:
+            if self.initial[k] == 'GREEN' and self.final[k] == 'RED':
                 result[k] = 'YELLOW'
             else:
-                result[k] = initial[k]
+                result[k] = self.initial[k]
+        return result
+
+    def get_all(self, color: str):
+        result = dict()
+        for k in self.initial:
+            result[k] = color
         return result
 
     @staticmethod
