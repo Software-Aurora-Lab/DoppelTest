@@ -1,4 +1,5 @@
 import glob
+import json
 import shutil
 import subprocess
 import math
@@ -110,7 +111,7 @@ def clean_appolo_dir():
     subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
 
 
-def save_record_files(dest: str):
+def save_record_files_and_chromosome(dest: str, ch: dict):
     dest = os.path.join(RECORDS_DIR, dest)
     if not os.path.exists(dest):
         os.mkdir(dest)
@@ -121,3 +122,7 @@ def save_record_files(dest: str):
     fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
     for filePath in fileList:
         shutil.copy2(filePath, dest)
+
+    dest_file = os.path.join(dest, "c.json")
+    with open(dest_file, 'w') as fp:
+        json.dump(ch, fp, indent=4)
