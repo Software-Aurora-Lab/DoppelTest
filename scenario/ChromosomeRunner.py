@@ -84,7 +84,7 @@ class ChromosomeRunner:
             tld = self.tm.get_traffic_configuration(runner_time/1000)
             mbk.broadcast(Topics.TrafficLight, tld.SerializeToString())
             for ar in self.__runners:
-                if ar.should_send_routing(runner_time):
+                if ar.should_send_routing(runner_time/1000):
                     ar.send_routing()
 
             if runner_time % 100 == 0:
