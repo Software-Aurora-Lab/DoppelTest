@@ -11,6 +11,7 @@ class AD:
     initial_position: PositionEstimate
     final_position: PositionEstimate
     start_time: float
+    apollo_container: str = ''
 
 
 @dataclass

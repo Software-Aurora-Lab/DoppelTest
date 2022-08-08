@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import dataclasses
 from random import random
 from deap import base
 from automation.section_ad import ADSection
@@ -33,6 +34,13 @@ class Chromosome:
             PD=PDSection.get_one(map),
             TC=TCSection.get_one(map),
         )
+
+    def to_dict(self):
+        return {
+            "AD": dataclasses.asdict(self.AD),
+            "PD": dataclasses.asdict(self.PD),
+            "TC": dataclasses.asdict(self.TC),
+        }
 
 # Evaluation
 # ================================================================================
