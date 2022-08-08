@@ -100,6 +100,7 @@ class ChromosomeRunner:
                     f'Scenario time: {round(runner_time / 1000, 1)}.')
 
             if runner_time / 1000 >= upper_limit:
+                scenario_logger.info('\n')
                 break
             time.sleep(0.1)
             runner_time += 100
