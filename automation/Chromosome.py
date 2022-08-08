@@ -26,6 +26,9 @@ class Chromosome:
     AD: ADSection
     PD: PDSection
     TC: TCSection
+
+    gid: str = ''  # generation id
+    cid: str = ''  # chromosome id
     fitness: base.Fitness = ChromosomeFitness()
 
     @staticmethod
