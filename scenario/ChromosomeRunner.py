@@ -77,23 +77,15 @@ class ChromosomeRunner:
             for r in self.__runners:
                 r.container.start_recorder(run_id)
         while True:
-            exit_reasons = list()
             for ar in self.__runners:
                 if ar.should_send_routing(runner_time):
                     ar.send_routing()
-                exit_reasons.append(ar.get_exit_reason())
 
             if runner_time % 100 == 0:
                 scenario_logger.info(
-                    f'Scenario time: {round(runner_time / 1000, 1)}. Status: {exit_reasons}')
+                    f'Scenario time: {round(runner_time / 1000, 1)}.')
 
-            if all(exit_reasons):
-                scenario_logger.info("\n")
-                self.logger.info(f'Stop reasons: {exit_reasons}')
-                break
-            elif runner_time / 1000 > upper_limit:
-                self.logger.info(
-                    f'Stopped. Scenario over {upper_limit} seconds')
+            if runner_time / 1000 >= upper_limit:
                 break
             time.sleep(0.1)
             runner_time += 100
