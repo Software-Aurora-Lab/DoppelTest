@@ -111,7 +111,14 @@ def clean_appolo_dir():
     subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
 
 
+def make_dir_for_generation(generation_name: str):
+    dest = os.path.join(RECORDS_DIR, generation_name)
+    if not os.path.exists(dest):
+        os.mkdir(dest)
+
+
 def save_record_files_and_chromosome(generation_name: str, run_id: str, ch: dict):
+    make_dir_for_generation(generation_name)
     dest = os.path.join(RECORDS_DIR, generation_name, run_id)
     if not os.path.exists(dest):
         os.mkdir(dest)
@@ -126,12 +133,3 @@ def save_record_files_and_chromosome(generation_name: str, run_id: str, ch: dict
     dest_file = os.path.join(dest, "c.json")
     with open(dest_file, 'w') as fp:
         json.dump(ch, fp, indent=4)
-
-
-def make_dir_for_generation(generation_name: str):
-    dest = os.path.join(RECORDS_DIR, generation_name)
-    if not os.path.exists(dest):
-        os.mkdir(dest)
-    else:
-        shutil.rmtree(dest)
-        os.mkdir(dest)
