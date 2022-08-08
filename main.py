@@ -124,8 +124,8 @@ def cx_ad(ad1: ADSection, ad2: ADSection):
         if can_add:
             adcs.append(b)
 
-    new_ad1_length = randint(2, 5)
-    new_ad2_length = randint(2, 5)
+    new_ad1_length = min(randint(2, 5), len(adcs))
+    new_ad2_length = min(randint(2, 5), len(adcs))
 
     return ADSection(sample(adcs, k=new_ad1_length)), ADSection(
         sample(adcs, k=new_ad2_length))
@@ -159,6 +159,7 @@ def cx(ind1: Chromosome, ind2: Chromosome):
 
 
 def eval(ind: Chromosome):
+    return 0, 0
     # closest distance between pair of ADC
     # # of unique decisions triggered during simulation
     runner = ChromosomeRunner.get_instance()
