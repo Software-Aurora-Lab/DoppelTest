@@ -3,6 +3,8 @@ from typing import List
 from modules.common.proto.geometry_pb2 import PointENU
 from modules.map.proto.map_pb2 import Map
 
+from map.MapAnalyzer import MapAnalyzer
+
 
 @dataclass
 class PD:
@@ -18,5 +20,5 @@ class PDSection:
     pds: List[PD]
 
     @staticmethod
-    def get_one(map: Map):
-        pass
+    def get_one(ma: MapAnalyzer):
+        return PDSection(list())
