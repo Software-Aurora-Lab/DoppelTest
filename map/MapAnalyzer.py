@@ -1,3 +1,4 @@
+from collections import defaultdict
 from itertools import combinations
 from logging import Logger
 from utils import get_logger
@@ -22,6 +23,7 @@ class MapAnalyzer:
     crosswalks: Dict[str, Crosswalk]
     _lanes: nx.DiGraph
     _signals: nx.DiGraph
+    _junction_lanes: dict
 
     def __init__(self, map: Map) -> None:
         self.logger = get_logger('MapAnalyzer')
@@ -31,8 +33,9 @@ class MapAnalyzer:
         self.junctions = dict()
         self.signals = dict()
         self.crosswalks = dict()
-        self.load_lanes()
+        self._junction_lanes = defaultdict(lambda: list())
         self.load_junctions()
+        self.load_lanes()
         self.load_signals()
         self.load_crosswalks()
         self.logger.info('Loaded {}L, {}J, {}S, {}CW.'.format(
@@ -52,6 +55,11 @@ class MapAnalyzer:
             length = line_segment.length
             DG.add_node(lane.id.id, start=lane_start,
                         end=lane_end, length=length)
+            for junction in self.junctions:
+                j_oids = get_overlap_ids(self.junctions[junction])
+                oids = get_overlap_ids(lane)
+                if j_oids & oids != set():
+                    self._junction_lanes[junction].append(lane.id.id)
         for node1 in DG:
             for node2 in DG:
                 if node1 == node2:
@@ -122,6 +130,18 @@ class MapAnalyzer:
                 self.crosswalks[merged.id.id] = merged
                 should_analyze = True
 
+    def get_lane_data(self, lane_id: str):
+        assert lane_id in self.lanes
+        return self._lanes.nodes[lane_id]
+
+    def get_reachable_lanes(self, lane_id: str):
+        assert lane_id in self.lanes
+        result = list()
+        for u, v in self._lanes.out_edges(lane_id):
+            result.append(v)
+            result += self.get_reachable_lanes(v)
+        return result
+
     def get_signals_wrt(self, signal_id: str) -> List[str]:
         assert signal_id in self.signals
         result = list()
@@ -137,6 +157,9 @@ class MapAnalyzer:
             if signal_oids & lane_oids != set():
                 lanes.append(lane)
         return lanes
+
+    def get_lanes_in_junction(self, junction: Junction) -> List[str]:
+        return self._junction_lanes[junction.id.id]
 
     def get_signals_in_junction(self, junction: Junction) -> List[str]:
         result = list()
