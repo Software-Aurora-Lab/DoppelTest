@@ -1,9 +1,7 @@
 from dataclasses import dataclass
-from mimetypes import init
 from random import randint, shuffle
 from typing import Dict
 from modules.map.proto.map_pb2 import Map
-from random import random
 from map.MapAnalyzer import MapAnalyzer
 
 
@@ -18,11 +16,14 @@ class TCSection:
     final: Dict[str, str]
         the final configuration for every traffic signal on the map
     duration_g: float
-        number of seconds for signal being green
+        number of seconds for signal being green 
+        allowedValue: [10, 30)
     duration_y: float
-        number of seconds for signal being yellow
+        number of seconds for signal being yellow 
+        allowedValue: 3
     duration_b: float
-        buffer period, where all signals go red
+        buffer period, where all signals go red 
+        allwedValue: 2
     """
     initial: Dict[str, str]
     final: Dict[str, str]
