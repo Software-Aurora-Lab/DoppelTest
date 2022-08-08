@@ -31,6 +31,16 @@ class TCSection:
     duration_b: float
 
     @staticmethod
+    def calculate_transition(initial: dict, final: dict):
+        result = dict()
+        for k in initial:
+            if initial[k] == 'GREEN' and final[k] == 'RED':
+                result[k] = 'YELLOW'
+            else:
+                result[k] = initial[k]
+        return result
+
+    @staticmethod
     def generate_config(ma: MapAnalyzer, preference=[]):
         result = dict()
         signals = list(ma.signals.keys())
