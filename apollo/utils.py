@@ -45,6 +45,46 @@ def generate_polygon(position: Point3D, theta: float, length: float, width: floa
     return points
 
 
+def generate_adc_polygon(position: Point3D, theta: float, length: float, width: float):
+    """
+    Generate polygon for the ADC
+
+    Parameters:
+        position: Point3D
+            position vector of the obstacle
+        theta: float
+            heading of the obstacle
+        length: float
+            length of the obstacle
+        width: float
+            width of the obstacle
+
+    Returns:
+        points: List[Point3D]
+            polygon points of the obstacle
+    """
+    points = []
+    half_l = length / 2.0
+    half_w = width / 2.0
+    sin_h = math.sin(theta)
+    cos_h = math.cos(theta)
+    vectors = [(length * cos_h - half_w * sin_h,
+                length * sin_h + half_w * cos_h),
+               (0 * cos_h - half_w * sin_h,
+                0 * sin_h + half_w * cos_h),
+               (0 * cos_h + half_w * sin_h,
+                0 * sin_h - half_w * cos_h),
+               (length * cos_h + half_w * sin_h,
+                length * sin_h - half_w * cos_h)]
+    for x, y in vectors:
+        p = Point3D()
+        p.x = position.x + x
+        p.y = position.y + y
+        p.z = position.z
+        points.append(p)
+    return points
+
+
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:
     """
     Converts LocalizationEstimate to PerceptionObstacle
@@ -76,7 +116,7 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         # sub_type=PerceptionObstacle.ST_CAR,
         timestamp=data.header.timestamp_sec,
         tracking_time=1.0,
-        polygon_point=generate_polygon(
+        polygon_point=generate_adc_polygon(
             position, data.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
     )
     return obs

@@ -3,7 +3,7 @@ from datetime import datetime
 from statistics import mean
 from cyber_record.record import Record
 from shapely.geometry import Point
-from apollo.utils import generate_polygon
+from apollo.utils import generate_adc_polygon
 from utils.config import APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH
 from shapely.geometry import Polygon
 
@@ -129,7 +129,7 @@ class RecordAnalyzer:
                 # None got updated
                 continue
             if localization and perception:
-                polygon_points = generate_polygon(
+                polygon_points = generate_adc_polygon(
                     localization.pose.position, localization.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
                 adc_polygon = Polygon(
                     sorted([(point.x, point.y) for point in polygon_points]))
