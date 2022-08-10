@@ -51,17 +51,13 @@ def generate_adc_polygon(position: Point3D, theta: float):
 
     Parameters:
         position: Point3D
-            position vector of the obstacle
+            localization pose of ADC
         theta: float
-            heading of the obstacle
-        length: float
-            length of the obstacle
-        width: float
-            width of the obstacle
+            heading of ADC
 
     Returns:
         points: List[Point3D]
-            polygon points of the obstacle
+            polygon points of the ADC
     """
     points = []
     half_w = APOLLO_VEHICLE_WIDTH / 2.0
@@ -114,7 +110,6 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         width=APOLLO_VEHICLE_WIDTH,
         height=APOLLO_VEHICLE_HEIGHT,
         type=PerceptionObstacle.VEHICLE,
-        # sub_type=PerceptionObstacle.ST_CAR,
         timestamp=data.header.timestamp_sec,
         tracking_time=1.0,
         polygon_point=generate_adc_polygon(
