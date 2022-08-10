@@ -130,7 +130,7 @@ class RecordAnalyzer:
                 continue
             if localization and perception:
                 polygon_points = generate_adc_polygon(
-                    localization.pose.position, localization.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
+                    localization.pose.position, localization.pose.heading)
                 adc_polygon = Polygon(
                     sorted([(point.x, point.y) for point in polygon_points]))
 

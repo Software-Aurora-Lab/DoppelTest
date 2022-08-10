@@ -2,7 +2,7 @@ import math
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from utils.config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH
+from utils.config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
 
 
 def generate_polygon(position: Point3D, theta: float, length: float, width: float):
@@ -45,7 +45,7 @@ def generate_polygon(position: Point3D, theta: float, length: float, width: floa
     return points
 
 
-def generate_adc_polygon(position: Point3D, theta: float, length: float, width: float):
+def generate_adc_polygon(position: Point3D, theta: float):
     """
     Generate polygon for the ADC
 
@@ -64,18 +64,19 @@ def generate_adc_polygon(position: Point3D, theta: float, length: float, width: 
             polygon points of the obstacle
     """
     points = []
-    half_l = length / 2.0
-    half_w = width / 2.0
+    half_w = APOLLO_VEHICLE_WIDTH / 2.0
+    front_l = APOLLO_VEHICLE_LENGTH - APOLLO_VEHICLE_back_edge_to_center
+    back_l = -1 * APOLLO_VEHICLE_back_edge_to_center
     sin_h = math.sin(theta)
     cos_h = math.cos(theta)
-    vectors = [(length * cos_h - half_w * sin_h,
-                length * sin_h + half_w * cos_h),
-               (0 * cos_h - half_w * sin_h,
-                0 * sin_h + half_w * cos_h),
-               (0 * cos_h + half_w * sin_h,
-                0 * sin_h - half_w * cos_h),
-               (length * cos_h + half_w * sin_h,
-                length * sin_h - half_w * cos_h)]
+    vectors = [(front_l * cos_h - half_w * sin_h,
+                front_l * sin_h + half_w * cos_h),
+               (back_l * cos_h - half_w * sin_h,
+                back_l * sin_h + half_w * cos_h),
+               (back_l * cos_h + half_w * sin_h,
+                back_l * sin_h - half_w * cos_h),
+               (front_l * cos_h + half_w * sin_h,
+                front_l * sin_h - half_w * cos_h)]
     for x, y in vectors:
         p = Point3D()
         p.x = position.x + x
@@ -117,6 +118,6 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         timestamp=data.header.timestamp_sec,
         tracking_time=1.0,
         polygon_point=generate_adc_polygon(
-            position, data.pose.heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
+            position, data.pose.heading)
     )
     return obs
