@@ -1,9 +1,11 @@
 
 from dataclasses import dataclass
-from random import choice, randint, uniform
+from random import choice, randint, random, uniform
 from typing import List
+from config import INSTANCE_MAX_WAIT_TIME
 from map.MapAnalyzer import MapAnalyzer
 from apollo.utils import PositionEstimate
+from map.utils import get_length_of_lane
 
 
 @dataclass
@@ -32,37 +34,27 @@ class AD:
 
     @staticmethod
     def get_one(ma: MapAnalyzer):
-        junction_lanes = list()
-        for junction in ma.junctions:
-            junction_lanes += ma.get_lanes_in_junction(ma.junctions[junction])
+        allowed_start = list(ma.get_lanes_not_in_junction())
+        start = None
+        routing = None
+        while True:
+            start = choice(allowed_start)
+            allowed_routing = ma.get_allowed_routing(start)
+            if len(allowed_routing) > 0:
+                routing = choice(allowed_routing)
+                break
 
-        chooseable = set(ma.lanes.keys()).difference(
-            set(junction_lanes))
+        print(start, routing)
+        start_length = get_length_of_lane(ma.lanes[start])
+        end_length = get_length_of_lane(ma.lanes[routing[-1]])
 
-        reachable = dict()
-        for k in chooseable:
-            reachable[k] = [
-                x for x in ma.get_reachable_lanes(k) if x in chooseable]
+        print()
 
-        for k in reachable:
-            if len(reachable[k]) == 0:
-                chooseable.remove(k)
-
-        init_lane = choice(list(chooseable))
-
-        initial = PositionEstimate(
-            init_lane, uniform(5.0, ma.get_lane_data(init_lane)['length']-5)
-        )
-
-        final_lane = choice(reachable[init_lane])
-        final = PositionEstimate(
-            final_lane, uniform(
-                ma.get_lane_data(final_lane)['length']*0.5, ma.get_lane_data(final_lane)['length'])
-        )
         return AD(
-            initial_position=initial,
-            final_position=final,
-            start_time=round(uniform(0, 15), 1)
+            routing,
+            random() * (start_length - 5),
+            random() * end_length,
+            randint(0, INSTANCE_MAX_WAIT_TIME),
         )
 
 
