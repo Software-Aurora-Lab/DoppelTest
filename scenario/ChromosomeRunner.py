@@ -1,16 +1,22 @@
-from logging import Logger
-import threading
 import time
-from typing import List, Optional
+import threading
+from logging import Logger
+from typing import List, Optional, Tuple
+
 from apollo.ApolloContainer import ApolloContainer
+from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Topics
 from apollo.MessageBroker import MessageBroker
 from automation.Chromosome import Chromosome
 from modules.map.proto.map_pb2 import Map
-from apollo.ApolloRunner import ApolloRunner
+from ..automation.section_ad import AD
+from scenario.TrafficManager import TrafficControlManager
+from scenario.PedestrianManager import PedestrianManager
 
 from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
-from scenario.TrafficManager import TrafficControlManager
+
+from shapely.geometry import LineString
+from matplotlib import pyplot as plt
 
 
 class ChromosomeRunner:
@@ -18,7 +24,8 @@ class ChromosomeRunner:
     map: Map
     containers: List[ApolloContainer]
     curr_chromosome: Optional[Chromosome]
-    tm: TrafficControlManager
+    pm: Optional[PedestrianManager]
+    tm: Optional[TrafficControlManager]
     is_initialized: bool
     __instance = None
 
@@ -57,6 +64,8 @@ class ChromosomeRunner:
                     start_time=a.start_time
                 )
             )
+
+        # initialize Apollo instances
         threads = list()
         for index in range(len(self.__runners)):
             threads.append(threading.Thread(
@@ -67,16 +76,21 @@ class ChromosomeRunner:
         for t in threads:
             t.join()
 
+        # remove Apollo logs
         clean_appolo_dir()
+
+        # initialize pedestrian and traffic control manager
+        self.pm = PedestrianManager(self.curr_chromosome.PD)
         self.tm = TrafficControlManager(self.curr_chromosome.TC)
         self.is_initialized = True
 
-    def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False):
+    def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False) -> List[Tuple(ApolloRunner, AD)]:
         num_adc = len(self.curr_chromosome.AD.adcs)
         self.logger.info(
             f'{num_adc} agents running a scenario G{self.curr_chromosome.gid}S{self.curr_chromosome.cid}.'
         )
         if self.curr_chromosome is None or not self.is_initialized:
+            print('Error: No chromosome or not initialized')
             return
 
         mbk = MessageBroker(self.__runners)
@@ -88,20 +102,28 @@ class ChromosomeRunner:
         if save_record:
             for r in self.__runners:
                 r.container.start_recorder(run_id)
+
+        # Begin Scenario Cycle
         while True:
+            # Publish TrafficLight
             tld = self.tm.get_traffic_configuration(runner_time/1000)
             mbk.broadcast(Topics.TrafficLight, tld.SerializeToString())
+
+            # Send Routing
             for ar in self.__runners:
                 if ar.should_send_routing(runner_time/1000):
                     ar.send_routing()
 
+            # Print Scenario Time
             if runner_time % 100 == 0:
                 scenario_logger.info(
                     f'Scenario time: {round(runner_time / 1000, 1)}.')
 
+            # Check if scenario exceeded upper limit
             if runner_time / 1000 >= upper_limit:
                 scenario_logger.info('\n')
                 break
+
             time.sleep(0.1)
             runner_time += 100
 
@@ -114,12 +136,13 @@ class ChromosomeRunner:
                 generation_name,
                 run_id, self.curr_chromosome.to_dict())
         # scenario ended
+        mbk.stop()
         for runner in self.__runners:
             runner.stop('MAIN')
-        mbk.stop()
 
         self.logger.debug(
             f'Scenario ended. Length: {round(runner_time/1000, 2)} seconds.')
 
         self.is_initialized = False
-        self.curr_chromosome = None
+
+        return list(zip(self.__runners, self.curr_chromosome.AD.adcs))
