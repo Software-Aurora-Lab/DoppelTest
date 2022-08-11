@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from logging import Logger
 import time
 from typing import Optional
@@ -12,16 +11,8 @@ from modules.map.proto.map_pb2 import Map
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import LaneWaypoint, RoutingRequest
 from utils import zero_velocity, get_logger
-from utils.config import USE_SIM_CONTROL_STANDALONE
-
-
-@dataclass
-class PositionEstimate:
-    lane_id: str
-    s: float
-
-    def is_too_close(self, rhs):
-        return self.lane_id == rhs.lane_id and abs(self.s-rhs.s) < 10
+from config import USE_SIM_CONTROL_STANDALONE
+from apollo.utils import PositionEstimate
 
 
 class ApolloRunner:

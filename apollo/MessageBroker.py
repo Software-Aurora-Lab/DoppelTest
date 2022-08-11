@@ -5,10 +5,10 @@ from threading import Thread
 from modules.common.proto.header_pb2 import Header
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from apollo.utils import localization_to_obstacle
-from scenario.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Channel, Topics
 from utils import get_logger
-from utils.config import PERCEPTION_FREQUENCY
+from config import PERCEPTION_FREQUENCY
+from apollo.ApolloRunner import ApolloRunner
 
 
 class MessageBroker:

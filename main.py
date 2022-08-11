@@ -11,7 +11,7 @@ from automation.section_tc import TCSection
 from apollo.ApolloContainer import ApolloContainer
 from scenario.ChromosomeRunner import ChromosomeRunner
 from utils import get_logger
-from utils.config import APOLLO_ROOT, RECORDS_DIR
+from config import APOLLO_ROOT, RECORDS_DIR
 from deap import tools, creator, base, algorithms
 from automation.RecordAnalyzer import RecordAnalyzer
 
@@ -97,7 +97,12 @@ def mut(ind: Chromosome):
     mut_pb = random()
     if mut_pb < 1/3:
         # mute AD section
-        ind.AD = mut_ad(ad=ind.AD)
+        if random() < 0.5:
+            # mutate items in the AD section
+            ind.AD = mut_ad(ad=ind.AD)
+        else:
+            # replace entire AD section
+            ind.AD = ADSection.get_one(MapAnalyzer.get_instance())
     elif mut_pb < 2/3:
         # mutate PD section
         ind.PD = mut_pd(pd=ind.PD)
@@ -159,7 +164,6 @@ def cx(ind1: Chromosome, ind2: Chromosome):
 
 
 def eval(ind: Chromosome):
-    return 0, 0
     # closest distance between pair of ADC
     # # of unique decisions triggered during simulation
     runner = ChromosomeRunner.get_instance()
@@ -211,9 +215,9 @@ def main():
     runner = ChromosomeRunner(map, containers)
 
     # GA Hyperparameters
-    POP_SIZE = 5
-    OFF_SIZE = 5  # number of offspring to produce
-    CXPB = 0.5  # crossover probablitiy
+    POP_SIZE = 10
+    OFF_SIZE = 10  # number of offspring to produce
+    CXPB = 0.8  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
     toolbox = base.Toolbox()
@@ -243,8 +247,8 @@ def main():
         curr_gen += 1
         logger.info(f' ====== Generation {curr_gen} ====== ')
         # Vary the population
-        offspring = algorithms.varOr(
-            population, toolbox, OFF_SIZE, CXPB, MUTPB)
+        offspring = algorithms.varAnd(
+            population, toolbox, CXPB, MUTPB)
 
         # update chromosome gid and cid
         for index, c in enumerate(offspring):
@@ -270,3 +274,10 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# add perception frequency as gene
+# add seeding (initial scenarios)
+# take scenarios I know to be buggy from bug reports
+# start with good scenarios with violations
+# give technique a head start
+# move fast with implementation

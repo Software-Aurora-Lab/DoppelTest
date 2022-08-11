@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from random import choice, randint, uniform
 from typing import List
 from map.MapAnalyzer import MapAnalyzer
-from scenario.ApolloRunner import PositionEstimate
+from apollo.utils import PositionEstimate
 
 
 @dataclass

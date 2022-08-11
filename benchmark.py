@@ -5,9 +5,9 @@ from automation.Chromosome import Chromosome
 from automation.section_ad import AD, ADSection
 from automation.section_pd import PDSection
 from automation.section_tc import TCSection
-from scenario.ApolloRunner import ApolloRunner, PositionEstimate
+from apollo.utils import PositionEstimate
 from scenario.ChromosomeRunner import ChromosomeRunner
-from utils.config import APOLLO_ROOT
+from config import APOLLO_ROOT
 
 map = Map()
 f = open('./data/maps/borregas_ave_fix/base_map.bin', 'rb')
@@ -15,11 +15,11 @@ map.ParseFromString(f.read())
 
 chromosome = Chromosome(
     ADSection(
-        [AD(PositionEstimate('lane_25', 25), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 35), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 45), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 55), PositionEstimate('lane_27', 20), 1),
-         AD(PositionEstimate('lane_25', 65), PositionEstimate('lane_27', 20), 1)]
+        [AD(PositionEstimate('lane_25', 55), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 65), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 75), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 85), PositionEstimate('lane_27', 20), 1),
+         AD(PositionEstimate('lane_25', 95), PositionEstimate('lane_27', 20), 1)]
     ),
     PDSection([]),
     TCSection(dict(), dict(), 0, 0, 0)
@@ -38,6 +38,7 @@ while True:
     print(counter)
     runner.set_chromosome(chromosome)
     runner.init_scenario()
-    runner.run_scenario(run_id='benchmark', upper_limit=55, save_record=True)
+    runner.run_scenario(generation_name='TestGeneration',
+                        run_id='benchmark', upper_limit=55, save_record=True)
     counter += 1
     break

@@ -2,7 +2,7 @@ from time import time
 from automation.section_tc import TCSection
 from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection, TrafficLight
 
-from utils.config import FORCE_INVALID_TRAFFIC_CONTROL
+from config import FORCE_INVALID_TRAFFIC_CONTROL
 
 
 class TrafficControlManager:

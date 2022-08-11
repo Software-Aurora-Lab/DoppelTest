@@ -9,10 +9,10 @@ import random
 from typing import List
 
 from modules.common.proto.geometry_pb2 import PointENU
-from utils.config import APOLLO_ROOT, RECORDS_DIR, STREAM_LOGGING_LEVEL
+from config import APOLLO_ROOT, LOG_DIR, RECORDS_DIR, STREAM_LOGGING_LEVEL
 
 
-def get_logger(name, filename=None) -> logging.Logger:
+def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
     """
     Gets logger from logging module
 
@@ -26,20 +26,27 @@ def get_logger(name, filename=None) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.handlers.clear()
     logger.setLevel(logging.DEBUG)
-    if not os.path.exists("Logs"):
-        os.makedirs("Logs")
-    fh = logging.FileHandler(f"Logs/{filename if filename else name}.log")
-    fh.setLevel(logging.ERROR)
-    ch = logging.StreamHandler()
-    ch.setLevel(STREAM_LOGGING_LEVEL)
+
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     # %(filename)s - %(lineno)d
-    fh.setFormatter(formatter)
+
+    # stream handlers
+    ch = logging.StreamHandler()
+    ch.setLevel(STREAM_LOGGING_LEVEL)
     ch.setFormatter(formatter)
-    # add the handlers to the logger
-    logger.addHandler(fh)
     logger.addHandler(ch)
+
+    # file handler
+    if log_to_file:
+        if not os.path.exists(LOG_DIR):
+            os.makedirs(LOG_DIR)
+        fh = logging.FileHandler(
+            f"{LOG_DIR}/{filename if filename else name}.log")
+        fh.setLevel(logging.ERROR)
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+
     return logger
 
 
@@ -103,6 +110,7 @@ def clean_appolo_dir():
     fileList = glob.glob(f'{APOLLO_ROOT}/*.log.*')
     for filePath in fileList:
         os.remove(filePath)
+
     # create data dir
     subprocess.run(f"mkdir {APOLLO_ROOT}/data".split())
     subprocess.run(f"mkdir {APOLLO_ROOT}/data/bag".split())
@@ -111,20 +119,13 @@ def clean_appolo_dir():
     subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
 
 
-def make_dir_for_generation(generation_name: str):
-    dest = os.path.join(RECORDS_DIR, generation_name)
-    if not os.path.exists(dest):
-        os.mkdir(dest)
-
-
 def save_record_files_and_chromosome(generation_name: str, run_id: str, ch: dict):
-    make_dir_for_generation(generation_name)
     dest = os.path.join(RECORDS_DIR, generation_name, run_id)
     if not os.path.exists(dest):
-        os.mkdir(dest)
+        os.makedirs(dest)
     else:
         shutil.rmtree(dest)
-        os.mkdir(dest)
+        os.makedirs(dest)
 
     fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
     for filePath in fileList:

@@ -7,7 +7,7 @@ from apollo.CyberBridge import Topics
 from apollo.MessageBroker import MessageBroker
 from automation.Chromosome import Chromosome
 from modules.map.proto.map_pb2 import Map
-from scenario.ApolloRunner import ApolloRunner
+from apollo.ApolloRunner import ApolloRunner
 
 from utils import clean_appolo_dir, get_logger, get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
 from scenario.TrafficManager import TrafficControlManager

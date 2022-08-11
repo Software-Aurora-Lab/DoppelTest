@@ -2,7 +2,17 @@ import math
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from utils.config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
+from config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
+from dataclasses import dataclass
+
+
+@dataclass
+class PositionEstimate:
+    lane_id: str
+    s: float
+
+    def is_too_close(self, rhs):
+        return self.lane_id == rhs.lane_id and abs(self.s-rhs.s) < 10
 
 
 def generate_polygon(position: Point3D, theta: float, length: float, width: float):

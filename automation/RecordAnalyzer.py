@@ -4,7 +4,6 @@ from statistics import mean
 from cyber_record.record import Record
 from shapely.geometry import Point
 from apollo.utils import generate_adc_polygon
-from utils.config import APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH
 from shapely.geometry import Polygon
 
 
