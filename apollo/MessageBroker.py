@@ -4,7 +4,7 @@ from logging import Logger
 from threading import Thread
 from modules.common.proto.header_pb2 import Header
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from apollo.utils import localization_to_obstacle
+from apollo.utils import localization_to_obstacle, obstacle_to_polygon
 from apollo.CyberBridge import Channel, Topics
 from utils import get_logger
 from config import PERCEPTION_FREQUENCY
@@ -64,33 +64,39 @@ class MessageBroker:
             # retrieve localization of running instances
             locations = dict()
             for runner in self.runners:
-                if runner.is_running:
-                    loc = runner.localization
-                    if loc and loc.header.module_name == 'SimControl':
-                        locations[runner.nid] = runner.localization
+                loc = runner.localization
+                if loc and loc.header.module_name == 'SimControl':
+                    locations[runner.nid] = runner.localization
 
             # convert localization into obstacles
             obs = dict()
+            obs_poly = dict()
             for k in locations:
                 obs[k] = localization_to_obstacle(k, locations[k])
+                obs_poly[k] = obstacle_to_polygon(obs[k])
 
             # publish obstacle to all running instances
             for runner in self.runners:
-                if runner.is_running:
-                    perception_obs = [obs[x]
-                                      for x in obs if x != runner.nid]
-                    header = Header(
-                        timestamp_sec=time.time(),
-                        module_name='MAGGIE',
-                        sequence_num=header_sequence_num
-                    )
-                    bag = PerceptionObstacles(
-                        header=header,
-                        perception_obstacle=perception_obs,
-                    )
-                    runner.container.bridge.publish(
-                        Topics.Obstacles, bag.SerializeToString()
-                    )
+                perception_obs = [obs[x]
+                                  for x in obs if x != runner.nid]
+                header = Header(
+                    timestamp_sec=time.time(),
+                    module_name='MAGGIE',
+                    sequence_num=header_sequence_num
+                )
+                bag = PerceptionObstacles(
+                    header=header,
+                    perception_obstacle=perception_obs,
+                )
+                runner.container.bridge.publish(
+                    Topics.Obstacles, bag.SerializeToString()
+                )
+            # update closest distance
+            for runner in self.runners:
+                _adc = obs_poly[runner.nid]
+                _obs = [obs_poly[x] for x in obs_poly if x != runner.nid]
+                for o in _obs:
+                    runner.set_min_distance(_adc.distance(o))
             header_sequence_num += 1
             time.sleep(1/PERCEPTION_FREQUENCY)
 
