@@ -115,26 +115,27 @@ class MapAnalyzer:
         for cw in self.map.crosswalk:
             self.crosswalks[cw.id.id] = cw
 
-        should_analyze = True
-        while should_analyze:
-            should_analyze = False
-            # analyze overlapping junction
-            g = nx.Graph()
-            for cw1 in self.crosswalks:
-                for cw2 in self.crosswalks:
-                    if cw1 == cw2:
-                        continue
-                    if share_edge(self.crosswalks[cw1], self.crosswalks[cw2]):
-                        g.add_edge(cw1, cw2)
+        # should_analyze = True
+        # while should_analyze:
+        #     should_analyze = False
+        #     # analyze overlapping junction
+        #     g = nx.Graph()
+        #     for cw1 in self.crosswalks:
+        #         for cw2 in self.crosswalks:
+        #             if cw1 == cw2:
+        #                 continue
+        #             if share_edge(self.crosswalks[cw1], self.crosswalks[cw2]):
+        #                 print(cw1, cw2)
+        #                 g.add_edge(cw1, cw2)
 
-            # merge crosswalks
-            for edge in g.edges:
-                cw1, cw2 = edge
-                merged = merge_cw(self.crosswalks[cw1], self.crosswalks[cw2])
-                del self.crosswalks[cw1]
-                del self.crosswalks[cw2]
-                self.crosswalks[merged.id.id] = merged
-                should_analyze = True
+        #     # merge crosswalks
+        #     for edge in g.edges:
+        #         cw1, cw2 = edge
+        #         merged = merge_cw(self.crosswalks[cw1], self.crosswalks[cw2])
+        #         del self.crosswalks[cw1]
+        #         del self.crosswalks[cw2]
+        #         self.crosswalks[merged.id.id] = merged
+        #         should_analyze = True
 
     def get_lane_data(self, lane_id: str):
         assert lane_id in self.lanes
@@ -167,6 +168,12 @@ class MapAnalyzer:
     def get_lanes_in_junction(self, junction: Junction) -> List[str]:
         return self._junction_lanes[junction.id.id]
 
+    def get_lanes_not_in_junction(self):
+        lanes = set()
+        for j in self.junctions:
+            lanes.update(set(self.get_lanes_in_junction(self.junctions[j])))
+        return set(self.lanes) - lanes
+
     def get_signals_in_junction(self, junction: Junction) -> List[str]:
         result = list()
         j_oids = get_overlap_ids(junction)
@@ -175,9 +182,6 @@ class MapAnalyzer:
             if j_oids & s_oids != set():
                 result.append(signal.id.id)
         return result
-
-    def get_cw_lanes_overlap(self, cw: Crosswalk) -> List[str]:
-        pass
 
     def is_controlling_same_lanes(self, signal1: Signal, signal2: Signal) -> bool:
         lanes1 = self.get_lanes_controlled_by_signal(signal1)
