@@ -9,7 +9,7 @@ import networkx as nx
 from modules.map.proto.map_signal_pb2 import Signal
 from modules.map.proto.map_junction_pb2 import Junction
 from modules.map.proto.map_crosswalk_pb2 import Crosswalk
-from shapely.geometry import MultiLineString
+from shapely.geometry import MultiLineString, LineString
 
 from map.utils import get_distance, get_overlap_ids, merge_cw, share_edge
 
@@ -24,6 +24,7 @@ class MapAnalyzer:
     _lanes: nx.DiGraph
     _signals: nx.DiGraph
     _junction_lanes: dict
+    _lanes_not_in_junction: set
     __instance = None
 
     def __init__(self, map: Map) -> None:
@@ -35,6 +36,7 @@ class MapAnalyzer:
         self.signals = dict()
         self.crosswalks = dict()
         self._junction_lanes = defaultdict(lambda: list())
+        self._lanes_not_in_junction = None
         self.load_junctions()
         self.load_lanes()
         self.load_signals()
@@ -149,6 +151,41 @@ class MapAnalyzer:
             result += self.get_reachable_lanes(v)
         return result
 
+    def get_allowed_routing(self, lane_id: str, depth=10):
+        result = list()
+        if depth == 0:
+            return [[lane_id]]
+        for u, v in self._lanes.out_edges(lane_id):
+            if v in self.get_lanes_not_in_junction():
+                result.append([u, v])
+            rec = self.get_allowed_routing(v, depth-1)
+            if len(rec) > 0:
+                for p in rec:
+                    result.append([u] + p)
+        return result
+
+    def get_routing_trajectory(self, routing: List[str]):
+        points = []
+        for lane_id in routing:
+            for segment in self.lanes[lane_id].central_curve.segment:
+                for point in segment.line_segment.point:
+                    points.append((point.x, point.y))
+        return points
+
+    def check_routing_relation(self, routing1: List[str], routing2: List[str]) -> int:
+        """
+        0 -> Intersection
+        1 -> Equal
+        2 -> No relation
+        """
+        if routing1 == routing2:
+            return 1
+        rl1 = LineString(self.get_routing_trajectory(routing1))
+        rl2 = LineString(self.get_routing_trajectory(routing2))
+        if rl1.intersects(rl2):
+            return 0
+        return 2
+
     def get_signals_wrt(self, signal_id: str) -> List[str]:
         assert signal_id in self.signals
         result = list()
@@ -169,10 +206,13 @@ class MapAnalyzer:
         return self._junction_lanes[junction.id.id]
 
     def get_lanes_not_in_junction(self):
-        lanes = set()
-        for j in self.junctions:
-            lanes.update(set(self.get_lanes_in_junction(self.junctions[j])))
-        return set(self.lanes) - lanes
+        if self._lanes_not_in_junction is None:
+            lanes = set()
+            for j in self.junctions:
+                lanes.update(
+                    set(self.get_lanes_in_junction(self.junctions[j])))
+            self._lanes_not_in_junction = set(self.lanes) - lanes
+        return self._lanes_not_in_junction
 
     def get_signals_in_junction(self, junction: Junction) -> List[str]:
         result = list()
