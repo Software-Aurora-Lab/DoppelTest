@@ -10,6 +10,7 @@ from typing import List
 
 from modules.common.proto.geometry_pb2 import PointENU
 from config import APOLLO_ROOT, LOG_DIR, RECORDS_DIR, STREAM_LOGGING_LEVEL
+from modules.map.proto.map_pb2 import Map
 
 
 def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
@@ -96,7 +97,7 @@ def random_numeric_id(length=5) -> List[int]:
         result: List[int]
             list of integer ids in range 100000, 999999
     """
-    return random.choices(range(100000, 999999), k=length)
+    return sorted(random.sample(range(100000, 999999), k=length))
 
 
 def clean_appolo_dir():
@@ -134,3 +135,10 @@ def save_record_files_and_chromosome(generation_name: str, run_id: str, ch: dict
     dest_file = os.path.join(dest, "c.json")
     with open(dest_file, 'w') as fp:
         json.dump(ch, fp, indent=4)
+
+
+def load_map(map_path: str):
+    map = Map()
+    f = open(map_path, 'rb')
+    map.ParseFromString(f.read())
+    return map
