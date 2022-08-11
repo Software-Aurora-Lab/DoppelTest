@@ -15,11 +15,12 @@ map.ParseFromString(f.read())
 
 chromosome = Chromosome(
     ADSection(
-        [AD(PositionEstimate('lane_25', 55), PositionEstimate('lane_27', 50), 1),
-         AD(PositionEstimate('lane_25', 65), PositionEstimate('lane_27', 50), 1),
-         AD(PositionEstimate('lane_25', 75), PositionEstimate('lane_27', 50), 1),
-         AD(PositionEstimate('lane_25', 85), PositionEstimate('lane_27', 50), 1),
-         AD(PositionEstimate('lane_25', 95), PositionEstimate('lane_27', 50), 1)]
+        [AD(['lane_25', 'lane_49', 'lane_27'], 55, 50, 1),
+         AD(['lane_25', 'lane_49', 'lane_27'], 65, 50, 1),
+         AD(['lane_25', 'lane_49', 'lane_27'], 75, 50, 1),
+         AD(['lane_25', 'lane_49', 'lane_27'], 85, 50, 1),
+         AD(['lane_25', 'lane_49', 'lane_27'], 95, 50, 1)
+         ]
     ),
     PDSection([]),
     TCSection(dict(), dict(), 0, 0, 0)

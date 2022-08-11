@@ -60,7 +60,7 @@ class ChromosomeRunner:
                     ctn=c,
                     map=self.map,
                     start=a.initial_position,
-                    destination=a.final_position,
+                    waypoints=a.get_waypoints(),
                     start_time=a.start_time
                 )
             )

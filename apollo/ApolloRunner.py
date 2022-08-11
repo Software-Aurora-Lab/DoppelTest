@@ -22,7 +22,7 @@ class ApolloRunner:
     map: Map
     start: PositionEstimate
     start_time: float
-    destination: PositionEstimate
+    waypoints: List[PositionEstimate]
 
     routing_started: bool
     stop_time_counter: float
@@ -38,7 +38,7 @@ class ApolloRunner:
                  map: Map,
                  start: PositionEstimate,
                  start_time: float,
-                 destination: PositionEstimate
+                 waypoints: List[PositionEstimate]
                  ) -> None:
         self.logger = get_logger(f'ApolloRunner[{ctn.container_name}]')
         self.nid = nid
@@ -46,7 +46,7 @@ class ApolloRunner:
         self.map = map
         self.start = start
         self.start_time = start_time
-        self.destination = destination
+        self.waypoints = waypoints
 
     def set_min_distance(self, d: float):
         if self.__min_distance is None:
@@ -163,11 +163,12 @@ class ApolloRunner:
                 LaneWaypoint(
                     pose=coord,
                     heading=heading
-                ),
-                LaneWaypoint(
-                    id=self.destination.lane_id,
-                    s=self.destination.s,
                 )
+            ] + [
+                LaneWaypoint(
+                    id=x.lane_id,
+                    s=x.s,
+                ) for x in self.waypoints
             ]
         )
 

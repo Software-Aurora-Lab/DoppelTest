@@ -8,10 +8,27 @@ from apollo.utils import PositionEstimate
 
 @dataclass
 class AD:
-    initial_position: PositionEstimate
-    final_position: PositionEstimate
+    routing: List[str]
+    start_s: float
+    end_s: float
     start_time: float
     apollo_container: str = ''
+
+    @property
+    def initial_position(self):
+        return PositionEstimate(self.routing[0], self.start_s)
+
+    def get_waypoints(self):
+        result = list()
+        for i, r in enumerate(self.routing):
+            if i == 0:
+                continue
+            elif i == len(self.routing) - 1:
+                # destination
+                result.append(PositionEstimate(r, self.end_s))
+            else:
+                result.append(PositionEstimate(r, 0))
+        return result
 
     @staticmethod
     def get_one(ma: MapAnalyzer):
