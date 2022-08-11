@@ -9,7 +9,7 @@ from apollo.CyberBridge import Topics
 from apollo.MessageBroker import MessageBroker
 from automation.Chromosome import Chromosome
 from modules.map.proto.map_pb2 import Map
-from ..automation.section_ad import AD
+from automation.section_ad import AD
 from scenario.TrafficManager import TrafficControlManager
 from scenario.PedestrianManager import PedestrianManager
 
@@ -84,7 +84,7 @@ class ChromosomeRunner:
         self.tm = TrafficControlManager(self.curr_chromosome.TC)
         self.is_initialized = True
 
-    def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False) -> List[Tuple(ApolloRunner, AD)]:
+    def run_scenario(self, generation_name: str, run_id: str, upper_limit=30, save_record=False) -> List[Tuple[ApolloRunner, AD]]:
         num_adc = len(self.curr_chromosome.AD.adcs)
         self.logger.info(
             f'{num_adc} agents running a scenario G{self.curr_chromosome.gid}S{self.curr_chromosome.cid}.'
