@@ -5,7 +5,6 @@ from automation.Chromosome import Chromosome
 from automation.section_ad import AD, ADSection
 from automation.section_pd import PDSection
 from automation.section_tc import TCSection
-from apollo.utils import PositionEstimate
 from scenario.ChromosomeRunner import ChromosomeRunner
 from config import APOLLO_ROOT
 
