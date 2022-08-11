@@ -1,6 +1,6 @@
 from logging import Logger
 import time
-from typing import Optional
+from typing import List, Optional, Set, Tuple
 from apollo.CyberBridge import Topics
 from apollo.ApolloContainer import ApolloContainer
 from map.utils import get_coordinate_for, get_lane_by_id
@@ -12,7 +12,7 @@ from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import LaneWaypoint, RoutingRequest
 from utils import zero_velocity, get_logger
 from config import USE_SIM_CONTROL_STANDALONE
-from apollo.utils import PositionEstimate
+from apollo.utils import PositionEstimate, extract_main_decision
 
 
 class ApolloRunner:
@@ -24,11 +24,13 @@ class ApolloRunner:
     start_time: float
     destination: PositionEstimate
 
-    is_running: bool
     routing_started: bool
     stop_time_counter: float
     localization: Optional[LocalizationEstimate]
     planning: Optional[ADCTrajectory]
+    __min_distance: Optional[float]
+    __decisions: Set[Tuple]
+    __coords: List[Tuple]
 
     def __init__(self,
                  nid: int,
@@ -46,7 +48,11 @@ class ApolloRunner:
         self.start_time = start_time
         self.destination = destination
 
-        self.is_running = False
+    def set_min_distance(self, d: float):
+        if self.__min_distance is None:
+            self.__min_distance = d
+        elif d < self.__min_distance:
+            self.__min_distance = d
 
     def register_publishers(self):
         for c in [Topics.Localization, Topics.Obstacles, Topics.TrafficLight, Topics.RoutingRequest]:
@@ -74,13 +80,15 @@ class ApolloRunner:
                     self.stop_time_counter = 0
 
             self.localization = data
+            self.__coords.append((data.pose.position.x, data.pose.position.y))
 
         def pcb(data):
             self.planning = data
+            decisions = extract_main_decision(data)
+            self.__decisions.update(decisions)
 
         self.container.bridge.add_subscriber(Topics.Localization, lcb)
         self.container.bridge.add_subscriber(Topics.Planning, pcb)
-        # self.container.bridge.spin()
 
     def initialize(self):
         '''
@@ -98,8 +106,10 @@ class ApolloRunner:
             self.container.dreamview.start_sim_control()
 
         # initialize class variables
-        self.is_running = True
         self.routing_started = False
+        self.__min_distance = None
+        self.__decisions = set()
+        self.__coords = list()
         self.stop_time_counter = 0.0
         self.planning = None
         self.localization = None
@@ -129,7 +139,7 @@ class ApolloRunner:
                 heading=heading,
             )
         )
-        for i in range(5):
+        for i in range(4):
             loc.header.sequence_num = i
             self.container.bridge.publish(
                 Topics.Localization, loc.SerializeToString())
@@ -165,29 +175,16 @@ class ApolloRunner:
             Topics.RoutingRequest, rr.SerializeToString()
         )
 
-    def get_exit_reason(self):
-        pdata = self.planning
-
-        # Route completed
-        if pdata and pdata.decision.main_decision.HasField("mission_complete"):
-            return 'SUCCESS'
-
-        # Stopping for too long
-        if self.routing_started and self.stop_time_counter > 5:
-            # Planning failure
-            if pdata and pdata.header.HasField('status') and pdata.header.status.error_code in [6000]:
-                return 'PLANNING ERROR'
-
-        if self.routing_started and not self.localization is None and time.time() - self.localization.header.timestamp_sec > 5:
-            raise Exception('localization broken')
-            # return 'More than 5 seconds without localization'
-
-        if self.routing_started and self.stop_time_counter > 10:
-            return 'Stopped for 10+ seconds'
-        return None
-
     def stop(self, stop_reason: str):
         self.logger.debug('Stopping container')
         self.container.stop_all()
-        self.is_running = False
         self.logger.debug(f"STOPPED [{stop_reason}]")
+
+    def get_min_distance(self):
+        return self.__min_distance
+
+    def get_decisions(self):
+        return self.__decisions
+
+    def get_trajectory(self):
+        return self.__coords
