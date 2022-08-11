@@ -240,3 +240,6 @@ cython_debug/
 
 data/records/*
 !data/records/.gitkeep
+
+notes.txt
+test.py
