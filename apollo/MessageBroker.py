@@ -93,6 +93,8 @@ class MessageBroker:
                 )
             # update closest distance
             for runner in self.runners:
+                if runner.nid not in obs_poly:
+                    continue
                 _adc = obs_poly[runner.nid]
                 _obs = [obs_poly[x] for x in obs_poly if x != runner.nid]
                 for o in _obs:
