@@ -1,8 +1,11 @@
+import glob
 import math
+import os
+import subprocess
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from config import APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
+from config import APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
 from dataclasses import dataclass
 from shapely.geometry import Polygon
 from typing import Set, Tuple
@@ -181,3 +184,23 @@ def extract_main_decision(data: ADCTrajectory) -> Set[Tuple]:
         decisions.add(od)
 
     return decisions
+
+
+def clean_appolo_dir():
+    # remove data dir
+    subprocess.run(f"rm -rf {APOLLO_ROOT}/data".split())
+
+    # remove records dir
+    subprocess.run(f"rm -rf {APOLLO_ROOT}/records".split())
+
+    # remove logs
+    fileList = glob.glob(f'{APOLLO_ROOT}/*.log.*')
+    for filePath in fileList:
+        os.remove(filePath)
+
+    # create data dir
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/bag".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/log".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/data/core".split())
+    subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())

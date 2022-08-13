@@ -70,21 +70,6 @@ def get_scenario_logger() -> logging.Logger:
     return logger
 
 
-def zero_velocity(velocity: PointENU) -> bool:
-    """
-    Checks if the given velocity vector is 0
-
-    Parameters:
-        velocity: PointENU
-            velocity vector
-
-    Returns
-        result: bool
-            True if velocity is 0, False otherwise
-    """
-    return round(math.sqrt(velocity.x ** 2 + velocity.y ** 2), 2) == 0.00
-
-
 def random_numeric_id(length=5) -> List[int]:
     """
     Generates a list of random integer ids
@@ -98,47 +83,3 @@ def random_numeric_id(length=5) -> List[int]:
             list of integer ids in range 100000, 999999
     """
     return sorted(random.sample(range(100000, 999999), k=length))
-
-
-def clean_appolo_dir():
-    # remove data dir
-    subprocess.run(f"rm -rf {APOLLO_ROOT}/data".split())
-
-    # remove records dir
-    subprocess.run(f"rm -rf {APOLLO_ROOT}/records".split())
-
-    # remove logs
-    fileList = glob.glob(f'{APOLLO_ROOT}/*.log.*')
-    for filePath in fileList:
-        os.remove(filePath)
-
-    # create data dir
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/bag".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/log".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/core".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
-
-
-def save_record_files_and_chromosome(generation_name: str, run_id: str, ch: dict):
-    dest = os.path.join(RECORDS_DIR, generation_name, run_id)
-    if not os.path.exists(dest):
-        os.makedirs(dest)
-    else:
-        shutil.rmtree(dest)
-        os.makedirs(dest)
-
-    fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
-    for filePath in fileList:
-        shutil.copy2(filePath, dest)
-
-    dest_file = os.path.join(dest, "c.json")
-    with open(dest_file, 'w') as fp:
-        json.dump(ch, fp, indent=4)
-
-
-def load_map(map_path: str):
-    map = Map()
-    f = open(map_path, 'rb')
-    map.ParseFromString(f.read())
-    return map
