@@ -2,6 +2,7 @@ import glob
 import math
 import os
 import subprocess
+import time
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
@@ -100,6 +101,29 @@ def generate_adc_polygon(position: Point3D, theta: float):
 
 def obstacle_to_polygon(obs: PerceptionObstacle) -> Polygon:
     return Polygon([[p.x, p.y] for p in obs.polygon_point])
+
+
+def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, heading: float) -> PerceptionObstacle:
+    position = Point3D(x=loc.x,
+                       y=loc.y, z=loc.z)
+    velocity = Point3D(x=math.cos(heading) * speed,
+                       y=math.sin(heading) * speed, z=0.0)
+    obs = PerceptionObstacle(
+        id=_id,
+        position=position,
+        theta=heading,
+        velocity=velocity,
+        acceleration=Point3D(x=0, y=0, z=0),
+        length=0.3,
+        width=0.5,
+        height=1.75,
+        type=PerceptionObstacle.PEDESTRIAN,
+        timestamp=time.time(),
+        tracking_time=1.0,
+        polygon_point=generate_polygon(
+            position, heading, 0.3, 0.5)
+    )
+    return obs
 
 
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:

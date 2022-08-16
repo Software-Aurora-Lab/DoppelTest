@@ -78,7 +78,7 @@ class ScenarioRunner:
         clean_appolo_dir()
 
         # initialize pedestrian and traffic control manager
-        # self.pm = PedestrianManager(self.curr_scenario.pd_section)
+        self.pm = PedestrianManager(self.curr_scenario.pd_section)
         self.tm = TrafficControlManager(self.curr_scenario.tc_section)
         self.is_initialized = True
 

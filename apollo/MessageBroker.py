@@ -6,6 +6,7 @@ from modules.common.proto.header_pb2 import Header
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from apollo.utils import localization_to_obstacle, obstacle_to_polygon
 from apollo.CyberBridge import Channel, Topics
+from framework.scenario.PedestrianManager import PedestrianManager
 from utils import get_logger
 from config import PERCEPTION_FREQUENCY
 from apollo.ApolloRunner import ApolloRunner
@@ -60,6 +61,7 @@ class MessageBroker:
         Helper function to start forwarding localization
         """
         header_sequence_num = 0
+        curr_time = 0.0
         while self.spinning:
             # retrieve localization of running instances
             locations = dict()
@@ -75,10 +77,14 @@ class MessageBroker:
                 obs[k] = localization_to_obstacle(k, locations[k])
                 obs_poly[k] = obstacle_to_polygon(obs[k])
 
+            # pedestrian obstacles
+            pm = PedestrianManager.get_instance()
+            pds = pm.get_pedestrians(curr_time)
+
             # publish obstacle to all running instances
             for runner in self.runners:
                 perception_obs = [obs[x]
-                                  for x in obs if x != runner.nid]
+                                  for x in obs if x != runner.nid] + pds
                 header = Header(
                     timestamp_sec=time.time(),
                     module_name='MAGGIE',
@@ -101,6 +107,7 @@ class MessageBroker:
                     runner.set_min_distance(_adc.distance(o))
             header_sequence_num += 1
             time.sleep(1/PERCEPTION_FREQUENCY)
+            curr_time += 1/PERCEPTION_FREQUENCY
 
     def spin(self):
         """

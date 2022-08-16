@@ -172,6 +172,9 @@ class MapParser:
     def get_crosswalks(self) -> List[str]:
         return list(self.__crosswalk.keys())
 
+    def get_crosswalk_by_id(self, cw_id: str):
+        return self.__crosswalk[cw_id]
+
     def get_signals(self) -> List[str]:
         return list(self.__signals.keys())
 
