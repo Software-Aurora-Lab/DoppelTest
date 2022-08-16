@@ -1,3 +1,4 @@
+import math
 from typing import List, Optional, Tuple
 from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -35,6 +36,12 @@ class CollisionOracle(OracleInterface):
 
         # begin analyze
         adc_pose = self.last_localization.pose
+
+        vx, vy = adc_pose.linear_velocity.x, adc_pose.linear_velocity.y
+        if math.sqrt(vx**2+vy**2) == 0:
+            # vehicle is stopped
+            return
+
         adc_polygon_pts = generate_adc_polygon(
             adc_pose.position, adc_pose.heading)
         adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
