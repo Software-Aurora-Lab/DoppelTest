@@ -51,9 +51,14 @@ class ADAgent:
         start_length = ma.get_lane_length(start_r)
         dest_length = ma.get_lane_length(routing[-1])
 
+        if start_length > 5:
+            start_s = round(random() * (start_length - 5), 1)
+        else:
+            start_s = 0.0
+
         return ADAgent(
             routing=routing,
-            start_s=round(random() * start_length, 1),
+            start_s=start_s,
             dest_s=round(dest_length / 2, 1),
             start_t=randint(0, INSTANCE_MAX_WAIT_TIME)
         )
