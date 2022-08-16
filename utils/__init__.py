@@ -83,3 +83,29 @@ def random_numeric_id(length=5) -> List[int]:
             list of integer ids in range 100000, 999999
     """
     return sorted(random.sample(range(100000, 999999), k=length))
+
+
+def create_dir_for_scenario(generation_name: str, scenario_name: str):
+    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    else:
+        shutil.rmtree(dest)
+        os.makedirs(dest)
+
+
+def save_record_files_and_chromosome(generation_name: str, scenario_name: str, ch: dict):
+    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    if not os.path.exists(dest):
+        os.makedirs(dest)
+    else:
+        shutil.rmtree(dest)
+        os.makedirs(dest)
+
+    fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
+    for filePath in fileList:
+        shutil.copy2(filePath, dest)
+
+    dest_file = os.path.join(dest, "c.json")
+    with open(dest_file, 'w') as fp:
+        json.dump(ch, fp, indent=4)

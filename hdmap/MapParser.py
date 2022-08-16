@@ -22,6 +22,8 @@ class MapParser:
     __signal_relations: nx.Graph
     __lane_nx: nx.DiGraph
 
+    __instance = None
+
     def __init__(self, filename: str) -> None:
         self.__map = load_hd_map(filename)
         self.load_junctions()
@@ -31,6 +33,12 @@ class MapParser:
         self.parse_relations()
         self.parse_signal_relations()
         self.parse_lane_relations()
+        MapParser.__instance = self
+
+    @staticmethod
+    def get_instance():
+        assert not MapParser.__instance is None
+        return MapParser.__instance
 
     def load_junctions(self):
         self.__junctions = dict()

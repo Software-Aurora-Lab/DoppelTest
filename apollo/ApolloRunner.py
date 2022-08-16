@@ -3,14 +3,14 @@ import time
 from typing import List, Optional, Set, Tuple
 from apollo.CyberBridge import Topics
 from apollo.ApolloContainer import ApolloContainer
-from map.utils import get_coordinate_for, get_lane_by_id
+from hdmap.MapParser import MapParser
 from modules.common.proto.header_pb2 import Header
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.localization.proto.pose_pb2 import Pose
 from modules.map.proto.map_pb2 import Map
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import LaneWaypoint, RoutingRequest
-from utils import zero_velocity, get_logger
+from utils import get_logger
 from config import USE_SIM_CONTROL_STANDALONE
 from apollo.utils import PositionEstimate, extract_main_decision
 
@@ -19,7 +19,6 @@ class ApolloRunner:
     logger: Logger
     nid: int
     container: ApolloContainer
-    map: Map
     start: PositionEstimate
     start_time: float
     waypoints: List[PositionEstimate]
@@ -35,7 +34,6 @@ class ApolloRunner:
     def __init__(self,
                  nid: int,
                  ctn: ApolloContainer,
-                 map: Map,
                  start: PositionEstimate,
                  start_time: float,
                  waypoints: List[PositionEstimate]
@@ -43,7 +41,6 @@ class ApolloRunner:
         self.logger = get_logger(f'ApolloRunner[{ctn.container_name}]')
         self.nid = nid
         self.container = ctn
-        self.map = map
         self.start = start
         self.start_time = start_time
         self.waypoints = waypoints
@@ -61,24 +58,6 @@ class ApolloRunner:
     def register_subscribers(self):
 
         def lcb(data):
-            prev_ = self.localization
-            next_ = data
-
-            if prev_ != None and \
-                prev_.header.module_name == "SimControl" and \
-                    next_.header.module_name == "SimControl" and \
-                self.routing_started:
-                prev_stop = zero_velocity(prev_.pose.linear_velocity)
-                next_stop = zero_velocity(next_.pose.linear_velocity)
-
-                if prev_stop and next_stop:
-                    tdelta = next_.header.timestamp_sec - prev_.header.timestamp_sec
-                    stop_time = self.stop_time_counter
-                    new_time = stop_time + tdelta
-                    self.stop_time_counter = new_time
-                else:
-                    self.stop_time_counter = 0
-
             self.localization = data
             self.__coords.append((data.pose.position.x, data.pose.position.y))
 
@@ -110,7 +89,6 @@ class ApolloRunner:
         self.__min_distance = None
         self.__decisions = set()
         self.__coords = list()
-        self.stop_time_counter = 0.0
         self.planning = None
         self.localization = None
         self.register_subscribers()
@@ -125,8 +103,9 @@ class ApolloRunner:
 
     def send_initial_localization(self):
         self.logger.debug('Sending initial localization')
-        coord, heading = get_coordinate_for(get_lane_by_id(
-            self.map, self.start.lane_id), self.start.s)
+        ma = MapParser.get_instance()
+        coord, heading = ma.get_coordinate_and_heading(
+            self.start.lane_id, self.start.s)
 
         loc = LocalizationEstimate(
             header=Header(
@@ -149,9 +128,9 @@ class ApolloRunner:
         self.logger.debug(
             f'Sending routing request to {self.container.container_name}')
         self.routing_started = True
-
-        coord, heading = get_coordinate_for(get_lane_by_id(
-            self.map, self.start.lane_id), self.start.s)
+        ma = MapParser.get_instance()
+        coord, heading = ma.get_coordinate_and_heading(
+            self.start.lane_id, self.start.s)
 
         rr = RoutingRequest(
             header=Header(
