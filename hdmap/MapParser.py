@@ -12,6 +12,7 @@ class MapParser:
     __map: Map
     __junctions: dict
     __signals: dict
+    __stop_signs: dict
     __lanes: dict
     __crosswalk: dict
 
@@ -28,6 +29,7 @@ class MapParser:
         self.__map = load_hd_map(filename)
         self.load_junctions()
         self.load_signals()
+        self.load_stop_signs()
         self.load_lanes()
         self.load_crosswalks()
         self.parse_relations()
@@ -49,6 +51,12 @@ class MapParser:
         self.__signals = dict()
         for sig in self.__map.signal:
             self.__signals[sig.id.id] = sig
+
+    def load_stop_signs(self):
+        self.__stop_signs = dict()
+        for ss in self.__map.stop_sign:
+            print(ss.id.id)
+            self.__stop_signs[ss.id.id] = ss
 
     def load_lanes(self):
         self.__lanes = dict()
@@ -169,6 +177,9 @@ class MapParser:
     def get_lanes(self) -> List[str]:
         return list(self.__lanes.keys())
 
+    def get_lane_by_id(self, l_id: str):
+        return self.__lanes[l_id]
+
     def get_crosswalks(self) -> List[str]:
         return list(self.__crosswalk.keys())
 
@@ -177,6 +188,15 @@ class MapParser:
 
     def get_signals(self) -> List[str]:
         return list(self.__signals.keys())
+
+    def get_signal_by_id(self, s_id: str):
+        return self.__signals[s_id]
+
+    def get_stop_signs(self) -> List[str]:
+        return list(self.__stop_signs.keys())
+
+    def get_stop_sign_by_id(self, ss_id: str):
+        return self.__stop_signs[ss_id]
 
     def get_lanes_not_in_junction(self) -> Set[str]:
         lanes = set(self.get_lanes())
