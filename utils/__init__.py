@@ -25,6 +25,9 @@ def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
         logger: Logger
     """
     logger = logging.getLogger(name)
+    logger.propagate = False
+    if logger.handlers:
+        return logger
     logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.setLevel(STREAM_LOGGING_LEVEL)
@@ -44,6 +47,10 @@ def get_scenario_logger() -> logging.Logger:
         logger: Logger
     """
     logger = logging.getLogger('Scenario')
+    logger.propagate = False
+    if logger.handlers:
+        return logger
+
     logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.terminator = '\r'
