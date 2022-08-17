@@ -161,6 +161,8 @@ class ApolloRunner:
         self.logger.debug(f"STOPPED [{stop_reason}]")
 
     def get_min_distance(self):
+        if not self.__min_distance:
+            return 10000
         return self.__min_distance
 
     def get_decisions(self):
