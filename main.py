@@ -1,4 +1,5 @@
 from random import random, sample, shuffle, randint
+import shutil
 from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles import RecordAnalyzer
@@ -10,7 +11,7 @@ from framework.scenario.pd_agents import PDAgent, PDSection
 from framework.scenario.ad_agents import ADAgent, ADSection
 from hdmap.MapParser import MapParser
 from deap import base, tools, algorithms
-from utils import get_logger
+from utils import get_logger, remove_record_files
 import os
 
 # EVALUATION (FITNESS)
@@ -75,6 +76,11 @@ def eval_scenario(ind: Scenario):
                 continue
             if ma.is_conflict_lanes(r1.routing, r2.routing):
                 conflict.add(frozenset([r1.routing_str, r2.routing_str]))
+
+    if unique_violation == 0:
+        # no unique violation, remove records
+        remove_record_files(g_name, s_name)
+        pass
 
     return min(min_distance), len(decisions), len(conflict), unique_violation
 
@@ -201,9 +207,9 @@ def cx_pd_section(ind1: PDSection, ind2: PDSection):
     available_pds = ind1.pds + ind2.pds
 
     result1 = PDSection(
-        sample(available_pds, k=randint(0, len(available_pds))))
+        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
     result2 = PDSection(
-        sample(available_pds, k=randint(0, len(available_pds))))
+        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
     return result1, result2
 
 

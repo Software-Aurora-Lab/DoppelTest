@@ -46,6 +46,8 @@ class ComfortOracle(OracleInterface):
 
     def get_result(self):
         result = list()
+        if len(result) == 0:
+            return result
         max_accl = np.max(self.accl)
         min_accl = np.min(self.accl)
         if max_accl > ComfortOracle.MAX_ACCL:

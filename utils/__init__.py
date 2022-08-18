@@ -100,3 +100,8 @@ def save_record_files_and_chromosome(generation_name: str, scenario_name: str, c
     dest_file = os.path.join(dest, "c.json")
     with open(dest_file, 'w') as fp:
         json.dump(ch, fp, indent=4)
+
+
+def remove_record_files(generation_name: str, scenario_name: str):
+    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    shutil.rmtree(dest)
