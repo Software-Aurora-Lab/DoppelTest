@@ -17,7 +17,7 @@ Please follow the following steps to set up the framework.
 > Our framework restarts modules being tested after every scenario, which creates a large number of unnecessary log files.
 
 ### Set up MAGGIE
-1. Install the required libraries: numpy, Shapely, DEAP, pandas, networkx and [cyber_record](https://github.com/daohu527/cyber_record)
+1. Install the required Python libraries: numpy, Shapely, DEAP, pandas, networkx, [docker](https://docker-py.readthedocs.io/en/stable/) and [cyber_record](https://github.com/daohu527/cyber_record)
 2. Replace directories in `config.py`
 https://github.com/YuqiHuai/MAGGIE/blob/2530b47a90ca39fa130998538e14b7f95b455ba3/config.py#L19-L21
 3. Verify that the framework is runnable via `python test_generation.py`
