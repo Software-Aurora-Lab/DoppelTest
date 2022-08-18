@@ -1,0 +1,25 @@
+# MAGGIE 
+
+A doppelgänger testing approach for automatically finding bug-revealing violations of autonomous driving systems
+
+## Set Up MAGGIE
+Please follow the following steps to set up the framework.
+### Set up Apollo 7.0, with a standalone Sim Control 
+1. Clone the forked version of Apollo 7.0 from https://github.com/YuqiHuai/apollo
+> In our version, we separated Sim Control from Dreamview, because Dreamview can suffer from unknown issues due to high number of websocket communication.
+2. Start up Apollo container via `./docker/scripts/dev_start.sh -l`
+3. Find the name of container via `docker ps -a`
+4. Enter the container in root mode `docker exec -it apollo_dev_your_name /bin/bash`
+> Remember to replace `apollo_dev_your_name` with the name of your container.
+5. In the container, build Apollo via `./apollo.sh build`
+6. Exit the container and create directories `data`, `data/log`, `data/bag`, `data/log`, `data/core` under Apollo's root directory.
+> This step is necessary for our framework running on the host machine to delete Apollo's log files. 
+> Our framework restarts modules being tested after every scenario, which creates a large number of unnecessary log files.
+
+### Set up MAGGIE
+1. Install the required libraries: numpy, Shapely, DEAP, pandas, and [cyber_record](https://github.com/daohu527/cyber_record)
+2. Replace directories in `config.py`
+https://github.com/YuqiHuai/MAGGIE/blob/2530b47a90ca39fa130998538e14b7f95b455ba3/config.py#L19-L21
+3. Verify that the framework is runnable via `python test_generation.py`
+> You might be prompted to downgrade Python protobuf via `pip install protobuf==3.20.1`
+4. Start finding violations via `python main.py`
