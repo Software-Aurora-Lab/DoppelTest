@@ -15,6 +15,10 @@ Please follow the following steps to set up the framework.
 6. Exit the container and create directories `data`, `data/log`, `data/bag`, `data/log`, `data/core` under Apollo's root directory.
 > This step is necessary for our framework running on the host machine to delete Apollo's log files. 
 > Our framework restarts modules being tested after every scenario, which creates a large number of unnecessary log files.
+7. In the container, start up Dreamview via `./scripts/bootstra.sh`
+8. Exit the container, and find the IP address of the container via `docker inspect apollo_dev_your_name`
+9. Verify Dreamview is accessible at `http://172.17.0.2:8888` (your container IP address may be different)
+
 
 ### Set up MAGGIE
 1. Install the required Python libraries: numpy, Shapely, DEAP, pandas, networkx, [docker](https://docker-py.readthedocs.io/en/stable/) and [cyber_record](https://github.com/daohu527/cyber_record)
