@@ -42,10 +42,12 @@ class ComfortOracle(OracleInterface):
 
     def get_result(self):
         result = list()
+        if len(result) == 0:
+            return result
         max_accl = np.max(self.accl)
         min_accl = np.min(self.accl)
         if max_accl > ComfortOracle.MAX_ACCL:
-            result.append(('comfort', 'Acceleratoin exceeded max'))
+            result.append(('comfort', 'Acceleration exceeded max'))
         if min_accl < ComfortOracle.MAX_DCCL:
             result.append(('comfort', 'Deceleration exceeded max'))
         return result

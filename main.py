@@ -1,15 +1,17 @@
-from time import sleep
-from config import APOLLO_ROOT, MAX_ADC_COUNT, RECORDS_DIR
+from random import random, sample, shuffle, randint
+import shutil
+from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles import RecordAnalyzer
+from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from framework.scenario.tc_config import TCSection
-from framework.scenario.pd_agents import PDSection
-from framework.scenario.ad_agents import ADSection
+from framework.scenario.pd_agents import PDAgent, PDSection
+from framework.scenario.ad_agents import ADAgent, ADSection
 from hdmap.MapParser import MapParser
 from deap import base, tools, algorithms
-from utils import get_logger
+from utils import get_logger, remove_record_files
 import os
 
 # EVALUATION (FITNESS)
@@ -21,65 +23,223 @@ def eval_scenario(ind: Scenario):
     srunner = ScenarioRunner.get_instance()
     srunner.set_scenario(ind)
     srunner.init_scenario()
-    for a, r in srunner.run_scenario(g_name, s_name, True):
-        print(a.container.container_name, r.routing_str)
+    runners = srunner.run_scenario(g_name, s_name, True)
+
+    obs_routing_map = dict()
+    for a, r in runners:
+        obs_routing_map[a.nid] = r.routing_str
+
+    unique_violation = 0
+    min_distance = list()
+    decisions = set()
+    for a, r in runners:
+        min_distance.append(a.get_min_distance())
+        decisions.update(a.get_decisions())
         c_name = a.container.container_name
         r_name = f"{c_name}.{s_name}.00000"
         record_path = os.path.join(RECORDS_DIR, g_name, s_name, r_name)
         ra = RecordAnalyzer(record_path)
-        print(record_path)
         ra.analyze()
-        print(ra.get_results())
-    # analyze violations
-    # analyze scenario fitness
-    return 0, 0, 0, 0
+        for v in ra.get_results():
+            main_type = v[0]
+            sub_type = v[1]
+            if main_type == 'collision':
+                if sub_type < 100:
+                    # pedestrian collisoin
+                    related_data = frozenset(
+                        [r.routing_str, ind.pd_section.pds[sub_type].cw_id])
+                    sub_type = 'A&P'
+                else:
+                    # adc to adc collision
+                    related_data = frozenset(
+                        [r.routing_str, obs_routing_map[sub_type]]
+                    )
+                    sub_type = 'A&A'
+            else:
+                related_data = r.routing_str
+            if ViolationTracker.get_instance().add_violation(
+                gname=g_name,
+                sname=s_name,
+                record_file=record_path,
+                mt=main_type,
+                st=sub_type,
+                data=related_data
+            ):
+                unique_violation += 1
+
+    # //TODO: Add Compute Conflict Count to Scenario class
+    ma = MapParser.get_instance()
+    conflict = set()
+    for a1, r1 in runners:
+        for a2, r2 in runners:
+            if r1.routing_str == r2.routing_str:
+                continue
+            if ma.is_conflict_lanes(r1.routing, r2.routing):
+                conflict.add(frozenset([r1.routing_str, r2.routing_str]))
+
+    if unique_violation == 0:
+        # no unique violation, remove records
+        remove_record_files(g_name, s_name)
+        pass
+
+    return min(min_distance), len(decisions), len(conflict), unique_violation
 
 # MUTATION OPERATOR
 
 
 def mut_ad_section(ind: ADSection):
+    mut_pb = random()
+
+    # remove a random 1
+    if mut_pb < 0.2 and len(ind.adcs) > 2:
+        shuffle(ind.adcs)
+        ind.adcs.pop()
+        ind.adjust_time()
+        return ind
+
+    # add a random 1
+    if mut_pb < 0.4 and len(ind.adcs) < MAX_ADC_COUNT:
+        while True:
+            if ind.add_agent(ADAgent.get_one()):
+                break
+        return ind
+
+    # mutate a random agent
+    index = randint(0, len(ind.adcs) - 1)
+    ind.adcs[index] = ADAgent.get_one_for_routing(ind.adcs[index].routing)
     return ind
 
 
 def mut_pd_section(ind: PDSection):
+
+    if len(ind.pds) == 0:
+        ind.add_agent(PDAgent.get_one())
+        return ind
+
+    mut_pb = random()
+    # remove a random
+    if mut_pb < 0.2 and len(ind.pds) > 0:
+        shuffle(ind.pds)
+        ind.pds.pop()
+        return ind
+
+    # add a random
+    if mut_pb < 0.4 and len(ind.pds) <= MAX_PD_COUNT:
+        ind.pds.append(PDAgent.get_one())
+        return ind
+
+    # mutate a random
+    index = randint(0, len(ind.pds) - 1)
+    ind.pds[index] = PDAgent.get_one_for_cw(ind.pds[index].cw_id)
     return ind
 
 
 def mut_tc_section(ind: TCSection):
-    return ind
+    mut_pb = random()
+
+    if mut_pb < 0.3:
+        ind.initial = TCSection.generate_config()
+        return ind
+    elif mut_pb < 0.6:
+        ind.final = TCSection.generate_config()
+    elif mut_pb < 0.9:
+        ind.duration_g = TCSection.get_random_duration_g()
+
+    return TCSection.get_one()
 
 
 def mut_scenario(ind: Scenario):
-    ind.ad_section = mut_ad_section(ind.ad_section)
-    ind.pd_section = mut_pd_section(ind.pd_section)
-    ind.tc_section = mut_tc_section(ind.tc_section)
+    mut_pb = random()
+    if mut_pb < 1/3:
+        ind.ad_section = mut_ad_section(ind.ad_section)
+    elif mut_pb < 2/3:
+        ind.pd_section = mut_pd_section(ind.pd_section)
+    else:
+        ind.tc_section = mut_tc_section(ind.tc_section)
     return ind,
 
 
 # CROSSOVER OPERATOR
 
 def cx_ad_section(ind1: ADSection, ind2: ADSection):
-    return ind1, ind2
+    # swap entire ad section
+    cx_pb = random()
+    if cx_pb < 0.1:
+        return ind2, ind1
+
+    # combine to make 2 new populations
+    available_adcs = ind1.adcs + ind2.adcs
+    shuffle(available_adcs)
+
+    split_index = randint(2, len(available_adcs) - 2)
+
+    result1 = ADSection([])
+    for x in available_adcs[:split_index]:
+        result1.add_agent(x)
+
+    result2 = ADSection([])
+    for x in available_adcs[split_index:]:
+        result2.add_agent(x)
+
+    # make sure offspring adc count is valid
+
+    while len(result1.adcs) > MAX_ADC_COUNT:
+        result1.adcs.pop()
+
+    while len(result2.adcs) > MAX_ADC_COUNT:
+        result2.adcs.pop()
+
+    while len(result1.adcs) < 2:
+        if result1.add_agent(ADAgent.get_one()):
+            break
+    while len(result2.adcs) < 2:
+        if result2.add_agent(ADAgent.get_one()):
+            break
+
+    return result1, result2
 
 
 def cx_pd_section(ind1: PDSection, ind2: PDSection):
-    return ind1, ind2
+    cx_pb = random()
+    if cx_pb < 0.1:
+        return ind2, ind1
+
+    available_pds = ind1.pds + ind2.pds
+
+    result1 = PDSection(
+        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
+    result2 = PDSection(
+        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
+    return result1, result2
 
 
 def cx_tc_section(ind1: TCSection, ind2: TCSection):
+    cx_pb = random()
+    if cx_pb < 0.1:
+        return ind2, ind1
+    elif cx_pb < 0.4:
+        ind1.initial, ind2.initial = ind2.initial, ind1.initial
+    elif cx_pb < 0.7:
+        ind1.final, ind2.final = ind2.final, ind1.final
+    else:
+        ind1.duration_g, ind2.duration_g = ind2.duration_g, ind1.duration_g
     return ind1, ind2
 
 
 def cx_scenario(ind1: Scenario, ind2: Scenario):
-    ind1.ad_section, ind2.ad_section = cx_ad_section(
-        ind1.ad_section, ind2.ad_section
-    )
-    ind1.pd_section, ind2.pd_section = cx_pd_section(
-        ind1.pd_section, ind2.pd_section
-    )
-    ind1.tc_section, ind2.tc_section = cx_tc_section(
-        ind1.tc_section, ind2.tc_section
-    )
+    cx_pb = random()
+    if cx_pb < 1/3:
+        ind1.ad_section, ind2.ad_section = cx_ad_section(
+            ind1.ad_section, ind2.ad_section
+        )
+    elif cx_pb < 2/3:
+        ind1.pd_section, ind2.pd_section = cx_pd_section(
+            ind1.pd_section, ind2.pd_section
+        )
+    else:
+        ind1.tc_section, ind2.tc_section = cx_tc_section(
+            ind1.tc_section, ind2.tc_section
+        )
     return ind1, ind2
 
 
@@ -97,10 +257,11 @@ def main():
         print(f'Dreamview at http://{ctn.ip}:{ctn.port}')
 
     srunner = ScenarioRunner(containers)
+    vt = ViolationTracker()
 
     # GA Hyperparameters
-    POP_SIZE = 5
-    OFF_SIZE = 5  # number of offspring to produce
+    POP_SIZE = 25  # number of population
+    OFF_SIZE = 25  # number of offspring to produce
     CXPB = 0.8  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
@@ -152,7 +313,9 @@ def main():
 
         print(f"{hof[-1].gid} - {hof[-1].cid}: {hof[-1].fitness}")
 
-        if curr_gen - hof[-1].gid > 500:
+        vt.save_to_file()
+
+        if curr_gen == 500:
             break
 
 

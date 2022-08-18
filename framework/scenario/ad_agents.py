@@ -63,6 +63,25 @@ class ADAgent:
             start_t=randint(0, INSTANCE_MAX_WAIT_TIME)
         )
 
+    @staticmethod
+    def get_one_for_routing(routing: List[str]):
+        start_r = routing[0]
+        ma = MapParser.get_instance()
+        start_length = ma.get_lane_length(start_r)
+        dest_length = ma.get_lane_length(routing[-1])
+
+        if start_length > 5:
+            start_s = round(random() * (start_length - 5), 1)
+        else:
+            start_s = 0.0
+
+        return ADAgent(
+            routing=routing,
+            start_s=start_s,
+            dest_s=round(dest_length / 2, 1),
+            start_t=randint(0, INSTANCE_MAX_WAIT_TIME)
+        )
+
 
 @dataclass
 class ADSection:

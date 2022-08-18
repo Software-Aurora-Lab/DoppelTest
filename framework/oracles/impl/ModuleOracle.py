@@ -13,7 +13,7 @@ class ModuleOracle(OracleInterface):
     def __init__(self) -> None:
         self.prev_ = None
         self.next_ = None
-        self.distance_traveled = 0.0
+        self.distance_traveled = -1.0
 
     def get_interested_topics(self):
         return [
@@ -23,6 +23,7 @@ class ModuleOracle(OracleInterface):
     def on_new_message(self, topic: str, message, t):
         if self.prev_ is None and self.next_ is None:
             self.prev_ = message
+            self.distance_traveled = 0.0
             return
         self.next_ = message
         # analyze
@@ -38,4 +39,6 @@ class ModuleOracle(OracleInterface):
         result = list()
         if self.distance_traveled == 0.0:
             result.append(('module', 'routing failure'))
+        elif self.distance_traveled == -1.0:
+            result.append(('module', 'sim control failure'))
         return result

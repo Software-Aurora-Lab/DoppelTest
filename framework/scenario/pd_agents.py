@@ -24,6 +24,15 @@ class PDAgent:
             start_t=randint(0, SCENARIO_UPPER_LIMIT)
         )
 
+    @staticmethod
+    def get_one_for_cw(cw_id: str):
+        ma = MapParser.get_instance()
+        return PDAgent(
+            cw_id=cw_id,
+            speed=round(uniform(1.25, 3), 1),
+            start_t=randint(0, SCENARIO_UPPER_LIMIT)
+        )
+
 
 @dataclass
 class PDSection:

@@ -25,29 +25,17 @@ def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
         logger: Logger
     """
     logger = logging.getLogger(name)
-    logger.handlers.clear()
-    logger.setLevel(logging.DEBUG)
-
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    # %(filename)s - %(lineno)d
-
-    # stream handlers
+    logger.propagate = False
+    if logger.handlers:
+        return logger
+    logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.setLevel(STREAM_LOGGING_LEVEL)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     ch.setFormatter(formatter)
+    # add the handlers to the logger
     logger.addHandler(ch)
-
-    # file handler
-    if log_to_file:
-        if not os.path.exists(LOG_DIR):
-            os.makedirs(LOG_DIR)
-        fh = logging.FileHandler(
-            f"{LOG_DIR}/{filename if filename else name}.log")
-        fh.setLevel(logging.ERROR)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-
     return logger
 
 
@@ -59,7 +47,10 @@ def get_scenario_logger() -> logging.Logger:
         logger: Logger
     """
     logger = logging.getLogger('Scenario')
-    logger.handlers.clear()
+    logger.propagate = False
+    if logger.handlers:
+        return logger
+
     logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.terminator = '\r'
@@ -109,3 +100,8 @@ def save_record_files_and_chromosome(generation_name: str, scenario_name: str, c
     dest_file = os.path.join(dest, "c.json")
     with open(dest_file, 'w') as fp:
         json.dump(ch, fp, indent=4)
+
+
+def remove_record_files(generation_name: str, scenario_name: str):
+    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    shutil.rmtree(dest)

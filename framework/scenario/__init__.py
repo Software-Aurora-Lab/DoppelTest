@@ -9,7 +9,7 @@ class ScenarioFitness(base.Fitness):
     # minimize closest distance between pair of ADC
     # maximize number of unique decisions being made
     # maximize pairs of conflict trajectory
-    # maximize scenario interestingness (unique = interesting)
+    # maximize unique violation
     weights = (-1.0, 1.0, 1.0, 1.0)
 
 

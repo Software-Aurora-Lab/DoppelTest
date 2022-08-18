@@ -67,3 +67,7 @@ class TCSection:
             duration_y=3,
             duration_b=2
         )
+
+    @staticmethod
+    def get_random_duration_g():
+        return randint(5, int(SCENARIO_UPPER_LIMIT/2))
