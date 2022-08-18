@@ -10,13 +10,16 @@ from framework.oracles.OracleManager import OracleManager
 
 from cyber_record.record import Record
 
+from hdmap.MapParser import MapParser
+
 
 class RecordAnalyzer:
     record_path: str
 
-    def __init__(self, record_path: str) -> None:
+    def __init__(self, record_path: str, map_parser: MapParser = None) -> None:
         self.oracle_manager = OracleManager()
         self.record_path = record_path
+        self.map_parser = map_parser
         self.register_oracles()
 
     def register_oracles(self):
@@ -25,8 +28,8 @@ class RecordAnalyzer:
             EStopOracle(),
             ModuleOracle(),
             ComfortOracle(),
-            StopSignOracle(),
-            TrafficSignalOracle(),
+            StopSignOracle(self.map_parser),
+            TrafficSignalOracle(self.map_parser),
             UUStopOracle()
         ]
         for o in oracles:

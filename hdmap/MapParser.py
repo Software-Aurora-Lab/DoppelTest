@@ -55,7 +55,6 @@ class MapParser:
     def load_stop_signs(self):
         self.__stop_signs = dict()
         for ss in self.__map.stop_sign:
-            print(ss.id.id)
             self.__stop_signs[ss.id.id] = ss
 
     def load_lanes(self):

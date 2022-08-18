@@ -1,5 +1,7 @@
 import math
 from typing import List, Optional
+
+from apollo.utils import calculate_velocity
 from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 import numpy as np
@@ -27,10 +29,8 @@ class ComfortOracle(OracleInterface):
             return
         self.next_ = message
         # compare velocity
-        prev_velocity = self.calculate_velocity(
-            self.prev_.pose.linear_velocity)
-        next_velocity = self.calculate_velocity(
-            self.next_.pose.linear_velocity)
+        prev_velocity = calculate_velocity(self.prev_.pose.linear_velocity)
+        next_velocity = calculate_velocity(self.next_.pose.linear_velocity)
 
         delta_t = self.next_.header.timestamp_sec - self.prev_.header.timestamp_sec
         delta_v = next_velocity - prev_velocity
@@ -39,10 +39,6 @@ class ComfortOracle(OracleInterface):
 
         # update prev_
         self.prev_ = message
-
-    def calculate_velocity(self, linear_velocity):
-        x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
-        return math.sqrt(x**2+y**2)
 
     def get_result(self):
         result = list()

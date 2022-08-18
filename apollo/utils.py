@@ -228,3 +228,8 @@ def clean_appolo_dir():
     subprocess.run(f"mkdir {APOLLO_ROOT}/data/log".split())
     subprocess.run(f"mkdir {APOLLO_ROOT}/data/core".split())
     subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
+
+
+def calculate_velocity(linear_velocity):
+    x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
+    return math.sqrt(x**2+y**2)

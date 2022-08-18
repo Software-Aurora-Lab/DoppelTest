@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from apollo.utils import generate_adc_polygon
+from apollo.utils import generate_adc_polygon, calculate_velocity
 from shapely.geometry import Polygon
 import numpy as np
 
@@ -37,8 +37,7 @@ class CollisionOracle(OracleInterface):
         # begin analyze
         adc_pose = self.last_localization.pose
 
-        vx, vy = adc_pose.linear_velocity.x, adc_pose.linear_velocity.y
-        if math.sqrt(vx**2+vy**2) == 0:
+        if calculate_velocity(adc_pose.linear_velocity) == 0:
             # vehicle is stopped
             return
 
