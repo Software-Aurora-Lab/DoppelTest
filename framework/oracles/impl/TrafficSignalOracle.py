@@ -29,14 +29,14 @@ class TrafficSignalOracle(OracleInterface):
 
     TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_"
 
-    def __init__(self, map_parser: MapParser) -> None:
+    def __init__(self) -> None:
         self.violated_at_traffic_signal_ids = list()
 
         self.last_localization = None
         self.last_traffic_signal_detection = None
         self.last_planning = None
 
-        self.parse_traffic_signal_stop_line_string_on_map(map_parser)
+        self.parse_traffic_signal_stop_line_string_on_map(MapParser.get_instance())
 
     def get_interested_topics(self):
         return [
