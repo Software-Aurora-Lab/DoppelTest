@@ -96,9 +96,10 @@ class ADSection:
             self.adcs[i].start_t = start_times[i]
 
     def add_agent(self, adc: ADAgent) -> bool:
+        adc_start = PositionEstimate(adc.routing[0], adc.start_s)
         for ad in self.adcs:
-            if ad.routing[0] == adc.routing[0] and abs(ad.start_s - adc.start_s) < 6:
-                # start too close
+            ad_start = PositionEstimate(ad.routing[0], ad.start_s)
+            if ad_start.is_too_close(adc_start):
                 return False
         self.adcs.append(adc)
         return True

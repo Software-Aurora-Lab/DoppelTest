@@ -106,7 +106,18 @@ def mut_ad_section(ind: ADSection):
 
     # mutate a random agent
     index = randint(0, len(ind.adcs) - 1)
-    ind.adcs[index] = ADAgent.get_one_for_routing(ind.adcs[index].routing)
+    routing = ind.adcs[index].routing
+    original_adc = ind.adcs.pop(index)
+    mut_counter = 0
+    while True:
+        if ind.add_agent(ADAgent.get_one_for_routing(routing)):
+            break
+        mut_counter += 1
+        if mut_counter == 5:
+            # mutation kept failing, dont mutate
+            ind.add_agent(original_adc)
+            pass
+    ind.adjust_time()
     return ind
 
 
@@ -190,11 +201,9 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
         result2.adcs.pop()
 
     while len(result1.adcs) < 2:
-        if result1.add_agent(ADAgent.get_one()):
-            break
+        result1.add_agent(ADAgent.get_one())
     while len(result2.adcs) < 2:
-        if result2.add_agent(ADAgent.get_one()):
-            break
+        result2.add_agent(ADAgent.get_one())
 
     return result1, result2
 
