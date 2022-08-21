@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from shapely.geometry import Polygon
 from typing import Set, Tuple
 from modules.planning.proto.planning_pb2 import ADCTrajectory
+from hdmap.MapParser import MapParser
 
 
 @dataclass
@@ -19,7 +20,16 @@ class PositionEstimate:
     s: float
 
     def is_too_close(self, rhs):
-        return self.lane_id == rhs.lane_id and abs(self.s-rhs.s) < 10
+        ma = MapParser.get_instance()
+        adc1 = generate_adc_polygon(
+            *ma.get_coordinate_and_heading(self.lane_id, self.s))
+        adc2 = generate_adc_polygon(
+            *ma.get_coordinate_and_heading(rhs.lane_id, rhs.s))
+
+        adc1p = Polygon([[x.x, x.y] for x in adc1])
+        adc2p = Polygon([[x.x, x.y] for x in adc2])
+
+        return adc1p.intersects(adc2p)
 
 
 def generate_polygon(position: Point3D, theta: float, length: float, width: float):
