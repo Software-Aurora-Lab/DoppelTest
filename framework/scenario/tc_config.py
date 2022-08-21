@@ -47,12 +47,13 @@ class TCSection:
             for sig, cond in relevant:
                 if sig in preference:
                     preference.remove(sig)
-                signals.remove(sig)
-                if cond == 'EQ':
-                    result[sig] = 'GREEN'
-                else:
-                    # NE
-                    result[sig] = 'RED'
+                if sig in signals:
+                    signals.remove(sig)
+                    if cond == 'EQ':
+                        result[sig] = 'GREEN'
+                    else:
+                        # NE
+                        result[sig] = 'RED'
         return result
 
     @staticmethod
