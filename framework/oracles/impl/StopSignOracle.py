@@ -25,12 +25,12 @@ class StopSignOracle(OracleInterface):
     violated_at_stop_sign_ids: List[str]
     stop_sign_stop_line_string_dict: Dict[str, LineString]
 
-    is_adc_intersecting_stop_line: Optional[bool]
-
     ADC_INTERSECTING_STOP_LINE_MAX_LOOK_BACK_FRAMES_IN_SECOND = 5.0
 
     # Apollo: virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
     STOP_SIGN_VO_ID_PREFIX = "SS_"
+
+    checked = set()
 
     def __init__(self):
         self.violated_at_stop_sign_ids = list()
@@ -56,12 +56,12 @@ class StopSignOracle(OracleInterface):
             return
 
         crossing_stop_sign_id = self.check_if_adc_intersecting_any_stop_lines()
-        if not crossing_stop_sign_id:
-            if not self.is_adc_intersecting_stop_line:  # status from previous localization message
-                return
-        else:
-            self.is_adc_intersecting_stop_line = True
+
+        if crossing_stop_sign_id == "" or crossing_stop_sign_id in self.checked:
             return
+
+        # when ADC started intersecting, check if stop decision was made before that
+        self.checked.add(crossing_stop_sign_id)
 
         # the code below means that ADC just crossed the stop line
         # while in the previous message it was still intersecting the stop_line
@@ -113,19 +113,20 @@ class StopSignOracle(OracleInterface):
         stop_sign_ids = map_parser.get_stop_signs()
         for ss_id in stop_sign_ids:
             stop_sign_data = map_parser.get_stop_sign_by_id(ss_id)
-            line = LineString([[p.x, p.y] for p in stop_sign_data.stop_line[0].segment[0].line_segment.point])
+            line = LineString(
+                [[p.x, p.y] for p in stop_sign_data.stop_line[0].segment[0].line_segment.point])
             self.stop_sign_stop_line_string_dict[ss_id] = line
 
     def reset_all_oracle_states(self) -> None:
         self.past_localization_list = list()
         self.past_planning_list = list()
-        self.is_adc_intersecting_stop_line = False
 
     def check_if_adc_intersecting_any_stop_lines(self) -> str:
         last_localization = self.past_localization_list[-1]
         adc_pose = last_localization.pose
 
-        adc_polygon_pts = generate_adc_polygon(adc_pose.position, adc_pose.heading)
+        adc_polygon_pts = generate_adc_polygon(
+            adc_pose.position, adc_pose.heading)
         adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
         for stop_sign_id, stop_line_string in self.stop_sign_stop_line_string_dict.items():
             if not stop_line_string.intersection(adc_polygon).is_empty:
@@ -140,7 +141,8 @@ class StopSignOracle(OracleInterface):
         if stop_reason_code != STOP_REASON_STOP_SIGN:
             return False
 
-        stop_reason = stop_decision.reason  # e.g,  stop_reason = "stop by SS_stop_sign_0" (included stop_sign_id)
+        # e.g,  stop_reason = "stop by SS_stop_sign_0" (included stop_sign_id)
+        stop_reason = stop_decision.reason
         if re.sub("^stop by ", "", stop_reason) == self.STOP_SIGN_VO_ID_PREFIX + stop_sign_id:
             return True
 
