@@ -39,6 +39,8 @@ def main():
 
         curr_gen += 1
 
+        vt.save_to_file()
+
 
 if __name__ == '__main__':
     main()
