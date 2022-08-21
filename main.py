@@ -302,7 +302,8 @@ def main():
         logger.info(f' ====== Generation {curr_gen} ====== ')
         # Vary the population
         offspring = algorithms.varOr(
-            population, toolbox, OFF_SIZE, CXPB, MUTPB)
+            population, toolbox, OFF_SIZE - 5, CXPB, MUTPB)
+        offspring += [Scenario.get_one() for _ in range(5)]
 
         # update chromosome gid and cid
         for index, c in enumerate(offspring):
