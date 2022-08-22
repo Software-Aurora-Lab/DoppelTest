@@ -105,7 +105,8 @@ class StopSignOracle(OracleInterface):
         result = list()
         for stop_sign_id in self.violated_at_stop_sign_ids:
             violation = ('stop_sign', stop_sign_id)
-            result.append(violation)
+            if violation not in result:
+                result.append(violation)
         return result
 
     def parse_stop_sign_stop_line_string_on_map(self, map_parser: MapParser) -> None:

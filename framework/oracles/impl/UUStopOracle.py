@@ -87,4 +87,6 @@ class UUStopOracle(OracleInterface):
         for ssst in self.violated_stop_sign_stopped_times:
             violation = ('uu_stop', ssst[1])
             result.append(violation)
+            if violation not in result:
+                result.append(violation)
         return result

@@ -83,7 +83,8 @@ class TrafficSignalOracle(OracleInterface):
         result = list()
         for traffic_signal_id in self.violated_at_traffic_signal_ids:
             violation = ('traffic_signal', traffic_signal_id)
-            result.append(violation)
+            if violation not in result:
+                result.append(violation)
         return result
 
     def parse_traffic_signal_stop_line_string_on_map(self, map_parser: MapParser) -> None:
