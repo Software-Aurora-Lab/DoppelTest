@@ -116,7 +116,10 @@ class TrafficSignalOracle(OracleInterface):
 
     def is_planning_main_decision_to_stop_at_traffic_signal(self, planning_message: ADCTrajectory,
                                                             traffic_signal_id: str) -> bool:
-        stop_decision = planning_message.decision.main_decision.stop
+        try:
+            stop_decision = planning_message.decision.main_decision.stop
+        except AttributeError:
+            return False
 
         stop_reason_code = stop_decision.reason_code
         if stop_reason_code != STOP_REASON_SIGNAL:

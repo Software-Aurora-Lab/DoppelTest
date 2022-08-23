@@ -65,12 +65,7 @@ class UUStopOracle(OracleInterface):
 
     # the function below will handle the case that ADC stop too long at stop sign
     def calculate_adc_stop_times_at_stop_signs(self) -> None:
-        stop_decision = self.last_planning.decision.main_decision.stop
-
-        last_stop_reason_code = stop_decision.reason_code  # e.g, stop_reason_code = "STOP_REASON_STOP_SIGN"
-        last_stop_reason = stop_decision.reason  # e.g,  stop_reason = "stop by SS_stop_sign_0" (included stop_sign_id)
-
-        if last_stop_reason_code != STOP_REASON_STOP_SIGN:
+        if not self.is_planning_main_decision_to_stop_at_stop_sign(self.last_planning):
             self.first_stop_timestamp = None
             return
 
@@ -80,13 +75,25 @@ class UUStopOracle(OracleInterface):
 
         adc_total_stop_time = last_stop_timestamp - self.first_stop_timestamp
         if adc_total_stop_time > self.ADC_MAX_STOP_TIME_ON_STOP_SIGN_IN_SECOND:
+            last_stop_reason = self.last_planning.decision.main_decision.stop.reason
             self.violated_stop_sign_stopped_times.append((adc_total_stop_time, str(last_stop_reason)))
+
+    def is_planning_main_decision_to_stop_at_stop_sign(self, planning_message: ADCTrajectory) -> bool:
+        try:
+            stop_decision = planning_message.decision.main_decision.stop
+        except AttributeError:
+            return False
+
+        stop_reason_code = stop_decision.reason_code
+        if stop_reason_code == STOP_REASON_STOP_SIGN:
+            return True
+
+        return False
 
     def get_result(self):
         result = list()
         for ssst in self.violated_stop_sign_stopped_times:
             violation = ('uu_stop', ssst[1])
-            result.append(violation)
             if violation not in result:
                 result.append(violation)
         return result

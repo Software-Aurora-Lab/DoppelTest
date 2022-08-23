@@ -76,11 +76,8 @@ class StopSignOracle(OracleInterface):
             if last_localization_timestamp - past_localization_timestamp > self.ADC_INTERSECTING_STOP_LINE_MAX_LOOK_BACK_FRAMES_IN_SECOND:
                 break
 
-            adc_pose = past_localization.pose
-            adc_velocity = calculate_velocity(adc_pose.linear_velocity)
-
             # check condition (2)
-            if adc_velocity > 0.0:
+            if not self.was_adc_completely_stopped(past_localization):
                 continue
 
             # check condition (1)
@@ -136,7 +133,10 @@ class StopSignOracle(OracleInterface):
 
     def is_planning_main_decision_to_stop_at_stop_sign(self, planning_message: ADCTrajectory,
                                                        stop_sign_id: str) -> bool:
-        stop_decision = planning_message.decision.main_decision.stop
+        try:
+            stop_decision = planning_message.decision.main_decision.stop
+        except AttributeError:
+            return False
 
         stop_reason_code = stop_decision.reason_code
         if stop_reason_code != STOP_REASON_STOP_SIGN:
@@ -149,7 +149,16 @@ class StopSignOracle(OracleInterface):
 
         return False
 
-    def prune_old_messages(self):
+    @staticmethod
+    def was_adc_completely_stopped(past_localization) -> bool:
+        adc_pose = past_localization.pose
+        adc_velocity = calculate_velocity(adc_pose.linear_velocity)
+
+        # https://github.com/ApolloAuto/apollo/blob/0789b7ea1e1356dde444452ab21b51854781e304/modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.cc#L237
+        # return adc_velocity <= self.MAX_ABS_SPEED_WHEN_STOPPED
+        return adc_velocity == 0
+
+    def prune_old_messages(self) -> None:
         total_localization_message_number = len(self.past_localization_list)
         if total_localization_message_number > 200:
             # based on PERCEPTION_FREQUENCY = 25 == 125 messages sent per 5 seconds
