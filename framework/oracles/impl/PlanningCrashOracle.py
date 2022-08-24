@@ -12,7 +12,7 @@ from modules.planning.proto.planning_pb2 import ADCTrajectory
 class PlanningCrashOracle(OracleInterface):
     """
         *Idea for checking if ADC planner crashed:
-        ADC must have been driven for a certain distance,
+        ADC must have been driven for a certain distance (to make sure it's not routing failure),
         If ADC stopped at speed of 0.0 m/s, check if:
         (1) no decision/NOT_READY decision is being made
     """
