@@ -1,8 +1,8 @@
-from typing import List, Set, Optional, Tuple, Dict
+from typing import Set, Optional, Dict
 
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import LineString, Point
 
-from apollo.utils import calculate_velocity, generate_adc_polygon
+from apollo.utils import calculate_velocity, construct_lane_polygon
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -20,7 +20,7 @@ class PlanningCrashOracle(OracleInterface):
     last_localization = Optional[LocalizationEstimate]
     last_planning = Optional[ADCTrajectory]
     is_adc_started_to_drive = Optional[bool]
-    center_lane_line_string_dict: Dict[str, LineString]
+    lane_polygon_dict: Dict[str, LineString]
 
     planning_crash_locations: Set[str]
 
@@ -32,7 +32,7 @@ class PlanningCrashOracle(OracleInterface):
 
         self.is_adc_started_to_drive = False
 
-        self.parse_center_lane_line_string_on_map(MapParser.get_instance())
+        self.parse_lane_polygon_on_map(MapParser.get_instance())
 
     def get_interested_topics(self):
         return [
@@ -84,25 +84,22 @@ class PlanningCrashOracle(OracleInterface):
 
         return True
 
-    def parse_center_lane_line_string_on_map(self, map_parser: MapParser) -> None:
-        self.center_lane_line_string_dict = dict()
+    def parse_lane_polygon_on_map(self, map_parser: MapParser) -> None:
+        self.lane_polygon_dict = dict()
         lane_ids = map_parser.get_lanes()
         for l_id in lane_ids:
-            center_line = map_parser.get_lane_central_curve(l_id)
-            self.center_lane_line_string_dict[l_id] = center_line
+            lane_polygon = construct_lane_polygon(map_parser.get_lane_by_id(l_id))
+            self.lane_polygon_dict[l_id] = lane_polygon
 
     def find_current_lane_of_adc(self):
-        adc_pose = self.last_localization.pose
-        adc_polygon_pts = generate_adc_polygon(adc_pose.position, adc_pose.heading)
-        adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
-        min_distance = 10000
-        adc_lane_id = None
-        for lane_id, center_line in self.center_lane_line_string_dict.items():
-            current_distance = adc_polygon.distance(center_line)
-            if current_distance < min_distance:
-                adc_lane_id = lane_id
-                min_distance = current_distance
-        return adc_lane_id
+        last_localization = self.last_localization
+        adc_pose = last_localization.pose
+        adc_pose_position = adc_pose.position
+        current_point = Point(adc_pose_position.x, adc_pose_position.y)
+        for lane_id, lane_polygon in self.lane_polygon_dict.items():
+            if current_point.within(lane_polygon):
+                return lane_id
+        return None
 
     def get_result(self):
         result = list()

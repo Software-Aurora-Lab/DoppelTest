@@ -32,9 +32,9 @@ class MapParser:
         self.load_stop_signs()
         self.load_lanes()
         self.load_crosswalks()
-        self.parse_relations()
-        self.parse_signal_relations()
-        self.parse_lane_relations()
+        # self.parse_relations()
+        # self.parse_signal_relations()
+        # self.parse_lane_relations()
         MapParser.__instance = self
 
     @staticmethod

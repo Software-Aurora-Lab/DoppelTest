@@ -97,7 +97,6 @@ class TrafficSignalOracle(OracleInterface):
     def check_if_adc_intersecting_any_stop_lines(self) -> str:
         last_localization = self.last_localization
         adc_pose = last_localization.pose
-
         adc_polygon_pts = generate_adc_polygon(adc_pose.position, adc_pose.heading)
         adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
         for traffic_signal_id, stop_line_string in self.traffic_signal_stop_line_string_dict.items():

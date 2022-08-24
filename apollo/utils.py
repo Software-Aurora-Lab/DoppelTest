@@ -6,9 +6,10 @@ import time
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from config import APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, APOLLO_VEHICLE_back_edge_to_center
+from config import APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, \
+    APOLLO_VEHICLE_back_edge_to_center
 from dataclasses import dataclass
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, LineString
 from typing import Set, Tuple
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from hdmap.MapParser import MapParser
@@ -242,4 +243,38 @@ def clean_appolo_dir():
 
 def calculate_velocity(linear_velocity):
     x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
-    return math.sqrt(x**2+y**2)
+    return math.sqrt(x ** 2 + y ** 2)
+
+
+def construct_lane_polygon(lane_msg):
+    '''
+    Construct the lane polygon based on their boundaries
+    '''
+    left_points = get_lane_boundary_points(lane_msg.left_boundary)
+    right_points = get_lane_boundary_points(lane_msg.right_boundary)
+    right_points.reverse()
+    all_points = left_points + right_points
+    return Polygon(all_points)
+
+
+def get_lane_boundary_points(boundary):
+    '''
+    Given a lane boundary (left/right), return a list of x, y
+    coordinates of all points in the boundary
+    '''
+    boundary_points = []
+    for segment in boundary.curve.segment:
+        for segment_point in segment.line_segment.point:
+            boundary_points.append((segment_point.x, segment_point.y))
+    return boundary_points
+
+
+def construct_lane_boundary_linestring(lane_msg):
+    """
+    Description: Construct two linestrings for the lane's left and right boundary
+    Input: A lane message.
+    Output: A list containing the linestrings representing the left and right boundary of the lane
+    """
+    left_boundary_points = get_lane_boundary_points(lane_msg.left_boundary)
+    right_boundary_points = get_lane_boundary_points(lane_msg.right_boundary)
+    return LineString(left_boundary_points), LineString(right_boundary_points)
