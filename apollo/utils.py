@@ -1,3 +1,4 @@
+from cmath import isnan
 import glob
 import math
 import os
@@ -137,6 +138,14 @@ def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, headin
     return obs
 
 
+def to_Point3D(data):
+    return Point3D(
+        x=0.0 if math.isnan(data.x) else data.x,
+        y=0.0 if math.isnan(data.y) else data.y,
+        z=0.0 if math.isnan(data.z) else data.z
+    )
+
+
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:
     """
     Converts LocalizationEstimate to PerceptionObstacle
@@ -151,16 +160,16 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         obs: PerceptionObstacle
             prepared data which is ready to be sent as PerceptionObstacle
     """
-    position = Point3D(x=data.pose.position.x,
-                       y=data.pose.position.y, z=data.pose.position.z)
-    velocity = Point3D(x=data.pose.linear_velocity.x,
-                       y=data.pose.linear_velocity.y, z=data.pose.linear_velocity.z)
+    position = to_Point3D(data.pose.position)
+    velocity = to_Point3D(data.pose.linear_velocity)
+    acceleration = to_Point3D(data.pose.linear_acceleration)
+
     obs = PerceptionObstacle(
         id=_id,
         position=position,
         theta=data.pose.heading,
         velocity=velocity,
-        acceleration=data.pose.linear_acceleration,
+        acceleration=acceleration,
         length=APOLLO_VEHICLE_LENGTH,
         width=APOLLO_VEHICLE_WIDTH,
         height=APOLLO_VEHICLE_HEIGHT,
