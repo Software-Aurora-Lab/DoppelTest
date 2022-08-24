@@ -19,7 +19,6 @@ import numpy as np
 
 
 def eval_scenario(ind: Scenario):
-    return random(), random(), random(), random()
     g_name = f'Generation_{ind.gid:05}'
     s_name = f'Scenario_{ind.cid:05}'
     srunner = ScenarioRunner.get_instance()
