@@ -29,8 +29,8 @@ class RecordAnalyzer:
             StopSignOracle(),
             TrafficSignalOracle(),
             UUStopOracle(),
-            PlanningCrashOracle(),
-            UnsafeLaneChangeOracle(),
+            # PlanningCrashOracle(),
+            # UnsafeLaneChangeOracle(),
         ]
         for o in oracles:
             self.oracle_manager.register_oracle(o)
