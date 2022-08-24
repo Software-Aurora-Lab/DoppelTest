@@ -23,6 +23,7 @@ class UUStopOracle(OracleInterface):
 
     # STOP_SIGN_VO_ID_PREFIX = "SS_"
     ADC_MAX_STOP_TIME_ON_STOP_SIGN_IN_SECOND = 10.0
+
     # MAX_ABS_SPEED_WHEN_STOPPED = 0.2  # mkz_example
 
     def __init__(self) -> None:

@@ -1,3 +1,4 @@
+from framework.oracles.impl.PlanningCrashOracle import PlanningCrashOracle
 from framework.oracles.impl.StopSignOracle import StopSignOracle
 from framework.oracles.impl.ModuleOracle import ModuleOracle
 from framework.oracles.impl.EStopOracle import EStopOracle
@@ -29,7 +30,8 @@ class RecordAnalyzer:
             ComfortOracle(),
             StopSignOracle(),
             TrafficSignalOracle(),
-            UUStopOracle()
+            UUStopOracle(),
+            PlanningCrashOracle(),
         ]
         for o in oracles:
             self.oracle_manager.register_oracle(o)

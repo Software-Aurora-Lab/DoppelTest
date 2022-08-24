@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from shapely.geometry import LineString, Polygon
 
@@ -25,12 +25,12 @@ class TrafficSignalOracle(OracleInterface):
     last_planning = Optional[ADCTrajectory]
 
     traffic_signal_stop_line_string_dict: Dict[str, LineString]
-    violated_at_traffic_signal_ids: List[str]
+    violated_at_traffic_signal_ids: Set[str]
 
     TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_"
 
     def __init__(self) -> None:
-        self.violated_at_traffic_signal_ids = list()
+        self.violated_at_traffic_signal_ids = set()
 
         self.last_localization = None
         self.last_traffic_signal_detection = None
@@ -77,14 +77,13 @@ class TrafficSignalOracle(OracleInterface):
         if self.is_planning_main_decision_to_stop_at_traffic_signal(self.last_planning,
                                                                     crossing_traffic_signal_id) is False \
                 or self.is_adc_completely_stopped() is False:
-            self.violated_at_traffic_signal_ids.append(crossing_traffic_signal_id)
+            self.violated_at_traffic_signal_ids.add(crossing_traffic_signal_id)
 
     def get_result(self):
         result = list()
         for traffic_signal_id in self.violated_at_traffic_signal_ids:
             violation = ('traffic_signal', traffic_signal_id)
-            if violation not in result:
-                result.append(violation)
+            result.append(violation)
         return result
 
     def parse_traffic_signal_stop_line_string_on_map(self, map_parser: MapParser) -> None:
