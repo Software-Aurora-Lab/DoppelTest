@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
 
 from shapely.geometry import Polygon, LineString
 
@@ -22,7 +22,7 @@ class StopSignOracle(OracleInterface):
     past_localization_list: List[LocalizationEstimate]
     past_planning_list: List[ADCTrajectory]
 
-    violated_at_stop_sign_ids: List[str]
+    violated_at_stop_sign_ids: Set[str]
     stop_sign_stop_line_string_dict: Dict[str, LineString]
 
     ADC_INTERSECTING_STOP_LINE_MAX_LOOK_BACK_FRAMES_IN_SECOND = 5.0
@@ -33,7 +33,7 @@ class StopSignOracle(OracleInterface):
     checked = set()
 
     def __init__(self):
-        self.violated_at_stop_sign_ids = list()
+        self.violated_at_stop_sign_ids = set()
         self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance())
         self.reset_all_oracle_states()
 
@@ -94,7 +94,7 @@ class StopSignOracle(OracleInterface):
                 break
 
         if not is_adc_followed_stop_sign_rule:
-            self.violated_at_stop_sign_ids.append(crossing_stop_sign_id)
+            self.violated_at_stop_sign_ids.add(crossing_stop_sign_id)
 
         self.reset_all_oracle_states()
 
@@ -102,8 +102,7 @@ class StopSignOracle(OracleInterface):
         result = list()
         for stop_sign_id in self.violated_at_stop_sign_ids:
             violation = ('stop_sign', stop_sign_id)
-            if violation not in result:
-                result.append(violation)
+            result.append(violation)
         return result
 
     def parse_stop_sign_stop_line_string_on_map(self, map_parser: MapParser) -> None:
