@@ -2,7 +2,7 @@
 Random version of the framework, used to compare as base line.
 """
 
-from main import eval_scenario
+from main_ga import eval_scenario
 from config import APOLLO_ROOT, MAX_ADC_COUNT
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles.ViolationTracker import ViolationTracker

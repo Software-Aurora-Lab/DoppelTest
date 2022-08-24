@@ -13,11 +13,13 @@ from hdmap.MapParser import MapParser
 from deap import base, tools, algorithms
 from utils import get_logger, remove_record_files
 import os
+import numpy as np
 
 # EVALUATION (FITNESS)
 
 
 def eval_scenario(ind: Scenario):
+    return random(), random(), random(), random()
     g_name = f'Generation_{ind.gid:05}'
     s_name = f'Scenario_{ind.cid:05}'
     srunner = ScenarioRunner.get_instance()
@@ -295,6 +297,13 @@ def main():
         ind.fitness.values = fit
     hof.update(population)
 
+    stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean, axis=0)
+    stats.register("max", np.max, axis=0)
+    stats.register("min", np.min, axis=0)
+    logbook = tools.Logbook()
+    logbook.header = 'gen', 'avg', 'max', 'min'
+
     # begin generational process
     curr_gen = 0
     while True:
@@ -321,12 +330,16 @@ def main():
         # Select the next generation population
         population[:] = toolbox.select(population + offspring, POP_SIZE)
 
-        print(f"{hof[-1].gid} - {hof[-1].cid}: {hof[-1].fitness}")
+        record = stats.compile(population)
+        logbook.record(gen=curr_gen, **record)
+        print(logbook.stream)
 
         vt.save_to_file()
 
         if curr_gen == 500:
             break
+
+    print(logbook)
 
 
 if __name__ == '__main__':
