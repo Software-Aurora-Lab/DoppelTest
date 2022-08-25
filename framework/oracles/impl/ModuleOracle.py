@@ -39,6 +39,6 @@ class ModuleOracle(OracleInterface):
         result = list()
         if self.distance_traveled == 0.0:
             result.append(('module', 'routing failure'))
-        elif self.distance_traveled == -1.0:
-            result.append(('module', 'sim control failure'))
+        # elif self.distance_traveled == -1.0:
+        #     result.append(('module', 'sim control failure'))
         return result

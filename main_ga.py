@@ -1,6 +1,9 @@
+from copy import deepcopy
+from datetime import datetime
+import pickle
 from random import random, sample, shuffle, randint
 import shutil
-from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR
+from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -13,6 +16,7 @@ from hdmap.MapParser import MapParser
 from deap import base, tools, algorithms
 from utils import get_logger, remove_record_files
 import os
+import numpy as np
 
 # EVALUATION (FITNESS)
 
@@ -30,6 +34,7 @@ def eval_scenario(ind: Scenario):
         obs_routing_map[a.nid] = r.routing_str
 
     unique_violation = 0
+    duplicate_violation = 0
     min_distance = list()
     decisions = set()
     for a, r in runners:
@@ -66,23 +71,18 @@ def eval_scenario(ind: Scenario):
                 data=related_data
             ):
                 unique_violation += 1
+            else:
+                duplicate_violation += 1
 
-    # //TODO: Add Compute Conflict Count to Scenario class
     ma = MapParser.get_instance()
-    conflict = set()
-    for a1, r1 in runners:
-        for a2, r2 in runners:
-            if r1.routing_str == r2.routing_str:
-                continue
-            if ma.is_conflict_lanes(r1.routing, r2.routing):
-                conflict.add(frozenset([r1.routing_str, r2.routing_str]))
+    conflict = ind.has_ad_conflict()
 
     if unique_violation == 0:
         # no unique violation, remove records
         remove_record_files(g_name, s_name)
         pass
 
-    return min(min_distance), len(decisions), len(conflict), unique_violation
+    return min(min_distance), len(decisions), conflict, unique_violation, duplicate_violation
 
 # MUTATION OPERATOR
 
@@ -91,7 +91,7 @@ def mut_ad_section(ind: ADSection):
     mut_pb = random()
 
     # remove a random 1
-    if mut_pb < 0.2 and len(ind.adcs) > 2:
+    if mut_pb < 0.1 and len(ind.adcs) > 2:
         shuffle(ind.adcs)
         ind.adcs.pop()
         ind.adjust_time()
@@ -100,8 +100,10 @@ def mut_ad_section(ind: ADSection):
     # add a random 1
     if mut_pb < 0.4 and len(ind.adcs) < MAX_ADC_COUNT:
         while True:
-            if ind.add_agent(ADAgent.get_one()):
+            new_ad = ADAgent.get_one()
+            if ind.has_conflict(new_ad) and ind.add_agent(new_ad):
                 break
+        ind.adjust_time()
         return ind
 
     # mutate a random agent
@@ -175,37 +177,53 @@ def mut_scenario(ind: Scenario):
 def cx_ad_section(ind1: ADSection, ind2: ADSection):
     # swap entire ad section
     cx_pb = random()
-    if cx_pb < 0.1:
+    if cx_pb < 0.05:
         return ind2, ind1
 
-    # combine to make 2 new populations
+    cxed = False
+
+    for adc1 in ind1.adcs:
+        for adc2 in ind2.adcs:
+            if adc1.routing_str == adc2.routing_str:
+                # same routing in both parents
+                # swap start_s and start_t
+                if random() < 0.5:
+                    adc1.start_s = adc2.start_s
+                else:
+                    adc1.start_t = adc2.start_t
+                mutated = True
+    if cxed:
+        ind1.adjust_time()
+        return ind1, ind2
+
+    if len(ind1.adcs) < MAX_ADC_COUNT:
+        for adc in ind2.adcs:
+            if ind1.has_conflict(adc) and ind1.add_agent(deepcopy(adc)):
+                # add an agent from parent 2 to parent 1 if there exists a conflict
+                ind1.adjust_time()
+                return ind1, ind2
+
+    # if none of the above happened, no common adc, no conflict in either
+    # combine to make a new populations
     available_adcs = ind1.adcs + ind2.adcs
     shuffle(available_adcs)
-
-    split_index = randint(2, len(available_adcs) - 2)
+    split_index = randint(2, min(len(available_adcs), 5))
 
     result1 = ADSection([])
     for x in available_adcs[:split_index]:
-        result1.add_agent(x)
-
-    result2 = ADSection([])
-    for x in available_adcs[split_index:]:
-        result2.add_agent(x)
+        result1.add_agent(deepcopy(x))
 
     # make sure offspring adc count is valid
 
     while len(result1.adcs) > MAX_ADC_COUNT:
         result1.adcs.pop()
 
-    while len(result2.adcs) > MAX_ADC_COUNT:
-        result2.adcs.pop()
-
     while len(result1.adcs) < 2:
-        result1.add_agent(ADAgent.get_one())
-    while len(result2.adcs) < 2:
-        result2.add_agent(ADAgent.get_one())
-
-    return result1, result2
+        new_ad = ADAgent.get_one()
+        if result1.has_conflict(new_ad) and result1.add_agent(new_ad):
+            break
+    result1.adjust_time()
+    return result1, ind2
 
 
 def cx_pd_section(ind1: PDSection, ind2: PDSection):
@@ -237,11 +255,11 @@ def cx_tc_section(ind1: TCSection, ind2: TCSection):
 
 def cx_scenario(ind1: Scenario, ind2: Scenario):
     cx_pb = random()
-    if cx_pb < 1/3:
+    if cx_pb < 0.6:
         ind1.ad_section, ind2.ad_section = cx_ad_section(
             ind1.ad_section, ind2.ad_section
         )
-    elif cx_pb < 2/3:
+    elif cx_pb < 0.6 + 0.2:
         ind1.pd_section, ind2.pd_section = cx_pd_section(
             ind1.pd_section, ind2.pd_section
         )
@@ -269,8 +287,8 @@ def main():
     vt = ViolationTracker()
 
     # GA Hyperparameters
-    POP_SIZE = 25  # number of population
-    OFF_SIZE = 25  # number of offspring to produce
+    POP_SIZE = 10  # number of population
+    OFF_SIZE = 10  # number of offspring to produce
     CXPB = 0.8  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
@@ -281,7 +299,8 @@ def main():
     toolbox.register("select", tools.selNSGA2)
 
     # start GA
-    population = [Scenario.get_one() for _ in range(POP_SIZE)]
+    start_time = datetime.now()
+    population = [Scenario.get_conflict_one() for _ in range(POP_SIZE)]
     for index, c in enumerate(population):
         c.gid = 0
         c.cid = index
@@ -295,15 +314,21 @@ def main():
         ind.fitness.values = fit
     hof.update(population)
 
+    stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean, axis=0)
+    stats.register("max", np.max, axis=0)
+    stats.register("min", np.min, axis=0)
+    logbook = tools.Logbook()
+    logbook.header = 'gen', 'avg', 'max', 'min'
+
     # begin generational process
     curr_gen = 0
     while True:
         curr_gen += 1
-        logger.info(f' ====== Generation {curr_gen} ====== ')
+        logger.info(f' ====== GA Generation {curr_gen} ====== ')
         # Vary the population
         offspring = algorithms.varOr(
-            population, toolbox, OFF_SIZE - 5, CXPB, MUTPB)
-        offspring += [Scenario.get_one() for _ in range(5)]
+            population, toolbox, OFF_SIZE, CXPB, MUTPB)
 
         # update chromosome gid and cid
         for index, c in enumerate(offspring):
@@ -321,11 +346,19 @@ def main():
         # Select the next generation population
         population[:] = toolbox.select(population + offspring, POP_SIZE)
 
-        print(f"{hof[-1].gid} - {hof[-1].cid}: {hof[-1].fitness}")
+        record = stats.compile(population)
+        logbook.record(gen=curr_gen, **record)
+        print(logbook.stream)
 
         vt.save_to_file()
+        with open('./data/log.bin', 'wb') as fp:
+            pickle.dump(logbook, fp)
+        with open('./data/hof.bin', 'wb') as fp:
+            pickle.dump(hof, fp)
 
-        if curr_gen == 500:
+        curr_time = datetime.now()
+        tdelta = (curr_time - start_time).total_seconds()
+        if tdelta / 3600 > RUN_FOR_HOUR:
             break
 
 
