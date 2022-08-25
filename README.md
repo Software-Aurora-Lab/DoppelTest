@@ -24,6 +24,6 @@ Please follow the following steps to set up the framework.
 1. Install the required Python libraries: numpy, Shapely, DEAP, pandas, networkx, [docker](https://docker-py.readthedocs.io/en/stable/) and [cyber_record](https://github.com/daohu527/cyber_record)
 2. Replace directories in `config.py`
 https://github.com/YuqiHuai/MAGGIE/blob/2530b47a90ca39fa130998538e14b7f95b455ba3/config.py#L19-L21
-3. Verify that the framework is runnable via `python test_generation.py`
+3. Verify that the framework is runnable via `python test_main.py`
 > You might be prompted to downgrade Python protobuf via `pip install protobuf==3.20.1`
-4. Start the magic via `python main.py`
+4. Start the magic via `python main_ga.py`
