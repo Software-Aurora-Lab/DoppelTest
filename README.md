@@ -26,4 +26,4 @@ Please follow the following steps to set up the framework.
 https://github.com/YuqiHuai/MAGGIE/blob/2530b47a90ca39fa130998538e14b7f95b455ba3/config.py#L19-L21
 3. Verify that the framework is runnable via `python test_main.py`
 > You might be prompted to downgrade Python protobuf via `pip install protobuf==3.20.1`
-4. Start the magic via `python main_ga.py`
+4. Start the magic via `python main_ga.py` or `python main_random.py`
