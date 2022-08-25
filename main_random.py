@@ -2,8 +2,9 @@
 Random version of the framework, used to compare as base line.
 """
 
+from datetime import datetime
 from main_ga import eval_scenario
-from config import APOLLO_ROOT, MAX_ADC_COUNT
+from config import APOLLO_ROOT, MAX_ADC_COUNT, RUN_FOR_HOUR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
@@ -26,7 +27,7 @@ def main():
 
     srunner = ScenarioRunner(containers)
     vt = ViolationTracker()
-    POP_SIZE = 25
+    POP_SIZE = 10
 
     hof = tools.ParetoFront()
     stats = tools.Statistics(key=lambda ind: ind.fitness.values)
@@ -35,6 +36,8 @@ def main():
     stats.register("min", np.min, axis=0)
     logbook = tools.Logbook()
     logbook.header = 'gen', 'avg', 'max', 'min'
+
+    start_time = datetime.now()
 
     curr_gen = 0
     while True:
@@ -58,6 +61,10 @@ def main():
         curr_gen += 1
 
         vt.save_to_file()
+        curr_time = datetime.now()
+        tdelta = (curr_time - start_time).total_seconds()
+        if tdelta / 3600 > RUN_FOR_HOUR:
+            break
 
 
 if __name__ == '__main__':
