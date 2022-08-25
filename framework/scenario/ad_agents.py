@@ -104,6 +104,13 @@ class ADSection:
         self.adcs.append(adc)
         return True
 
+    def has_conflict(self, adc: ADAgent) -> bool:
+        ma = MapParser.get_instance()
+        for ad in self.adcs:
+            if ma.is_conflict_lanes(adc.routing, ad.routing):
+                return True
+        return False
+
     @staticmethod
     def get_one():
         num = randint(2, MAX_ADC_COUNT)
