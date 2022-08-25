@@ -1,7 +1,9 @@
 from copy import deepcopy
+from datetime import datetime
+import pickle
 from random import random, sample, shuffle, randint
 import shutil
-from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR
+from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -32,6 +34,7 @@ def eval_scenario(ind: Scenario):
         obs_routing_map[a.nid] = r.routing_str
 
     unique_violation = 0
+    duplicate_violation = 0
     min_distance = list()
     decisions = set()
     for a, r in runners:
@@ -68,6 +71,8 @@ def eval_scenario(ind: Scenario):
                 data=related_data
             ):
                 unique_violation += 1
+            else:
+                duplicate_violation += 1
 
     ma = MapParser.get_instance()
     conflict = ind.has_ad_conflict()
@@ -77,7 +82,7 @@ def eval_scenario(ind: Scenario):
         remove_record_files(g_name, s_name)
         pass
 
-    return min(min_distance), len(decisions), conflict, unique_violation
+    return min(min_distance), len(decisions), conflict, unique_violation, duplicate_violation
 
 # MUTATION OPERATOR
 
@@ -175,6 +180,8 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
     if cx_pb < 0.05:
         return ind2, ind1
 
+    cxed = False
+
     for adc1 in ind1.adcs:
         for adc2 in ind2.adcs:
             if adc1.routing_str == adc2.routing_str:
@@ -184,21 +191,23 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
                     adc1.start_s = adc2.start_s
                 else:
                     adc1.start_t = adc2.start_t
+                mutated = True
+    if cxed:
+        ind1.adjust_time()
+        return ind1, ind2
+
+    if len(ind1.adcs) < MAX_ADC_COUNT:
+        for adc in ind2.adcs:
+            if ind1.has_conflict(adc) and ind1.add_agent(deepcopy(adc)):
+                # add an agent from parent 2 to parent 1 if there exists a conflict
                 ind1.adjust_time()
                 return ind1, ind2
-
-    for adc in ind2.adcs:
-        if ind1.has_conflict(adc) and ind1.add_agent(deepcopy(adc)):
-            # add an agent from parent 2 to parent 1 if there exists a conflict
-            ind1.adjust_time()
-            return ind1, ind2
 
     # if none of the above happened, no common adc, no conflict in either
     # combine to make a new populations
     available_adcs = ind1.adcs + ind2.adcs
     shuffle(available_adcs)
-
-    split_index = randint(2, min(len(available_adcs) - 2, 5))
+    split_index = randint(2, min(len(available_adcs), 5))
 
     result1 = ADSection([])
     for x in available_adcs[:split_index]:
@@ -211,8 +220,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
 
     while len(result1.adcs) < 2:
         new_ad = ADAgent.get_one()
-        if result1.has_conflict(new_ad):
-            result1.add_agent(new_ad)
+        if result1.has_conflict(new_ad) and result1.add_agent(new_ad):
             break
     result1.adjust_time()
     return result1, ind2
@@ -279,8 +287,8 @@ def main():
     vt = ViolationTracker()
 
     # GA Hyperparameters
-    POP_SIZE = 25  # number of population
-    OFF_SIZE = 25  # number of offspring to produce
+    POP_SIZE = 10  # number of population
+    OFF_SIZE = 10  # number of offspring to produce
     CXPB = 0.8  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
@@ -291,6 +299,7 @@ def main():
     toolbox.register("select", tools.selNSGA2)
 
     # start GA
+    start_time = datetime.now()
     population = [Scenario.get_conflict_one() for _ in range(POP_SIZE)]
     for index, c in enumerate(population):
         c.gid = 0
@@ -316,7 +325,7 @@ def main():
     curr_gen = 0
     while True:
         curr_gen += 1
-        logger.info(f' ====== Generation {curr_gen} ====== ')
+        logger.info(f' ====== GA Generation {curr_gen} ====== ')
         # Vary the population
         offspring = algorithms.varOr(
             population, toolbox, OFF_SIZE, CXPB, MUTPB)
@@ -342,11 +351,15 @@ def main():
         print(logbook.stream)
 
         vt.save_to_file()
+        with open('./data/log.bin', 'wb') as fp:
+            pickle.dump(logbook, fp)
+        with open('./data/hof.bin', 'wb') as fp:
+            pickle.dump(hof, fp)
 
-        if curr_gen == 500:
+        curr_time = datetime.now()
+        tdelta = (curr_time - start_time).total_seconds()
+        if tdelta / 3600 > RUN_FOR_HOUR:
             break
-
-    print(logbook)
 
 
 if __name__ == '__main__':

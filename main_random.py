@@ -41,7 +41,7 @@ def main():
 
     curr_gen = 0
     while True:
-        print(f'===== Generation {curr_gen} =====')
+        print(f'===== RAND Generation {curr_gen} =====')
         population = [Scenario.get_one() for _ in range(POP_SIZE)]
         for index, c in enumerate(population):
             c.gid = curr_gen
