@@ -12,7 +12,8 @@ class ScenarioFitness(base.Fitness):
     # maximize number of unique decisions being made
     # maximize pairs of conflict trajectory
     # maximize unique violation
-    weights = (-1.0, 1.0, 1.0, 1.0)
+    # minimize duplicate violation
+    weights = (-1.0, 1.0, 1.0, 1.0, -1.0)
 
 
 @dataclass
