@@ -209,7 +209,7 @@ class MapParser:
         reachable = self.__get_reachable_from(lane_id)
         return [p for p in reachable if p[-1] in target_lanes]
 
-    def __get_reachable_from(self, lane_id: str, depth=3):
+    def __get_reachable_from(self, lane_id: str, depth=5):
         if depth == 1:
             return [[lane_id]]
         result = list()
