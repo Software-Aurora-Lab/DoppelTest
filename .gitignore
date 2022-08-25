@@ -243,3 +243,5 @@ data/records/*
 
 notes.txt
 test.py
+data/hof.bin
+data/log.bin
