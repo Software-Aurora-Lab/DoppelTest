@@ -9,6 +9,9 @@ from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from hdmap.MapParser import MapParser
+from deap import tools
+import numpy as np
+import pickle
 
 
 def main():
@@ -25,6 +28,14 @@ def main():
     vt = ViolationTracker()
     POP_SIZE = 25
 
+    hof = tools.ParetoFront()
+    stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+    stats.register("avg", np.mean, axis=0)
+    stats.register("max", np.max, axis=0)
+    stats.register("min", np.min, axis=0)
+    logbook = tools.Logbook()
+    logbook.header = 'gen', 'avg', 'max', 'min'
+
     curr_gen = 0
     while True:
         print(f'===== Generation {curr_gen} =====')
@@ -35,7 +46,14 @@ def main():
 
         for ind in population:
             print(f'Running scenario {ind.cid} - {ind.gid}')
-            eval_scenario(ind)
+            fit = eval_scenario(ind)
+            ind.fitness.values = fit
+            print('Fitness', fit)
+
+        hof.update(population)
+        record = stats.compile(population)
+        logbook.record(gen=curr_gen, **record)
+        print(logbook.stream)
 
         curr_gen += 1
 
