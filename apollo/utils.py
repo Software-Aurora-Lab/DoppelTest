@@ -22,6 +22,7 @@ class PositionEstimate:
     s: float
 
     def is_too_close(self, rhs):
+        # 2 vehicles are too close if their distance is less than 5 meters
         ma = MapParser.get_instance()
         adc1 = generate_adc_polygon(
             *ma.get_coordinate_and_heading(self.lane_id, self.s))
@@ -31,7 +32,7 @@ class PositionEstimate:
         adc1p = Polygon([[x.x, x.y] for x in adc1])
         adc2p = Polygon([[x.x, x.y] for x in adc2])
 
-        return adc1p.intersects(adc2p)
+        return adc1p.distance(adc2p) < 5
 
 
 def generate_polygon(position: Point3D, theta: float, length: float, width: float):
