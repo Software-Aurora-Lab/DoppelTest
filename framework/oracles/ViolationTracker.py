@@ -19,10 +19,15 @@ class ViolationTracker:
     def get_instance():
         return ViolationTracker.__instance
 
-    def add_violation(self, gname, sname, record_file, mt, st, data) -> bool:
+    def add_violation(self, gname, sname, record_file, mt, st, data, force=True) -> bool:
         """
         Returns True if added (unique)
         """
+        if force:
+            self.scenario_tracker.append(
+                (f"{gname}/{sname}", mt, st, data, record_file))
+            return True
+
         if data not in self.tracker[mt][st]:
             self.tracker[mt][st].add(data)
             self.scenario_tracker.append(
