@@ -71,8 +71,6 @@ def eval_scenario(ind: Scenario):
                 data=related_data
             ):
                 unique_violation += 1
-            else:
-                duplicate_violation += 1
 
     ma = MapParser.get_instance()
     conflict = ind.has_ad_conflict()
@@ -82,7 +80,7 @@ def eval_scenario(ind: Scenario):
         remove_record_files(g_name, s_name)
         pass
 
-    return min(min_distance), len(decisions), conflict, unique_violation, duplicate_violation
+    return min(min_distance), len(decisions), conflict, unique_violation
 
 # MUTATION OPERATOR
 
