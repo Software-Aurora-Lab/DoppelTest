@@ -7,6 +7,7 @@ from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
 from hdmap.MapParser import MapParser
 from framework.scenario import Scenario
+from utils import remove_record_files
 
 
 def eval_scenario(ctn: ApolloContainer, s: Scenario):
@@ -50,6 +51,8 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
             st=sub_type,
             data=related_data
         )
+    if len(ra.get_results()) == 0:
+        remove_record_files(g_name, s_name)
 
 
 def main():
