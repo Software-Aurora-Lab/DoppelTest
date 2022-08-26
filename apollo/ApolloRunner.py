@@ -5,6 +5,7 @@ from apollo.CyberBridge import Topics
 from apollo.ApolloContainer import ApolloContainer
 from hdmap.MapParser import MapParser
 from modules.common.proto.header_pb2 import Header
+from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.localization.proto.pose_pb2 import Pose
 from modules.map.proto.map_pb2 import Map
@@ -116,6 +117,7 @@ class ApolloRunner:
             pose=Pose(
                 position=coord,
                 heading=heading,
+                linear_velocity=Point3D(x=0, y=0, z=0)
             )
         )
         for i in range(4):
