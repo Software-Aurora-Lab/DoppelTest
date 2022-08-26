@@ -138,6 +138,29 @@ def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, headin
     return obs
 
 
+def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, heading: float) -> PerceptionObstacle:
+    position = Point3D(x=loc.x,
+                       y=loc.y, z=loc.z)
+    velocity = Point3D(x=math.cos(heading) * speed,
+                       y=math.sin(heading) * speed, z=0.0)
+    obs = PerceptionObstacle(
+        id=_id,
+        position=position,
+        theta=heading,
+        velocity=velocity,
+        acceleration=Point3D(x=0, y=0, z=0),
+        length=APOLLO_VEHICLE_LENGTH,
+        width=APOLLO_VEHICLE_WIDTH,
+        height=APOLLO_VEHICLE_HEIGHT,
+        type=PerceptionObstacle.VEHICLE,
+        timestamp=time.time(),
+        tracking_time=1.0,
+        polygon_point=generate_polygon(
+            position, heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
+    )
+    return obs
+
+
 def to_Point3D(data):
     return Point3D(
         x=0.0 if math.isnan(data.x) else data.x,
