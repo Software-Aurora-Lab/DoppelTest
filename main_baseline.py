@@ -53,6 +53,8 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
         )
     if len(ra.get_results()) == 0:
         remove_record_files(g_name, s_name)
+    else:
+        print(ra.get_results())
 
 
 def main():
@@ -78,6 +80,8 @@ def main():
             c.cid = index
 
         for ind in population:
+            for adc in ind.ad_section.adcs:
+                adc.start_t = 0.0
             print(f'Running scenario {ind.cid} - {ind.gid}')
             eval_scenario(ctn, ind)
 
