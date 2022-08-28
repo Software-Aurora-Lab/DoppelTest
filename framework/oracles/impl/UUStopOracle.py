@@ -50,12 +50,11 @@ class UUStopOracle(OracleInterface):
         if self.last_localization is None or self.last_planning is None:
             return
 
-        if not self.is_adc_completely_stopped:
+        if not self.is_adc_completely_stopped():
             self.first_stop_timestamp = None
             return
         self.calculate_adc_stop_times_at_stop_signs()
 
-    @property
     def is_adc_completely_stopped(self) -> bool:
         adc_pose = self.last_localization.pose
         adc_velocity = calculate_velocity(adc_pose.linear_velocity)
