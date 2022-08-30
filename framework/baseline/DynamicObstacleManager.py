@@ -1,9 +1,9 @@
 from random import randint
 from typing import List, Tuple
+
 from apollo.utils import dynamic_obstacle_location_to_obstacle
 from framework.scenario.ad_agents import ADAgent
 from hdmap.MapParser import MapParser
-from shapely.geometry import MultiLineString
 from modules.common.proto.geometry_pb2 import PointENU
 
 

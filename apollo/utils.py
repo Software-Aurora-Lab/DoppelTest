@@ -37,7 +37,7 @@ class PositionEstimate:
 
 def generate_polygon(position: Point3D, theta: float, length: float, width: float):
     """
-    Generate polygon for an perception obstacle
+    Generate polygon for a perception obstacle
 
     Parameters:
         position: Point3D
@@ -103,6 +103,39 @@ def generate_adc_polygon(position: Point3D, theta: float):
                 back_l * sin_h - half_w * cos_h),
                (front_l * cos_h + half_w * sin_h,
                 front_l * sin_h - half_w * cos_h)]
+    for x, y in vectors:
+        p = Point3D()
+        p.x = position.x + x
+        p.y = position.y + y
+        p.z = position.z
+        points.append(p)
+    return points
+
+
+def generate_adc_rear_vertices(position: Point3D, theta: float):
+    """
+    Generate rear for the ADC
+
+    Parameters:
+        position: Point3D
+            localization pose of ADC
+        theta: float
+            heading of ADC
+
+    Returns:
+        points: List[Point3D]
+            polygon points of the ADC
+    """
+    points = []
+    half_w = APOLLO_VEHICLE_WIDTH / 2.0
+    back_l = -1 * APOLLO_VEHICLE_back_edge_to_center
+    sin_h = math.sin(theta)
+    cos_h = math.cos(theta)
+    vectors = [(back_l * cos_h - half_w * sin_h,
+                back_l * sin_h + half_w * cos_h),
+               (back_l * cos_h + half_w * sin_h,
+                back_l * sin_h - half_w * cos_h)]
+
     for x, y in vectors:
         p = Point3D()
         p.x = position.x + x
@@ -276,7 +309,7 @@ def clean_appolo_dir():
 
 def calculate_velocity(linear_velocity):
     x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
-    return math.sqrt(x ** 2 + y ** 2)
+    return round(math.sqrt(x ** 2 + y ** 2), 2)
 
 
 def construct_lane_polygon(lane_msg):
