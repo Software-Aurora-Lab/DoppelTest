@@ -13,6 +13,8 @@ class TrafficControlManager:
 
         if FORCE_INVALID_TRAFFIC_CONTROL:
             config = self.tc.get_config_with_color('GREEN')
+        elif self.tc.initial == self.tc.final:
+            config = self.tc.initial
         else:
             if curr_t <= self.tc.duration_g:
                 # green duration
