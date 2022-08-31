@@ -1,8 +1,8 @@
-# MAGGIE 
+# DoppelTest 
 
 A doppelgänger testing approach for automatically finding bug-revealing violations of autonomous driving systems
 
-## Set Up MAGGIE
+## Set Up Instruction
 Please follow the following steps to set up the framework.
 ### Set up Apollo 7.0, with a standalone Sim Control 
 1. Clone the forked version of Apollo 7.0 from https://github.com/YuqiHuai/apollo
@@ -20,7 +20,7 @@ Please follow the following steps to set up the framework.
 9. Verify Dreamview is accessible at `http://172.17.0.2:8888` (your container IP address may be different)
 
 
-### Set up MAGGIE
+### Set up DoppelTest
 1. Install the required Python libraries: numpy, Shapely, DEAP, pandas, networkx, [docker](https://docker-py.readthedocs.io/en/stable/) and [cyber_record](https://github.com/daohu527/cyber_record)
 2. Replace directories in `config.py`
 https://github.com/YuqiHuai/MAGGIE/blob/2530b47a90ca39fa130998538e14b7f95b455ba3/config.py#L19-L21
