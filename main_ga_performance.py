@@ -344,7 +344,7 @@ def main():
 
     # begin generational process
     curr_gen = 0
-    while curr_gen == 0:
+    while True:
         curr_gen += 1
         logger.info(f' ====== GA Generation {curr_gen} ====== ')
         # Vary the population
