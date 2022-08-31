@@ -3,7 +3,7 @@ from datetime import datetime
 import pickle
 from random import random, sample, shuffle, randint
 import shutil
-from config import APOLLO_ROOT, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR
+from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -205,7 +205,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
     # combine to make a new populations
     available_adcs = ind1.adcs + ind2.adcs
     shuffle(available_adcs)
-    split_index = randint(2, min(len(available_adcs), 5))
+    split_index = randint(2, min(len(available_adcs), MAX_ADC_COUNT))
 
     result1 = ADSection([])
     for x in available_adcs[:split_index]:
@@ -272,7 +272,7 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 
 def main():
     logger = get_logger('MAIN')
-    mp = MapParser('./data/maps/borregas_ave/base_map.bin')
+    mp = MapParser(HD_MAP_PATH)
 
     containers = [ApolloContainer(
         APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]

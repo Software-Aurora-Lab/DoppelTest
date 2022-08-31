@@ -17,8 +17,9 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 
 # DIRECTORIES =======================================
 APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/apollo'
-RECORDS_DIR = '/home/yuqi/ResearchWorkspace/MAGGIE/data/records'
-LOG_DIR = '/home/yuqi/ResearchWorkspace/MAGGIE/data/Logs'
+MAGGIE_ROOT = '/home/yuqi/ResearchWorkspace/MAGGIE'
+RECORDS_DIR = f'{MAGGIE_ROOT}/data/records'
+LOG_DIR = f'{MAGGIE_ROOT}/data/Logs'
 
 # MAGGIE CONFIGS ====================================
 STREAM_LOGGING_LEVEL = logging.INFO
@@ -28,4 +29,5 @@ SCENARIO_UPPER_LIMIT = 30
 INSTANCE_MAX_WAIT_TIME = 15
 MAX_ADC_COUNT = 5
 MAX_PD_COUNT = 5
-RUN_FOR_HOUR = 6
+RUN_FOR_HOUR = 12
+HD_MAP_PATH = f'{MAGGIE_ROOT}/data/maps/shalun/base_map.bin'
