@@ -308,8 +308,8 @@ def main():
     vt = ViolationTracker()
 
     # GA Hyperparameters
-    POP_SIZE = 2  # number of population
-    OFF_SIZE = 2  # number of offspring to produce
+    POP_SIZE = 10  # number of population
+    OFF_SIZE = 10  # number of offspring to produce
     CXPB = 0.8  # crossover probablitiy
     MUTPB = 0.2  # mutation probability
 
