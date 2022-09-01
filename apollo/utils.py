@@ -344,3 +344,16 @@ def construct_lane_boundary_linestring(lane_msg):
     left_boundary_points = get_lane_boundary_points(lane_msg.left_boundary)
     right_boundary_points = get_lane_boundary_points(lane_msg.right_boundary)
     return LineString(left_boundary_points), LineString(right_boundary_points)
+
+
+def find_all_files_by_wildcard(base_dir, file_name, recursive=False):
+    # NOTE: combine recursive and **/ to matches all files in the current directory and in all subdirectories
+    return glob.glob(join_path(base_dir, file_name), recursive=recursive)
+
+
+def join_path(*args, **kwargs):
+    return os.path.join(*args, **kwargs)
+
+
+def get_current_timestamp():
+    return round(time.time())
