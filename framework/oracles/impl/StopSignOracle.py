@@ -30,7 +30,7 @@ class StopSignOracle(OracleInterface):
     # Apollo: virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
     STOP_SIGN_VO_ID_PREFIX = "SS_"
 
-    checked: set()
+    checked = set()
 
     def __init__(self):
         self.violated_at_stop_sign_ids = set()
