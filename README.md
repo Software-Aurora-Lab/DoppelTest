@@ -5,7 +5,7 @@ A doppelgänger testing approach for automatically finding bug-revealing violati
 ## Set Up Instruction
 Please follow the following steps to set up the framework.
 ### Set up Apollo 7.0, with a standalone Sim Control 
-1. Clone the forked version of Apollo 7.0 from https://github.com/YuqiHuai/apollo
+1. Clone the forked version of Apollo 7.0 from [URL removed for ICSE submission]
 > In our version, we separated Sim Control from Dreamview, because Dreamview can suffer from unknown issues due to high number of websocket communication.
 2. Start up Apollo container via `./docker/scripts/dev_start.sh -l`
 3. Find the name of container via `docker ps -a`
