@@ -45,3 +45,17 @@ class ViolationTracker:
                 *scenario
             ]
         df.to_csv(os.path.join(RECORDS_DIR, "summary.csv"))
+    
+    def clear(self):
+        self.tracker = defaultdict(lambda: defaultdict(lambda: set()))
+        self.scenario_tracker = list()
+
+    def print(self):
+        column_names = ['scenario_id', "main_type",
+                        "sub_type", "data", "record_path"]
+        df = pd.DataFrame(columns=column_names)
+        for scenario in self.scenario_tracker:
+            df.loc[len(df.index)] = [
+                *scenario
+            ]
+        print(df[['main_type', 'sub_type', 'data']])

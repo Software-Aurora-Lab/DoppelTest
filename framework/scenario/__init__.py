@@ -1,11 +1,11 @@
 from dataclasses import asdict, dataclass
-from framework.scenario.ad_agents import ADSection
-from framework.scenario.pd_agents import PDSection
+from framework.scenario.ad_agents import ADAgent, ADSection
+from framework.scenario.pd_agents import PDAgent, PDSection
 from framework.scenario.tc_config import TCSection
 from deap import base
 
 from hdmap.MapParser import MapParser
-
+import json
 
 class ScenarioFitness(base.Fitness):
     # minimize closest distance between pair of ADC
@@ -31,6 +31,28 @@ class Scenario:
             'pd_section': asdict(self.pd_section),
             'tc_section': asdict(self.tc_section)
         }
+
+    @staticmethod
+    def from_json(json_file_path):
+        with open(json_file_path, 'r') as fp:
+            data = json.loads(fp.read())
+            ad_section = data['ad_section']
+            r_ad = ADSection([])
+            for adc in ad_section['adcs']:
+                r_ad.add_agent(
+                    ADAgent(adc['routing'], adc['start_s'], adc['dest_s'], adc['start_t'])
+                )
+            pd_section = data['pd_section']
+            r_pd = PDSection([])
+            for pd in pd_section['pds']:
+                r_pd.add_agent(
+                    PDAgent(pd['cw_id'], pd['speed'], pd['start_t'])
+                )
+            tc_section = data['tc_section']
+            r_tc = TCSection(tc_section['initial'], tc_section['final'], 
+                tc_section['duration_g'], tc_section['duration_y'], tc_section['duration_b'])
+
+            return Scenario(r_ad, r_pd, r_tc)
 
     @staticmethod
     def get_one():

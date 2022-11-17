@@ -16,8 +16,8 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 
 
 # DIRECTORIES =======================================
-APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/apollo'
-MAGGIE_ROOT = '/home/yuqi/ResearchWorkspace/MAGGIE'
+APOLLO_ROOT = '/home/sora/Desktop/yhuai/apollo'
+MAGGIE_ROOT = '/home/sora/Desktop/yhuai/DoppelTest'
 RECORDS_DIR = f'{MAGGIE_ROOT}/data/records'
 LOG_DIR = f'{MAGGIE_ROOT}/data/Logs'
 
