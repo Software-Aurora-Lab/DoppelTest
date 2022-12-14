@@ -16,7 +16,7 @@ APOLLO_VEHICLE_back_edge_to_center  = 1.043
 
 
 # DIRECTORIES =======================================
-APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/Baidu Apollo/DoppelTest_Apollo'
+APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/BaiduApollo/DoppelTest_Apollo'
 DT_ROOT     = '/home/yuqi/ResearchWorkspace/DoppelTest/tool'
 RECORDS_DIR = f'{DT_ROOT}/data/records'
 LOG_DIR     = f'{DT_ROOT}/data/Logs'
@@ -30,4 +30,4 @@ INSTANCE_MAX_WAIT_TIME          = 15
 MAX_ADC_COUNT                   = 5
 MAX_PD_COUNT                    = 5
 RUN_FOR_HOUR                    = 12
-HD_MAP_PATH                     = f'{DT_ROOT}/data/maps/san_mateo/base_map.bin'
+HD_MAP_PATH                     = f'{DT_ROOT}/data/maps/borregas_ave/base_map.bin'
