@@ -1,12 +1,10 @@
 import math
 from typing import List, Optional
 
-# from apollo.utils import calculate_velocity
-from objectives.violation_number.oracles.OracleInterface import OracleInterface
+from apollo.utils import calculate_velocity
+from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 import numpy as np
-
-from tools.utils import calculate_velocity
 
 
 class ComfortOracle(OracleInterface):
