@@ -173,6 +173,9 @@ class MapParser:
     def get_junctions(self) -> List[str]:
         return list(self.__junctions.keys())
 
+    def get_junction_by_id(self, j_id: str):
+        return self.__junctions[j_id]
+
     def get_lanes(self) -> List[str]:
         return list(self.__lanes.keys())
 

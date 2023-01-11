@@ -10,7 +10,8 @@ from framework.oracles.impl.StopSignOracle import StopSignOracle
 from framework.oracles.impl.TrafficSignalOracle import TrafficSignalOracle
 from framework.oracles.impl.UUStopOracle import UUStopOracle
 from framework.oracles.impl.UnsafeLaneChangeOracle import UnsafeLaneChangeOracle
-
+from framework.oracles.impl.SpeedingOracle import SpeedingOracle
+from framework.oracles.impl.JunctionLaneChangeOracle import JunctionLaneChangeOracle
 
 class RecordAnalyzer:
     record_path: str
@@ -29,6 +30,8 @@ class RecordAnalyzer:
             StopSignOracle(),
             TrafficSignalOracle(),
             UUStopOracle(),
+            SpeedingOracle(),
+            JunctionLaneChangeOracle()
             # PlanningCrashOracle(),
             # UnsafeLaneChangeOracle(),
         ]
