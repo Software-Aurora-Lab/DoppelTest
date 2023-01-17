@@ -1,11 +1,10 @@
 from collections import defaultdict
 
-from apollo.utils import find_all_files_by_wildcard, get_current_timestamp
 from framework.baseline.liability_checker import CollisionLiabilityChecker
 from framework.baseline.liability_checker.CollisionLiabilityChecker import CollisionType
 from framework.oracles import RecordAnalyzer
 from hdmap.MapParser import MapParser
-from utils import get_logger
+from utils import get_logger, find_all_files_by_wildcard, get_current_timestamp
 
 logger = get_logger(__name__)
 

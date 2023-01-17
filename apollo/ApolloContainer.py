@@ -13,18 +13,18 @@ class ApolloContainer:
     Class to represent Apollo container
 
     Attributes:
-    apollo_root: str
-        Root directory of Baidu Apollo
-    username: str
-        Unique id used to identify container
-    bridge: CyberBridge
-        Used to connect to cyber bridge
-    dreamview: Dreamview
-        Websocket connection to control Dreamview
-    port: int
-        Network port for Dreamview
-    bridge_port: int
-        Network port for cyber bridge
+        apollo_root: str
+            Root directory of Baidu Apollo
+        username: str
+            Unique id used to identify container
+        bridge: CyberBridge
+            Used to connect to cyber bridge
+        dreamview: Dreamview
+            Websocket connection to control Dreamview
+        port: int
+            Network port for Dreamview, default is 8888
+        bridge_port: int
+            Network port for cyber bridge, default is 9090
     """
     apollo_root: str
     username: str
@@ -98,7 +98,7 @@ class ApolloContainer:
             self.logger.debug(f'Already running at {self.ip}')
             return
         cmd = f'{self.apollo_root}/docker/scripts/dev_start.sh -l -y'
-        result = subprocess.run(
+        subprocess.run(
             cmd.split(),
             env={
                 'USER': self.username
@@ -121,9 +121,9 @@ class ApolloContainer:
             'stop': ('Stopping', 'stop', f'Stopped Dreamview'),
             'restart': ('Restarting', 'restart', f'Restarted Dreamview at http://{self.ip}:{self.port}')
         }
-        s0, s1, s2 = ops[op]
-        self.logger.debug(f'{s0} Dreamview')
-        cmd = f"docker exec {self.container_name} ./scripts/bootstrap.sh {s1}"
+        op_name, op_cmd, op_success_info = ops[op]
+        self.logger.debug(f'{op_name} Dreamview')
+        cmd = f"docker exec {self.container_name} ./scripts/bootstrap.sh {op_cmd}"
         subprocess.run(cmd.split(), stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
         if op == 'stop':
@@ -133,7 +133,7 @@ class ApolloContainer:
             self.logger.debug(
                 f'Dreamview running at http://{self.ip}:{self.port}')
 
-        self.logger.debug(s2)
+        self.logger.debug(op_success_info)
 
     def start_dreamview(self):
         """
@@ -212,13 +212,13 @@ class ApolloContainer:
             'stop': ('Stopping', 'stop', 'stopped'),
             'restart': ('Restarting', 'restart', 'restarted')
         }
-        s0, s1, s2 = ops[op]
+        op_name, op_cmd, op_success_info = ops[op]
 
-        self.logger.debug(f"{s0} required modules")
-        cmd = f"docker exec {self.container_name} ./scripts/bootstrap_maggie.sh {s1}"
+        self.logger.debug(f"{op_name} required modules")
+        cmd = f"docker exec {self.container_name} ./scripts/bootstrap_maggie.sh {op_cmd}"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.logger.debug(f'Modules {s2}')
+        self.logger.debug(f'Modules {op_success_info}')
 
     def start_modules(self):
         """
@@ -269,7 +269,7 @@ class ApolloContainer:
         """
         self.logger.debug(f"Starting sim_control_standalone")
         cmd = f"docker exec -d {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_main"
-        result = subprocess.run(
+        subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )

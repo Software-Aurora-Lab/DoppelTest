@@ -11,17 +11,37 @@ from config import APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, AP
     APOLLO_VEHICLE_back_edge_to_center
 from dataclasses import dataclass
 from shapely.geometry import Polygon, LineString
-from typing import Set, Tuple
+from typing import List, Set, Tuple
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from hdmap.MapParser import MapParser
 
 
 @dataclass
 class PositionEstimate:
+    """
+    Class representing a location on a HD Map
+
+    Attributes:
+        lane_id: str
+            The ID of the lane on the map
+        s: float
+            distance from the start of the lane
+    """
     lane_id: str
     s: float
 
-    def is_too_close(self, rhs):
+    def is_too_close(self, rhs) -> bool:
+        """
+        Check if 2 position estimates are too close to each other
+
+        Attributes:
+            rhs: PositionEstimate
+                The right-hand-side to be compared
+            
+        Returns:
+            is_close: bool
+                True if is too close, False otherwise
+        """
         # 2 vehicles are too close if their distance is less than 5 meters
         ma = MapParser.get_instance()
         adc1 = generate_adc_polygon(
@@ -146,10 +166,37 @@ def generate_adc_rear_vertices(position: Point3D, theta: float):
 
 
 def obstacle_to_polygon(obs: PerceptionObstacle) -> Polygon:
+    """
+    Constructs a polygon for an obstacle
+
+    Parameters:
+        obs: PerceptionObstacle
+            received perception obstacle message
+    
+    Returns:
+        polygon: Polygon
+            Shapely Polygon object
+    """
     return Polygon([[p.x, p.y] for p in obs.polygon_point])
 
 
 def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, heading: float) -> PerceptionObstacle:
+    """
+    Constructs a perception obstacle message for a pedestrian
+
+    Attributes:
+        _id: int
+            the ID of the obstacle
+        speed: float
+            the speed of the obstacle
+        loc: Point3D
+            the position of the obstacle (coordinate)
+        heading: float
+            rotation of the obstacle in radian format
+    Returns:
+        obs: PerceptionObstacle
+            the message ready to be published to cyberRT
+    """
     position = Point3D(x=loc.x,
                        y=loc.y, z=loc.z)
     velocity = Point3D(x=math.cos(heading) * speed,
@@ -173,6 +220,22 @@ def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, headin
 
 
 def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, heading: float) -> PerceptionObstacle:
+    """
+    Constructs a perception obstacle message for a dynamic obstacle, used for generating a simulated Apollo instance only
+
+    Attributes:
+        _id: int
+            the ID of the obstacle
+        speed: float
+            the speed of the obstacle
+        loc: Point3D
+            the position of the obstacle (coordinate)
+        heading: float
+            rotation of the obstacle in radian format
+    Returns:
+        obs: PerceptionObstacle
+            the message ready to be published to cyberRT
+    """
     position = Point3D(x=loc.x,
                        y=loc.y, z=loc.z)
     velocity = Point3D(x=math.cos(heading) * speed,
@@ -195,7 +258,18 @@ def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, 
     return obs
 
 
-def to_Point3D(data):
+def to_Point3D(data) -> Point3D:
+    """
+    Replaces NaN that may occur in Apollo to 0.0
+
+    Parameters:
+        data: Point3D
+            an object that has attributes x,y,z and each of them may be NaN
+    
+    Returns:
+        point: Point3D
+            cleaned up version of the original Point3D
+    """
     return Point3D(
         x=0.0 if math.isnan(data.x) else data.x,
         y=0.0 if math.isnan(data.y) else data.y,
@@ -240,6 +314,17 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
 
 
 def extract_main_decision(data: ADCTrajectory) -> Set[Tuple]:
+    """
+    Extracts the main decision from a Planning message
+
+    Parameters:
+        data: ADCTrajectory
+            Planning message recorded
+    
+    Returns:
+        decisions: Set[Tuple]
+        set of main decisions and main object decisions
+    """
     main_decision = data.decision.main_decision
     object_decisions = data.decision.object_decision.decision
 
@@ -288,6 +373,9 @@ def extract_main_decision(data: ADCTrajectory) -> Set[Tuple]:
 
 
 def clean_appolo_dir():
+    """
+    Removes Apollo's log files to save disk space
+    """
     # remove data dir
     subprocess.run(f"rm -rf {APOLLO_ROOT}/data".split())
 
@@ -308,6 +396,17 @@ def clean_appolo_dir():
 
 
 def calculate_velocity(linear_velocity):
+    """
+    Calculate velocity based on a given vector
+
+    Parameters:
+        linear_velocity: Point3D
+            velocity in vector format
+    
+    Returns:
+        speed: float
+            calculated speed
+    """
     x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
     return round(math.sqrt(x ** 2 + y ** 2), 2)
 
@@ -315,6 +414,14 @@ def calculate_velocity(linear_velocity):
 def construct_lane_polygon(lane_msg):
     '''
     Construct the lane polygon based on their boundaries
+
+    Parameters:
+        lane_msg: Lane
+            lane object extracted from HD Map
+    
+    Returns:
+        lane_polygon: Polygon
+            polygon representing the lane
     '''
     left_points = get_lane_boundary_points(lane_msg.left_boundary)
     right_points = get_lane_boundary_points(lane_msg.right_boundary)
@@ -323,10 +430,17 @@ def construct_lane_polygon(lane_msg):
     return Polygon(all_points)
 
 
-def get_lane_boundary_points(boundary):
+def get_lane_boundary_points(boundary) -> List[Tuple[float, float]]:
     '''
     Given a lane boundary (left/right), return a list of x, y
     coordinates of all points in the boundary
+
+    Parameters:
+        boundary
+            boundary object extracted from HD Map
+    
+    Returns:
+        boundary_points: List[Tuple[float,float]]
     '''
     boundary_points = []
     for segment in boundary.curve.segment:
@@ -335,25 +449,19 @@ def get_lane_boundary_points(boundary):
     return boundary_points
 
 
-def construct_lane_boundary_linestring(lane_msg):
+def construct_lane_boundary_linestring(lane_msg) -> List[Tuple[LineString, LineString]]:
     """
-    Description: Construct two linestrings for the lane's left and right boundary
-    Input: A lane message.
+    Construct two linestrings for the lane's left and right boundary
+
+    Parameters:
+        lane_msg: Lane
+            lane object extracted from HD Map
+    
+    Returns:
+        left_boundary, right_boundary: Tuple[LineString, LineString]
+            the left and right boundary of a lane
     Output: A list containing the linestrings representing the left and right boundary of the lane
     """
     left_boundary_points = get_lane_boundary_points(lane_msg.left_boundary)
     right_boundary_points = get_lane_boundary_points(lane_msg.right_boundary)
     return LineString(left_boundary_points), LineString(right_boundary_points)
-
-
-def find_all_files_by_wildcard(base_dir, file_name, recursive=False):
-    # NOTE: combine recursive and **/ to matches all files in the current directory and in all subdirectories
-    return glob.glob(join_path(base_dir, file_name), recursive=recursive)
-
-
-def join_path(*args, **kwargs):
-    return os.path.join(*args, **kwargs)
-
-
-def get_current_timestamp():
-    return round(time.time())

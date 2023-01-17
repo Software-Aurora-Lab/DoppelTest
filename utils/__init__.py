@@ -6,6 +6,7 @@ import math
 import os
 import logging
 import random
+import time
 from typing import List
 
 from modules.common.proto.geometry_pb2 import PointENU
@@ -105,3 +106,15 @@ def save_record_files_and_chromosome(generation_name: str, scenario_name: str, c
 def remove_record_files(generation_name: str, scenario_name: str):
     dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
     shutil.rmtree(dest)
+
+def find_all_files_by_wildcard(base_dir, file_name, recursive=False):
+    # NOTE: combine recursive and **/ to matches all files in the current directory and in all subdirectories
+    return glob.glob(join_path(base_dir, file_name), recursive=recursive)
+
+
+def join_path(*args, **kwargs):
+    return os.path.join(*args, **kwargs)
+
+
+def get_current_timestamp():
+    return round(time.time())
