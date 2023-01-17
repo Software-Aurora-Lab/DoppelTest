@@ -1,10 +1,3 @@
-A REQUIREMENTS file for artifacts which focus on software. This file should 
-cover aspects of hardware (e.g., performance, storage or non-commodity peripherals) 
-and software environments (e.g., Docker, VM, and operating system; package 
-dependencies, etc.). Any deviation from standard environments needs to be 
-reasonably justified. 
-
-
 # REQUIREMENTS
 
 

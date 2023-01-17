@@ -1,11 +1,3 @@
- A README file describing what the artifact does and where it can be obtained. 
- Also, there should be a clear description of how to repeat/replicate/reproduce 
- the results presented in the paper. Artifacts which focus on data should, in 
- principle, cover aspects relevant to understanding the context, data provenance, 
- ethical and legal statements (as long as relevant), and storage requirements. 
- Artifacts which focus on software should, in principle, cover aspects relevant 
- to how to install and use it (and be accompanied by a small example). 
-
 # DoppelTest
 
 ## Introduction
