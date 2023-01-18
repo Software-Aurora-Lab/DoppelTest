@@ -4,6 +4,8 @@ docker_py==1.10.6
 networkx==2.5.1
 numpy==1.21.0
 pandas==1.2.4
-protobuf==4.21.12
+protobuf==3.19.0
 Shapely==1.7.1
 websocket_client==1.4.2
+sphinx==1.8.5
+sphinx_rtd_theme==1.1.1
