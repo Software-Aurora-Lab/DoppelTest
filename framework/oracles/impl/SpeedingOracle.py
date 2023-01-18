@@ -11,17 +11,15 @@ class SpeedingOracle(OracleInterface):
     def __init__(self) -> None:
         self.result = None
         self.mp = MapParser.get_instance()
-        self.lanes = list()
+        self.lanes = dict()
 
         for lane in self.mp.get_lanes():
             lane_obj = self.mp.get_lane_by_id(lane)
             speed_limit = lane_obj.speed_limit
             central_curve = self.mp.get_lane_central_curve(lane)
-            self.lanes.append(
-                (lane, speed_limit, central_curve)
-            )
+            self.lanes[lane] = (speed_limit, central_curve)
 
-        self.lanes.sort(key=lambda x: x[1])  # sort lanes by speed limit
+        self.cached_lanes = set()
 
     def get_interested_topics(self) -> List[str]:
         return ['/apollo/localization/pose']
@@ -34,13 +32,26 @@ class SpeedingOracle(OracleInterface):
         p = message.pose.position
         ego_position = Point(p.x, p.y, p.z)
         ego_velocity = calculate_velocity(message.pose.linear_velocity)
+        for lane_id in self.cached_lanes:
+            lane_speed_limit, lane_curve = self.lanes[lane_id]
+            ego_position.distance(lane_curve)
+            if ego_position.distance(lane_curve) <= 1:
+                if ego_velocity > lane_speed_limit:
+                    self.result = ((p.x, p.y),
+                        f'{ego_velocity} violates speed limit {lane_speed_limit} at {lane_id}')
+                return
 
-        for lane in self.lanes:
-            lane_id, lane_speed_limit, lane_curve = lane
-            if round(ego_position.distance(lane_curve), 1) <= 0.1:
+        for lane_id in self.lanes:
+            lane_speed_limit, lane_curve = self.lanes[lane_id]
+            if round(ego_position.distance(lane_curve), 1) <= 1:
+                self.update_cached_lanes(lane_id)
                 if ego_velocity > lane_speed_limit:
                     self.result = ((p.x, p.y),
                                    f'{ego_velocity} violates speed limit {lane_speed_limit} at {lane_id}')
+                return
+
+    def update_cached_lanes(self, lane_id:str):
+        self.cached_lanes.add(lane_id)
 
     def get_result(self):
         if self.result is None:
