@@ -1,29 +1,24 @@
 import glob
 import json
 import shutil
-import subprocess
-import math
 import os
 import logging
 import random
 import time
 from typing import List
 
-from modules.common.proto.geometry_pb2 import PointENU
-from config import APOLLO_ROOT, LOG_DIR, RECORDS_DIR, STREAM_LOGGING_LEVEL
-from modules.map.proto.map_pb2 import Map
+from config import APOLLO_ROOT, RECORDS_DIR, STREAM_LOGGING_LEVEL
 
 
 def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
     """
     Gets logger from logging module
 
-    Parameters:
-        filename: str, Optional
-            filename of the log records
+    :param str filename: filename of the log records
+    :param bool log_to_file: flag to determine logging to file
 
-    Returns:
-        logger: Logger
+    :returns: Logger object
+    :rtype: Logger
     """
     logger = logging.getLogger(name)
     logger.propagate = False
@@ -44,8 +39,8 @@ def get_scenario_logger() -> logging.Logger:
     """
     Gets logger that always logs on the same line
 
-    Returns:
-        logger: Logger
+    :returns: Logger object
+    :rtype: Logger
     """
     logger = logging.getLogger('Scenario')
     logger.propagate = False
@@ -66,18 +61,21 @@ def random_numeric_id(length=5) -> List[int]:
     """
     Generates a list of random integer ids
 
-    Parameters:
-        length: int
-            expected size of the output
+    :param int length: expected length of the ID
 
-    Returns:
-        result: List[int]
-            list of integer ids in range 100000, 999999
+    :returns: list of integer ids
+    :rtype: List[int]
     """
     return sorted(random.sample(range(100000, 999999), k=length))
 
 
 def create_dir_for_scenario(generation_name: str, scenario_name: str):
+    """
+    Creates directory to store scenario record files
+
+    :param str generation_name: name of the generation
+    :param str scenario_name: name of the scenario
+    """
     dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
     if not os.path.exists(dest):
         os.makedirs(dest)
@@ -87,6 +85,13 @@ def create_dir_for_scenario(generation_name: str, scenario_name: str):
 
 
 def save_record_files_and_chromosome(generation_name: str, scenario_name: str, ch: dict):
+    """
+    Save the record file and the genetic representation
+
+    :param str generation_name: name of the generation
+    :param str scenario_name: name of the scenario
+    :param dict ch: the genetic representation
+    """
     dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
     if not os.path.exists(dest):
         os.makedirs(dest)
@@ -104,17 +109,34 @@ def save_record_files_and_chromosome(generation_name: str, scenario_name: str, c
 
 
 def remove_record_files(generation_name: str, scenario_name: str):
+    """
+    Remove record files for the specified generation and scenario name
+
+    :param str generation_name: name of the generation
+    :param str scenario_name: name of the scenario
+    """
     dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
     shutil.rmtree(dest)
 
-def find_all_files_by_wildcard(base_dir, file_name, recursive=False):
-    # NOTE: combine recursive and **/ to matches all files in the current directory and in all subdirectories
-    return glob.glob(join_path(base_dir, file_name), recursive=recursive)
+
+def find_all_files_by_wildcard(base_dir: str, file_name: str, recursive=False) -> List[str]:
+    """
+    Recursively find all files in a given directory based on filename
+
+    :param str base_dir: the root of the directory to be searched
+    :param str filename: filename (wildcard) to be matched
+
+    :returns: all files found
+    :rtype: List[str]
+    """
+    return glob.glob(os.path.join(base_dir, file_name), recursive=recursive)
 
 
-def join_path(*args, **kwargs):
-    return os.path.join(*args, **kwargs)
+def get_current_timestamp() -> float:
+    """
+    Retrieve the current timestamp
 
-
-def get_current_timestamp():
+    :returns: timestamp
+    :rtype: float
+    """
     return round(time.time())
