@@ -1,27 +1,46 @@
-.. DoppelTest documentation master file, created by
-   sphinx-quickstart on Tue Jan 17 17:57:48 2023.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to DoppelTest's documentation!
 ======================================
 
 DoppelTest is a scenario-based test generation framework for revealing bugs in autonomous driving softwares. It manages and orchestrates multiple ADS instances to simultaneously operate in a scenario and discover violation that occur by or among them. Since all vehicles are controlled by an instance of the ADS under test, each of them should respect traffic rules and react properly to other road traffic participants. At least one instance will be responsible for any violation occuring.
 
-You can get started with Installation and then get an overview with the Quickstart. There is also more detailed Tutorial that shows how to use parts of DoppelTest to create new approaches. The rest of the docs describe each component of DoppelTest in detail, with a full reference in the Internals section.
+.. You can get started with Installation and then get an overview with the Quickstart. There is also more detailed Tutorial that shows how to use parts of DoppelTest to create new approaches. The rest of the docs describe each component of DoppelTest in detail, with a full reference in the Internals section.
 
-DoppelTest is implemented in Python 3.8 and depends on .... The documentation for these libraries can be found at 
+DoppelTest is implemented in Python 3.8.10 and depends on ``cyber_record``, ``DEAP``, ``docker_py``, ``NetworkX``, ``NumPy``, ``pandas``, ``protobuf``, ``Shapely``, and ``websocket-client``. More information for these libraries can be found at 
+
+* `cyber_record - Apollo's cyberRT record file offline parse tool <https://pypi.org/project/cyber-record/>`_
+* `DEAP - Evolutionary computation framework <https://pypi.org/project/deap/>`_
+* `Docker - Docker Remote API <https://pypi.org/project/docker-py/>`_
+* `NetworkX - Creation, manipulation, and study of structure, dynamics, and functions of complex networks. <https://pypi.org/project/networkx/>`_
+* `NumPy - Scientific computing with Python <https://pypi.org/project/numpy/>`_
+* `pandas - Python data analysis toolkit <https://pypi.org/project/pandas/>`_
+* `protobuf - Python implementation of Google's data interchange format <https://pypi.org/project/protobuf/3.19.0/>`_
+* `Shapely - Manipulation and analysis of planar geometric objects <https://pypi.org/project/shapely/>`_
+* `websocket-client - WebSocket client for Python <https://pypi.org/project/websocket-client/>`_
+
 
 DoppelTest was designed and implemented by Yuqi Huai, Yuntianyi Chen, Sumaya Almanee, Tuan Ngo, Xiang Liao, Ziwen Wan, Qi Alfred Chen and Joshua Garcia. If you have any problems using DoppelTest, please submit an issue to `our GitHub repository <https://github.com/YuqiHuai/DoppelTest>`_  or contact Yuqi at yhuai@uci.edu.
 
-.. autofunction:: apollo.utils.generate_adc_polygon
+Table of Contents
+=================
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Introduction
+
+   installation
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tool reference
+
+   internals
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: General Information
 
-
+   publication
 
 Indices and tables
 ==================
