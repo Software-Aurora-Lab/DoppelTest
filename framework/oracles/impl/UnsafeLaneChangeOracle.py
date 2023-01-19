@@ -9,6 +9,7 @@ from datetime import datetime
 
 class UnsafeLaneChangeOracle(OracleInterface):
     ADC_INTERSECTING_LANE_BOUNDARY_MAX_LOOK_BACK_FRAMES_IN_SECOND = 5.0
+    PRUNE_DISTANCE = 150
 
     def __init__(self) -> None:
         self.mp = MapParser.get_instance()
@@ -16,6 +17,8 @@ class UnsafeLaneChangeOracle(OracleInterface):
         self.get_boundaries()
         self.boundary_ids = sorted(self.boundaries.keys())
         self.__data = list() # [ (intersects?, timestamp, boundary_id) ]
+
+        self.searchable_boundary_ids = set(self.boundary_ids)
 
     def get_boundaries(self):
         for lane_id in self.mp.get_lanes():
@@ -27,16 +30,20 @@ class UnsafeLaneChangeOracle(OracleInterface):
     def on_new_message(self, topic: str, message, t):
         ego_pts = generate_adc_polygon(message.pose.position, message.pose.heading)
         ego_polygon = Polygon([[x.x, x.y] for x in ego_pts])
-        for bid in self.boundary_ids:
-            if ego_polygon.intersects(self.boundaries[bid]):
-                self.__data.append((
-                    True, t, bid
-                ))
-                break
-            else:
-                self.__data.append((
-                    False, t, ''
-                ))
+        pending_removal_boundary_ids = set()
+        for bid in self.searchable_boundary_ids:
+            distance = ego_polygon.distance(self.boundaries[bid])
+            if distance == 0:
+                # intersection found
+                self.__data.append((True, t, bid))
+                return
+            if distance > UnsafeLaneChangeOracle.PRUNE_DISTANCE:
+                pending_removal_boundary_ids.add(bid)
+        
+        self.searchable_boundary_ids = self.searchable_boundary_ids - pending_removal_boundary_ids
+
+        # no intersection
+        self.__data.append((False, t, ''))
         
     def get_interested_topics(self) -> List[str]:
         return ["/apollo/localization/pose"]
