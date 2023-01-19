@@ -16,23 +16,24 @@ def to_bytes(s: str) -> bytes:
     """
     Converts string to bytes using ascii
 
-    Parameters:
-        s: str
-            string to be converted
-    Returns:
-        b: bytes
+    :param str s: string to be converted
+    :returns: bytes in ascii
+    :rtype: bytes
     """
     return bytes(s, 'ascii')
 
 
 class BridgeOp:
     """
-    Class representing cyber bridge operations
+    Class representing cyber bridge operations.
     """
     RegisterDesc = (1).to_bytes(1, byteorder='big')
     AddReader = (2).to_bytes(1, byteorder='big')
+    """Register a subscriber"""
     AddWriter = (3).to_bytes(1, byteorder='big')
+    """Register a publisher"""
     Publish = (4).to_bytes(1, byteorder='big')
+    """Publish a message"""
 
 
 @dataclass
@@ -40,13 +41,9 @@ class Channel:
     """
     Class representing information regarding cyber bridge channels
 
-    Attributes:
-        channel: str
-            name of the cyber_bridge channel
-        msg_type: str
-            name of the type of the channel
-        msg_cls: any
-            protobuf constructor for the specified type
+    :param str channel: the name of the channel
+    :param str msg_type: the protobuf data type of messages on this channel
+    :param any msg_cls: the compiled Python protobuf class
     """
     channel: str
     msg_type: str
@@ -59,34 +56,32 @@ class Topics:
     """
     Chassis = Channel('/apollo/canbus/chassis',
                       'apollo.canbus.Chassis', Chassis)
+    """Chassis channel"""
     Localization = Channel('/apollo/localization/pose',
                            'apollo.localization.LocalizationEstimate', LocalizationEstimate)
+    """Localization Channel, typically includes vehicle's location, velocity, acceleration, etc."""
     Obstacles = Channel('/apollo/perception/obstacles',
                         'apollo.perception.PerceptionObstacles', PerceptionObstacles)
+    """Perception Channel, typically includes obstacles perceived from sensor or ground truth."""
     TrafficLight = Channel('/apollo/perception/traffic_light',
                            'apollo.perception.TrafficLightDetection', TrafficLightDetection)
+    """Traffic Light Channel, users can send color of any traffic signal to this channel"""
     Planning = Channel('/apollo/planning/simplified',
                        'apollo.planning.ADCTrajectory', ADCTrajectory)
+    """Planning Channel, Apollo's planning decisions are published to this channel"""
     RoutingRequest = Channel('/apollo/routing_request',
                              'apollo.routing.RoutingRequest', RoutingRequest)
+    """Routing Request Channel, users send routing request to this channel"""
 
 
 class CyberBridge:
     """
     Class to represent CyberBridge
 
-    Attributes:
-        conn: socket
-            Socket connection to cyber bridge
-        subscribers: DefaultDict[str, List]
-            Dictionary of subscribers, key is channel name, value is list of function calls
-        publishable_channel: Set[str]
-            Set of registered publishers
-        spinning: bool
-            Controls the thread reading data from bridge to start/stop
-        t: Thread
-            Background thread to start reading data from bridge
+    :param str host: IP address of cyber bridge running inside docker
+    :param int port: port of the cyber bridge
     """
+
     conn: socket
     subscribers: DefaultDict[str, List]
     publishable_channel: Set[str]
@@ -95,13 +90,7 @@ class CyberBridge:
 
     def __init__(self, host: str, port=9090) -> None:
         """
-        Construct all the attributes for CyberBridge object
-
-        Parameters:
-            host: str
-                host IP address of the cyber bridge
-            port: int
-                host port of the cyber bridge
+        Constructor
         """
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.conn.connect((host, port))
@@ -115,13 +104,10 @@ class CyberBridge:
         """
         Transforms data into [length][data]
 
-        Parameters:
-            data: bytes
-                data to be sent
+        :param bytes data: data to be sent
 
-        Returns:
-            result: bytes
-                Prepared bytes ready to be sent to bridge
+        :returns: prepared bytes ready to be sent to bridge
+        :rtype: bytes
         """
         result = bytes()
         shifts = [0, 8, 16, 24]
@@ -135,11 +121,8 @@ class CyberBridge:
         """
         Adds a subscriber to the bridge
 
-        Parameters:
-            channel: Channel
-                the topic to subscribe from
-            cb: Function
-                a function that takes parsed data from bridge
+        :param Channel channel: the channel to subscribe from
+        :param Function cb: callback function that takes parsed data from bridge
         """
         topic_msg_type = channel.msg_type
 
@@ -160,9 +143,7 @@ class CyberBridge:
         """
         Adds a publisher to the bridge
 
-        Parameters:
-            channel: Channel
-                the channel to publish to
+        :param Channel channel: the channel to publish message to
         """
         if channel.channel in self.publishable_channel:
             return
@@ -179,9 +160,7 @@ class CyberBridge:
         """
         Function callback to notify bridge has published data
 
-        Parameters:
-            data: bytes
-                data received from bridge
+        :param bytes data: data received from bridge
         """
         op = data[0]
         if op == int.from_bytes(BridgeOp.Publish, 'big'):
@@ -193,9 +172,10 @@ class CyberBridge:
         """
         Converts 32 bit le integer to int
 
-        Parameters:
-            b: bytes
-                bytes representing a 32 bit integer
+        :param bytes b: bytes representing a 32 bit integer
+
+        :return: converted integer
+        :rtype: int
         """
         assert len(b) == 4, f"Expecting 4 bytes, got {len(b)}"
         b0 = b[0]
@@ -208,9 +188,7 @@ class CyberBridge:
         """
         Receives data published by bridge and calls subscribers
 
-        Parameters:
-            data: bytes
-                data received from bridge
+        :param bytes data: data received from bridge
         """
         if not self.spinning:
             return
@@ -230,11 +208,10 @@ class CyberBridge:
         """
         Publish data to the bridge
 
-        Parameters:
-            channel: Channel
-                channel to publish data to
-            data: bytes
-                data to be published
+        :param Channel channel: channel to publish data to
+        :param bytes data: data to be published
+
+        :note: You should register a publisher first before publishing any data
         """
         assert type(data) == bytes
         msg = BridgeOp.Publish

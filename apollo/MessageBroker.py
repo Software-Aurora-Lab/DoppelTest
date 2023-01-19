@@ -14,18 +14,12 @@ from apollo.ApolloRunner import ApolloRunner
 
 class MessageBroker:
     """
-    Class to represent MessageBroker
+    Class to represent MessageBroker, it tracks location of each ADS instance and broadcasts
+    perception message to all ADS instances
 
-    Attributes:
-    runners: List[ApolloRunners]
-        list of running Apollo instances
-    spinning: bool
-        whether the message broker should forward localization as obstacle
-    logger: Logger
-        logging the status of the message broker
-    t: Thread
-        background thread to forward data
+    :param List[ApolloRunner] runners: list of runners each controlling an ADS instance
     """
+
     runners: List[ApolloRunner]
     spinning: bool
     logger: Logger
@@ -33,11 +27,7 @@ class MessageBroker:
 
     def __init__(self, runners: List[ApolloRunner]) -> None:
         """
-        Constructs all the attributes for MessageBroker
-
-        Parameters:
-            runners: List[ApolloRunner]
-                list of running Apollo instances
+        Constructor
         """
         self.runners = runners
         self.spinning = False
@@ -45,13 +35,10 @@ class MessageBroker:
 
     def broadcast(self, channel: Channel, data: bytes):
         """
-        Sends data to every instance
+        Sends data to specified channel of every instance
 
-        Parameters:
-            channel: Channel
-                channel to send data to
-            data: bytes
-                data to be sent
+        :param Channel channel: cyberRT channel to send data to
+        :param bytes data: data to be sent
         """
         for runner in self.runners:
             runner.container.bridge.publish(channel, data)

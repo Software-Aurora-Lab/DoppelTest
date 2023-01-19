@@ -12,19 +12,8 @@ class ApolloContainer:
     """
     Class to represent Apollo container
 
-    Attributes:
-        apollo_root: str
-            Root directory of Baidu Apollo
-        username: str
-            Unique id used to identify container
-        bridge: CyberBridge
-            Used to connect to cyber bridge
-        dreamview: Dreamview
-            Websocket connection to control Dreamview
-        port: int
-            Network port for Dreamview, default is 8888
-        bridge_port: int
-            Network port for cyber bridge, default is 9090
+    :param str apollo_root: root directory of Baidu Apollo
+    :param str username: unique ID used to identify container
     """
     apollo_root: str
     username: str
@@ -35,13 +24,7 @@ class ApolloContainer:
 
     def __init__(self, apollo_root: str, username: str) -> None:
         """
-        Constructs all the attributes for ApolloContainer object
-
-        Parameters:
-            apollo_root: str
-                Root directory of Baidu Apollo
-            username: str
-                Unique id used to identify container
+        Constructor
         """
         self.apollo_root = apollo_root
         self.username = username
@@ -52,9 +35,7 @@ class ApolloContainer:
         """
         Gets the name of the container
 
-        Returns:
-            name: str
-                name of the container
+        :type: str
         """
         return f"apollo_dev_{self.username}"
 
@@ -62,9 +43,8 @@ class ApolloContainer:
         """
         Checks if the container is running
 
-        Returns:
-            status: bool
-                True if running, False otherwise
+        :returns: True if running, False otherwise
+        :rtype: bool
         """
         try:
             return docker.from_env().containers.get(self.container_name).status == 'running'
@@ -76,9 +56,7 @@ class ApolloContainer:
         """
         Gets the ip address of the container
 
-        Returns:
-            ip: str
-                ip address of the container
+        :type: str
         """
         assert self.is_running(
         ), f'Instance {self.container_name} is not running.'
@@ -89,9 +67,7 @@ class ApolloContainer:
         """
         Starts an Apollo instance
 
-        Parameters:
-            restart : bool
-                forcing container to restart
+        :param bool restart: force container to restart
         """
         self.logger.debug(f'Starting container')
         if not restart and self.is_running():
@@ -112,9 +88,7 @@ class ApolloContainer:
         """
         Helper function to start/stop/restart Dreamview
 
-        Parameters:
-            op: str
-                Operation can be one of [start, stop, restart]
+        :param str op: operation, can be any of stop/stop/restart
         """
         ops = {
             'start': ('Starting', 'start', f'Running Dreamview at http://{self.ip}:{self.port}'),
@@ -188,9 +162,8 @@ class ApolloContainer:
         """
         Checks if the bridge has been started already
 
-        Returns:
-            status: bool
-                True if running, False otherwise
+        :returns: True if running, False otherwise
+        :rtype: bool
         """
         try:
             b = CyberBridge(self.ip, self.bridge_port)
@@ -203,9 +176,7 @@ class ApolloContainer:
         """
         Helper function to control planning/routing/...
 
-        Parameters
-            op: str
-                Operation can be one of [start, stop, restart]
+        :param str op: operation, can be any of stop/stop/restart
         """
         ops = {
             'start': ('Starting', 'start', 'started'),
@@ -242,9 +213,7 @@ class ApolloContainer:
         """
         Starts cyber_recorder
 
-        Parameters:
-            record_id: str
-                The name of the record file
+        :param str record_id: the name of the record file
         """
         self.logger.debug(f"Starting recorder")
         cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
@@ -286,6 +255,9 @@ class ApolloContainer:
         )
 
     def stop_all(self):
+        """
+        Stops SimControl and all other AD related modules
+        """
         self.bridge.stop()
         if USE_SIM_CONTROL_STANDALONE:
             self.stop_sim_control_standalone()
@@ -295,7 +267,7 @@ class ApolloContainer:
 
     def reset(self):
         """
-        Resets the container
+        Resets the container (e.g., stopps and restarts all related modules)
         """
         self.logger.debug(f'Resetting')
         if USE_SIM_CONTROL_STANDALONE:

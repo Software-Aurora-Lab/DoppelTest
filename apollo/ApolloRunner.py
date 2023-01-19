@@ -20,37 +20,13 @@ class ApolloRunner:
     """
     Class to manage and run an Apollo instance
 
-    Attributes:
-        logger: Logger
-            used to log information about this Apollo runner
-        nid: int
-            an unique ID assigned to this runner
-        container: ApolloContainer
-            the Apollo container that this runner controls
-        start: PositionEstimate
-            the initial location of this Apollo instance
-        start_time: float
-            controls when should the instance start moving since the
-            scenario started
-        waypoints: List[PositionEstinate]
-            the expected routing this Apollo instance should complete
-        routing_started: bool
-            if the instance has started moving towards its destination
-        stop_time_counter: float
-            the amount of time the instance has stopped for
-        localization: Optional[LocalizationEstimate]
-            the last Localization message from this instance
-        planning: Optional[ADCTrajectory]
-            the last Planning message from this instance
-        __min_distance: Optional[float]
-            the minimum distance between this instance and another object
-            during a scenario
-        __decisions: Set[Tuple]
-            the set of decisions made by this instance
-        __coords: List[Tuple]
-            a list of coordinates traversed by this instance
-
+    :param int nid: an unique ID assigned to this container runner
+    :param ApolloContainer ctn: the Apollo container controlled by this runner
+    :param PositionEstimate start: the initial location of this Apollo instance
+    :param float start_time: the amount of time this Apollo instance waits before starts moving
+    :param List[PositionEstimate] waypoints: the expected route this Apollo instance should complete
     """
+
     logger: Logger
     nid: int
     container: ApolloContainer
@@ -73,20 +49,7 @@ class ApolloRunner:
                  waypoints: List[PositionEstimate]
                  ) -> None:
         """
-        Constracts all the attributes for ApolloRunner object
-
-        Parameters:
-            nid: int
-                an unique ID assigned to this container
-            ctn: ApolloContainer
-                the Apollo container that this runner controls
-            start: PositionEstimate
-                the initial location of this Apollo instance
-            start_time: float
-                the amount of time this instance should wait before
-                start moving
-            waypoints: List[PositionEstimate]
-                the expected routing this Apollo instance should complete
+        Constructor
         """
         self.logger = get_logger(f'ApolloRunner[{ctn.container_name}]')
         self.nid = nid
@@ -100,9 +63,7 @@ class ApolloRunner:
         Updates the minimum distance between this distance and another object if the 
         argument passed in is smaller than the current min distance
 
-        Parameters:
-            d: float
-                the distance between this instance and another object.
+        :param float d: the distance between this instance and another object.
         """
         if self.__min_distance is None:
             self.__min_distance = d
@@ -170,13 +131,10 @@ class ApolloRunner:
         """
         Check if a routing request should be send to the Apollo instance
 
-        Parameter:
-            t: float
-                The amount of time since the start of the simulation
-        
-        Returns:
-            should_send: bool
-                True if should send, False otherwise
+        :param float t: the amount of time since the start of the simulation
+
+        :returns: True if should send, False otherwise
+        :rtype: bool
         """
         return t >= self.start_time and not self.routing_started
 
@@ -247,9 +205,7 @@ class ApolloRunner:
         """
         Stop the modules in the container
 
-        Parameters:
-            stop_reason: str
-                a debug message indicating why the instance is stopped
+        :param str stop_reason: a debug message indicating why the instance is stopped
         """
         self.logger.debug('Stopping container')
         self.container.stop_all()
@@ -258,12 +214,10 @@ class ApolloRunner:
     def get_min_distance(self) -> float:
         """
         Get the minimum distance this instance ever reached w.r.t. another
-        object
+        object. e.g., 0 if a collision occurred
 
-        Returns:
-            min_distance: float
-                the minimum distance with another object
-                e.g., 0 if a collision occurred
+        :returns: the minimum distance between this Apollo instance and another object
+        :rtype: float
         """
         if not self.__min_distance:
             return 10000
@@ -273,9 +227,8 @@ class ApolloRunner:
         """
         Get the decisions made by the Apollo instance
 
-        Returns
-            decisions: Set[Tuple]
-                list of decisions made in tuple format
+        :returns: list of decisions made
+        :rtype: Set[Tuple]
         """
         return self.__decisions
 
@@ -283,8 +236,7 @@ class ApolloRunner:
         """
         Get the points traversed by this Apollo instance
 
-        Returns
-            coordinates: List[Tuple]
-                list of coordinates traversed by this Apollo instance
+        :returns: list of coordinates traversed by this Apollo instance
+        :rtype: List[Tuple[float, float]]
         """
         return self.__coords

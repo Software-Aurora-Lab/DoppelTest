@@ -1,4 +1,3 @@
-from cmath import isnan
 import glob
 import math
 import os
@@ -13,6 +12,7 @@ from dataclasses import dataclass
 from shapely.geometry import Polygon, LineString
 from typing import List, Set, Tuple
 from modules.planning.proto.planning_pb2 import ADCTrajectory
+from modules.map.proto.map_lane_pb2 import Lane, LaneBoundary
 from hdmap.MapParser import MapParser
 
 
@@ -21,26 +21,21 @@ class PositionEstimate:
     """
     Class representing a location on a HD Map
 
-    Attributes:
-        lane_id: str
-            The ID of the lane on the map
-        s: float
-            distance from the start of the lane
+    :param str lane_id: id of the lane on a HD Map
+    :param float s: distance from the start of the lane
     """
     lane_id: str
     s: float
 
     def is_too_close(self, rhs) -> bool:
         """
-        Check if 2 position estimates are too close to each other
-
-        Attributes:
-            rhs: PositionEstimate
-                The right-hand-side to be compared
-            
-        Returns:
-            is_close: bool
-                True if is too close, False otherwise
+        Check if 2 PositionEstimate objects are too close to each other. 
+        They are too close if their distance is less than 5 meters.
+        
+        :param self rhs: right hand side object for comparison
+        :returns:
+            True if too close, False otherwise
+        :rtype: bool
         """
         # 2 vehicles are too close if their distance is less than 5 meters
         ma = MapParser.get_instance()
@@ -55,23 +50,18 @@ class PositionEstimate:
         return adc1p.distance(adc2p) < 5
 
 
-def generate_polygon(position: Point3D, theta: float, length: float, width: float):
+def generate_polygon(position: Point3D, theta: float, length: float, width: float) -> List[Point3D]:
     """
     Generate polygon for a perception obstacle
 
-    Parameters:
-        position: Point3D
-            position vector of the obstacle
-        theta: float
-            heading of the obstacle
-        length: float
-            length of the obstacle
-        width: float
-            width of the obstacle
+    :param Point3D position: the position of the obstacle
+    :param float theta: the heading of the obstacle
+    :param float length: the length of the obstacle
+    :param float width: the width of the obstacle
 
-    Returns:
-        points: List[Point3D]
-            polygon points of the obstacle
+    :returns:
+        List with 4 Point3D objects representing the polygon of the obstacle
+    :rtype: List[Point3D]
     """
     points = []
     half_l = length / 2.0
@@ -95,20 +85,18 @@ def generate_polygon(position: Point3D, theta: float, length: float, width: floa
     return points
 
 
-def generate_adc_polygon(position: Point3D, theta: float):
+def generate_adc_polygon(position: Point3D, theta: float) -> List[Point3D]:
     """
-    Generate polygon for the ADC
+    Generate a polygon for the ADC based on its current position
 
-    Parameters:
-        position: Point3D
-            localization pose of ADC
-        theta: float
-            heading of ADC
+    :param Point3D position: position of the ADC
+    :param float theta: the heading of the ADC (in radians)
 
-    Returns:
-        points: List[Point3D]
-            polygon points of the ADC
+    :returns: a list consisting 4 Point3D objects to 
+        represent ADC polygon
+    :rtype: List[Point3D]
     """
+
     points = []
     half_w = APOLLO_VEHICLE_WIDTH / 2.0
     front_l = APOLLO_VEHICLE_LENGTH - APOLLO_VEHICLE_back_edge_to_center
@@ -134,17 +122,14 @@ def generate_adc_polygon(position: Point3D, theta: float):
 
 def generate_adc_rear_vertices(position: Point3D, theta: float):
     """
-    Generate rear for the ADC
+    Generate the rear edge for the ADC
 
-    Parameters:
-        position: Point3D
-            localization pose of ADC
-        theta: float
-            heading of ADC
+    :param Point3D position: position of the ADC
+    :param float theta: heading of the ADC
 
-    Returns:
-        points: List[Point3D]
-            polygon points of the ADC
+    :returns: a list consisting 2 Point3D objects to represent
+        the rear edge of the ADC
+    :rtype: List[Point3D]
     """
     points = []
     half_w = APOLLO_VEHICLE_WIDTH / 2.0
@@ -169,13 +154,10 @@ def obstacle_to_polygon(obs: PerceptionObstacle) -> Polygon:
     """
     Constructs a polygon for an obstacle
 
-    Parameters:
-        obs: PerceptionObstacle
-            received perception obstacle message
-    
-    Returns:
-        polygon: Polygon
-            Shapely Polygon object
+    :param PerceptionObstacle obs: the perception obstacle protobuf message
+
+    :returns: a Polygon object representing the obstacle
+    :rtype: Polygon
     """
     return Polygon([[p.x, p.y] for p in obs.polygon_point])
 
@@ -184,18 +166,13 @@ def pedestrian_location_to_obstacle(_id: int, speed: float, loc: Point3D, headin
     """
     Constructs a perception obstacle message for a pedestrian
 
-    Attributes:
-        _id: int
-            the ID of the obstacle
-        speed: float
-            the speed of the obstacle
-        loc: Point3D
-            the position of the obstacle (coordinate)
-        heading: float
-            rotation of the obstacle in radian format
-    Returns:
-        obs: PerceptionObstacle
-            the message ready to be published to cyberRT
+    :param int _id: ID of the obstacle
+    :param float speed: speed of the obstacle
+    :param Point3D loc: location of the obstacle
+    :param float heading: heading of the obstacle
+
+    :returns: a PerceptionObstacle protobuf message ready to be published to cyberRT
+    :rtype: PerceptionObstacle
     """
     position = Point3D(x=loc.x,
                        y=loc.y, z=loc.z)
@@ -223,18 +200,13 @@ def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, 
     """
     Constructs a perception obstacle message for a dynamic obstacle, used for generating a simulated Apollo instance only
 
-    Attributes:
-        _id: int
-            the ID of the obstacle
-        speed: float
-            the speed of the obstacle
-        loc: Point3D
-            the position of the obstacle (coordinate)
-        heading: float
-            rotation of the obstacle in radian format
-    Returns:
-        obs: PerceptionObstacle
-            the message ready to be published to cyberRT
+    :param int _id: ID of the obstacle
+    :param float speed: speed of the obstacle
+    :param Point3D loc: location of the obstacle
+    :param float heading: heading of the obstacle
+
+    :returns: a PerceptionObstacle protobuf message ready to be published to cyberRT
+    :rtype: PerceptionObstacle
     """
     position = Point3D(x=loc.x,
                        y=loc.y, z=loc.z)
@@ -258,17 +230,14 @@ def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, 
     return obs
 
 
-def to_Point3D(data) -> Point3D:
+def to_Point3D(data: Point3D) -> Point3D:
     """
     Replaces NaN that may occur in Apollo to 0.0
 
-    Parameters:
-        data: Point3D
-            an object that has attributes x,y,z and each of them may be NaN
-    
-    Returns:
-        point: Point3D
-            cleaned up version of the original Point3D
+    :param Point3D data: Point3D object to be cleaned
+
+    :returns: cleaned up version of the original Point3D object
+    :rtype: Point3D
     """
     return Point3D(
         x=0.0 if math.isnan(data.x) else data.x,
@@ -279,17 +248,14 @@ def to_Point3D(data) -> Point3D:
 
 def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> PerceptionObstacle:
     """
-    Converts LocalizationEstimate to PerceptionObstacle
+    Converts LocalizationEstimate to PerceptionObstacle. The localization message of an ADS
+    instance is used as part of the perception message for other ADS instances.
 
-    Parameters:
-        _id: int
-            id used to construct obstacle
-        data: LocalizationEstimate
-            localization result for an Apollo instance
+    :param int _id: ID of the obstacle
+    :param LocalizationEstimate data: localization message of the ADC
 
-    Returns:
-        obs: PerceptionObstacle
-            prepared data which is ready to be sent as PerceptionObstacle
+    :returns: PerceptionObstacle message converted from localization of an ADC
+    :rtype: PerceptionObstacle
     """
     position = to_Point3D(data.pose.position)
     velocity = to_Point3D(data.pose.linear_velocity)
@@ -317,13 +283,11 @@ def extract_main_decision(data: ADCTrajectory) -> Set[Tuple]:
     """
     Extracts the main decision from a Planning message
 
-    Parameters:
-        data: ADCTrajectory
-            Planning message recorded
-    
-    Returns:
-        decisions: Set[Tuple]
-        set of main decisions and main object decisions
+    :param ADCTrajectory data: ADC's planning module output
+
+    :returns: a set containing the overall decision and main decision
+        for each obstacle
+    :rtype: Set[Tuple]
     """
     main_decision = data.decision.main_decision
     object_decisions = data.decision.object_decision.decision
@@ -395,33 +359,27 @@ def clean_appolo_dir():
     subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
 
 
-def calculate_velocity(linear_velocity):
+def calculate_velocity(linear_velocity: Point3D) -> float:
     """
     Calculate velocity based on a given vector
 
-    Parameters:
-        linear_velocity: Point3D
-            velocity in vector format
-    
-    Returns:
-        speed: float
-            calculated speed
+    :param Point3D linear_velocity: velocity in vector form
+
+    :returns: speed calculated from the velocity
+    :rtype: float
     """
     x, y, z = linear_velocity.x, linear_velocity.y, linear_velocity.z
     return round(math.sqrt(x ** 2 + y ** 2), 2)
 
 
-def construct_lane_polygon(lane_msg):
+def construct_lane_polygon(lane_msg: Lane) -> Polygon:
     '''
     Construct the lane polygon based on their boundaries
 
-    Parameters:
-        lane_msg: Lane
-            lane object extracted from HD Map
-    
-    Returns:
-        lane_polygon: Polygon
-            polygon representing the lane
+    :param Lane lane_msg: Lane protobuf message extracted from HD Map
+
+    :returns: Polygon representing the lane
+    :rtype: Polygon
     '''
     left_points = get_lane_boundary_points(lane_msg.left_boundary)
     right_points = get_lane_boundary_points(lane_msg.right_boundary)
@@ -430,17 +388,15 @@ def construct_lane_polygon(lane_msg):
     return Polygon(all_points)
 
 
-def get_lane_boundary_points(boundary) -> List[Tuple[float, float]]:
+def get_lane_boundary_points(boundary: LaneBoundary) -> List[Tuple[float, float]]:
     '''
     Given a lane boundary (left/right), return a list of x, y
     coordinates of all points in the boundary
 
-    Parameters:
-        boundary
-            boundary object extracted from HD Map
-    
-    Returns:
-        boundary_points: List[Tuple[float,float]]
+    :param LaneBoundary boundary: LaneBoundary protobuf message
+
+    :returns: list of boundary points
+    :rtype: List[Tuple[float, float]]
     '''
     boundary_points = []
     for segment in boundary.curve.segment:
@@ -449,18 +405,14 @@ def get_lane_boundary_points(boundary) -> List[Tuple[float, float]]:
     return boundary_points
 
 
-def construct_lane_boundary_linestring(lane_msg) -> List[Tuple[LineString, LineString]]:
+def construct_lane_boundary_linestring(lane_msg: Lane) -> List[Tuple[LineString, LineString]]:
     """
     Construct two linestrings for the lane's left and right boundary
 
-    Parameters:
-        lane_msg: Lane
-            lane object extracted from HD Map
+    :param Lane lane_msg: Lane protobuf message extracted from HD Map
     
-    Returns:
-        left_boundary, right_boundary: Tuple[LineString, LineString]
-            the left and right boundary of a lane
-    Output: A list containing the linestrings representing the left and right boundary of the lane
+    :returns: 2 LineString objects representing left and right boundary of the lane
+    :rtype: Tuple[LaneString, LaneString]
     """
     left_boundary_points = get_lane_boundary_points(lane_msg.left_boundary)
     right_boundary_points = get_lane_boundary_points(lane_msg.right_boundary)
