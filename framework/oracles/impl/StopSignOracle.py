@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Tuple, Set
 
 from shapely.geometry import Polygon, LineString
 
@@ -13,10 +13,10 @@ from modules.planning.proto.planning_pb2 import ADCTrajectory
 
 class StopSignOracle(OracleInterface):
     """
-    *Idea for checking if ADC had stopped at stop sign:
-    Just after ADC crossed the stop line (not intersecting stop line anymore), oracle checks frames in past 5 seconds to see if:
-    (1) the STOP_REASON_STOP_SIGN decision was there for this stop_sign_id, and
-    (2) ADC reaches 0.0 m/s around the time when this STOP decision is made
+    The Stop Sign Oracle is responsible for checking if the ADS instance made a complete
+    stop before crossing a stop line controlled by a stop sign. After the oracle detects
+    the ADS instance crossing a stop line, it looks backward to check if the ADS stopped
+    for stop sign by looking at its main planning decision and its speed trace.
     """
 
     past_localization_list: List[LocalizationEstimate]
@@ -39,12 +39,29 @@ class StopSignOracle(OracleInterface):
         self.reset_all_oracle_states()
 
     def get_interested_topics(self):
+        """
+        The stop sign oracle is interested in Planning messages and Localization messages.
+        Localization messages are used to check if the AV is crossing a stop line,
+        and check if the AV's speed reached 0.0 m/s. Planning messages are used to check
+        if the AV's main decision was indeed for the stop sign, not stopping for other reasons
+        (e.g., obstacle)
+        """
         return [
             '/apollo/localization/pose',
             '/apollo/planning',
         ]
 
     def on_new_message(self, topic: str, message, t):
+        """
+        Upon receiving a planning/localization message, this oracle may not perform any
+        analysis if the AV is not crossing any stop line. Once the oracle detects it is
+        crossing a stop line, it looks at messages cached and analyze whether the AV
+        stopped for the stop sign before crossing the stop line.
+
+        :param str topic: topic of the message
+        :param any message: either Planning or Localization message
+        :param float t: the timestamp
+        """
         self.prune_old_messages()
 
         if topic == '/apollo/localization/pose':
@@ -99,7 +116,10 @@ class StopSignOracle(OracleInterface):
 
         self.reset_all_oracle_states()
 
-    def get_result(self):
+    def get_result(self) -> List[Tuple]:
+        """
+        Returns a list of violations from this oracle
+        """
         result = list()
         for stop_sign_id in self.violated_at_stop_sign_ids:
             violation = ('stop_sign', stop_sign_id)
@@ -107,6 +127,11 @@ class StopSignOracle(OracleInterface):
         return result
 
     def parse_stop_sign_stop_line_string_on_map(self, map_parser: MapParser) -> None:
+        """
+        Parse and store stop line for every stop sign on the map
+
+        :param MapParser map_parser: the MapParser singleton instance
+        """
         self.stop_sign_stop_line_string_dict = dict()
         stop_sign_ids = map_parser.get_stop_signs()
         for ss_id in stop_sign_ids:
@@ -116,10 +141,19 @@ class StopSignOracle(OracleInterface):
             self.stop_sign_stop_line_string_dict[ss_id] = line
 
     def reset_all_oracle_states(self) -> None:
+        """
+        Resets all oracle states
+        """
         self.past_localization_list = list()
         self.past_planning_list = list()
 
     def check_if_adc_intersecting_any_stop_lines(self) -> str:
+        """
+        Check if the AV is intersecting any stop line
+
+        :returns: the ID of the stop line intersecting with, or empty string
+        :rtype: str
+        """
         last_localization = self.past_localization_list[-1]
         adc_pose = last_localization.pose
 
@@ -133,6 +167,12 @@ class StopSignOracle(OracleInterface):
 
     def is_planning_main_decision_to_stop_at_stop_sign(self, planning_message: ADCTrajectory,
                                                        stop_sign_id: str) -> bool:
+        """
+        Given a planning message, check if its main decision is to stop for stop sign
+
+        :returns: True if includes a stop sign stop decision, False otherwise
+        :rtype: bool
+        """
         try:
             stop_decision = planning_message.decision.main_decision.stop
         except AttributeError:
@@ -151,6 +191,12 @@ class StopSignOracle(OracleInterface):
 
     @staticmethod
     def was_adc_completely_stopped(past_localization) -> bool:
+        """
+        Given a localization message, check if the AV completely stopped
+
+        :returns: True if completely stopped, False otherwise
+        :rtype: bool
+        """
         adc_pose = past_localization.pose
         adc_velocity = calculate_velocity(adc_pose.linear_velocity)
 
@@ -159,6 +205,9 @@ class StopSignOracle(OracleInterface):
         return adc_velocity == 0
 
     def prune_old_messages(self) -> None:
+        """
+        Remove messages that are too old, i.e., only keep the last 200 messages for analyzing
+        """
         total_localization_message_number = len(self.past_localization_list)
         if total_localization_message_number > 200:
             # based on PERCEPTION_FREQUENCY = 25 == 125 messages sent per 5 seconds

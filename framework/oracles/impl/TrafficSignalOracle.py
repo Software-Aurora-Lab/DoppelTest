@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 from shapely.geometry import LineString, Polygon
 
@@ -14,10 +14,10 @@ from modules.planning.proto.planning_pb2 import ADCTrajectory
 
 class TrafficSignalOracle(OracleInterface):
     """
-        *Idea for checking if ADC had crossed the stop line when signal was RED:
-        If the traffic light status is being RED and an ADC intersecting stop line at this time. Check if:
-        (1) the STOP_REASON_SIGNAL decision is being made for this signal_id, and
-        (2) ADC speed is 0.0 m/s at this time
+    The Traffic Signal Oracle is responsible for checking if the ADS instance violates a red light
+    signal. When the AV is facing a red light signal and the AV is already intersecting the stop line,
+    it should not have positive speed because it should have stopped before the stop line. If the AV
+    stopped, also check if its main decision is to stop for the traffic signal.
     """
 
     last_localization = Optional[LocalizationEstimate]
@@ -36,9 +36,16 @@ class TrafficSignalOracle(OracleInterface):
         self.last_traffic_signal_detection = None
         self.last_planning = None
 
-        self.parse_traffic_signal_stop_line_string_on_map(MapParser.get_instance())
+        self.parse_traffic_signal_stop_line_string_on_map(
+            MapParser.get_instance())
 
     def get_interested_topics(self):
+        """
+        The traffic signal oracle is interested in Localization, Traffic Light, and Planning messages.
+        Localization messages are used for checking AV's speed and whether it is crossing a stop line,
+        Traffic Light messages are used for checking if the AV is facing a red signal, and Planning
+        messages are used for checking if the AV made a stop decision for the signal.
+        """
         return [
             '/apollo/localization/pose',
             '/apollo/perception/traffic_light',
@@ -46,6 +53,16 @@ class TrafficSignalOracle(OracleInterface):
         ]
 
     def on_new_message(self, topic: str, message, t):
+        """
+        Upon receiving a new message, the oracle saves the message to analyze later if the AV is
+        not crossing a stop line. Once it is crossing a stop line, it checks if it has a positive
+        speed. To further gurantee the correctness of this oracle, we also attempt to check whether
+        the AV made a complete stop for the signal before crossing the stop line.
+
+        :param str topic: topic of the message
+        :param any message: either Planning or Localization message
+        :param float t: the timestamp
+        """
         if topic == '/apollo/localization/pose':
             self.last_localization = message
         elif topic == "/apollo/perception/traffic_light":
@@ -79,7 +96,10 @@ class TrafficSignalOracle(OracleInterface):
                 or self.is_adc_completely_stopped() is False:
             self.violated_at_traffic_signal_ids.add(crossing_traffic_signal_id)
 
-    def get_result(self):
+    def get_result(self) -> List[Tuple]:
+        """
+        Returns a list of violations from this oracle
+        """
         result = list()
         for traffic_signal_id in self.violated_at_traffic_signal_ids:
             violation = ('traffic_signal', traffic_signal_id)
@@ -87,17 +107,28 @@ class TrafficSignalOracle(OracleInterface):
         return result
 
     def parse_traffic_signal_stop_line_string_on_map(self, map_parser: MapParser) -> None:
+        """
+        Parse and store stop line for every traffic signal on the map
+        """
         self.traffic_signal_stop_line_string_dict = dict()
         traffic_signal_ids = map_parser.get_signals()
         for ts_id in traffic_signal_ids:
             traffic_signal_data = map_parser.get_signal_by_id(ts_id)
-            line = LineString([[p.x, p.y] for p in traffic_signal_data.stop_line[0].segment[0].line_segment.point])
+            line = LineString(
+                [[p.x, p.y] for p in traffic_signal_data.stop_line[0].segment[0].line_segment.point])
             self.traffic_signal_stop_line_string_dict[ts_id] = line
 
     def check_if_adc_intersecting_any_stop_lines(self) -> str:
+        """
+        Check if the AV is intersecting any stop line
+
+        :returns: the ID of the signal controlling that stop line, or empty string
+        :rtype: str
+        """
         last_localization = self.last_localization
         adc_pose = last_localization.pose
-        adc_polygon_pts = generate_adc_polygon(adc_pose.position, adc_pose.heading)
+        adc_polygon_pts = generate_adc_polygon(
+            adc_pose.position, adc_pose.heading)
         adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
         for traffic_signal_id, stop_line_string in self.traffic_signal_stop_line_string_dict.items():
             if not stop_line_string.intersection(adc_polygon).is_empty:
@@ -105,6 +136,12 @@ class TrafficSignalOracle(OracleInterface):
         return ""
 
     def is_adc_completely_stopped(self) -> bool:
+        """
+        Check if the AV is currently stopped
+
+        :returns: True if stopped, False otherwise
+        :rtype: bool
+        """
         adc_pose = self.last_localization.pose
         adc_velocity = calculate_velocity(adc_pose.linear_velocity)
 
@@ -114,6 +151,12 @@ class TrafficSignalOracle(OracleInterface):
 
     def is_planning_main_decision_to_stop_at_traffic_signal(self, planning_message: ADCTrajectory,
                                                             traffic_signal_id: str) -> bool:
+        """
+        Check if the AV's main decision is stop for the traffic signal with the specified ID
+
+        :returns: True if a stop decision for the specified signal ID is made, False otherwise
+        :rtype: bool
+        """
         try:
             stop_decision = planning_message.decision.main_decision.stop
         except AttributeError:
@@ -123,7 +166,8 @@ class TrafficSignalOracle(OracleInterface):
         if stop_reason_code != STOP_REASON_SIGNAL:
             return False
 
-        stop_reason = stop_decision.reason  # e.g,  stop_reason = "stop by SS_stop_sign_0" (included stop_sign_id)
+        # e.g,  stop_reason = "stop by SS_stop_sign_0" (included stop_sign_id)
+        stop_reason = stop_decision.reason
         if re.sub("^stop by ", "", stop_reason) == self.TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_signal_id:
             return True
 
