@@ -46,6 +46,7 @@ Table of Contents
    :caption: Tool reference
 
    internals
+   quickstart
 
 
 .. toctree::
