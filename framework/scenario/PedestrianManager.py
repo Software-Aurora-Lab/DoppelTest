@@ -9,23 +9,43 @@ from hdmap.MapParser import MapParser
 
 
 class PedestrianManager:
+    """
+    A simplified modeling of constant speed pedestrians
+
+    :param PDSection pedestrians: pedestrians to be managed
+    """
     pedestrians: PDSection
     __instance = None
     last_time = 0
     pd_walking_time: List[float]
 
     def __init__(self, pedestrians: PDSection) -> None:
+        """
+        Constructor
+        """
         self.pedestrians = pedestrians
         self.pd_walking_time = [0.0 for _ in range(len(pedestrians.pds))]
         PedestrianManager.__instance = self
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> 'PedestrianManager':
+        """
+        Returns the singleton instance
+
+        :returns: manager object
+        :rtype: PedestrianManager
+        """
         return PedestrianManager.__instance
 
     def calculate_position(self, pd: PDAgent, time_spent_walking: float) -> Tuple[Point3D, float]:
         '''
-        Return the pedestrians location and heading
+        Calculate the pedestrians location and heading at a given time
+
+        :param PDAgent pd: the pedestrian to be calculated
+        :param float time_spent_walking: the amount of time pedestrian has traveled for
+
+        :returns: the position and heading
+        :rtype: Tuple[Point3D, float]
         '''
         # heading is calculated by which segment the pedestrian is on (from the polygon) and then using atan2
         distance = pd.speed * time_spent_walking
@@ -59,6 +79,14 @@ class PedestrianManager:
                 return Point3D(x=curr_point.x, y=curr_point.y), heading_list[i]
 
     def get_pedestrians(self, curr_time: float) -> List[Tuple[Point3D, float]]:
+        """
+        Get the location and heading of all pedestrians
+
+        :param float curr_time: time since start of the scenario
+
+        :returns: list consisting position and heading
+        :rtype: List[Tuple[Point3D, float]]
+        """
         delta_t = curr_time - self.last_time
 
         result = list()

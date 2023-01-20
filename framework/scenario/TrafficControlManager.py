@@ -5,12 +5,29 @@ from framework.scenario.tc_config import TCSection
 
 
 class TrafficControlManager:
+    """
+    Manages traffic signals during a scenario based on the specification
+
+    :param TCSection tc: traffic control section
+    """
+
     def __init__(self, tc: TCSection) -> None:
+        """
+        Constructor
+        """
         self.tc = tc
         self.sequence_num = 0
 
     def get_traffic_configuration(self, curr_t: float) -> TrafficLightDetection:
+        """
+        Based on the current time, generate a TrafficLightDetection message
+        ready to be published to the ADS
 
+        :param float curr_t: time since start of the scenario
+
+        :returns: traffic light detection message
+        :rtype: TrafficLightDetection
+        """
         if FORCE_INVALID_TRAFFIC_CONTROL:
             config = self.tc.get_config_with_color('GREEN')
         elif self.tc.initial == self.tc.final:

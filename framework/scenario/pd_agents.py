@@ -9,12 +9,26 @@ from hdmap.MapParser import MapParser
 
 @dataclass
 class PDAgent:
+    """
+    Genetic representation of a single pedestrian
+
+    :param str cw_id: the ID of the crosswalk this pedestrian is on
+    :param float speed: the speed of this pedestrian
+    :param float start_s: the start time of this pedestrian
+    """
+
     cw_id: str
     speed: float
     start_t: float
 
     @staticmethod
-    def get_one():
+    def get_one() -> 'PDAgent':
+        """
+        Randomly generates an pedestrian representation
+
+        :returns: a pedestrian representation
+        :rtype: PDAgent
+        """
         ma = MapParser.get_instance()
         cws = list(ma.get_crosswalks())
         cw = choice(cws)
@@ -25,7 +39,15 @@ class PDAgent:
         )
 
     @staticmethod
-    def get_one_for_cw(cw_id: str):
+    def get_one_for_cw(cw_id: str) -> 'PDAgent':
+        """
+        Get a pedestrian representation with the specified crosswalk ID
+
+        :param str cw_id: ID of the expected crosswalk
+
+        :returns: a pedestrian representation
+        :rtype: PDAgent
+        """
         ma = MapParser.get_instance()
         return PDAgent(
             cw_id=cw_id,
@@ -36,9 +58,20 @@ class PDAgent:
 
 @dataclass
 class PDSection:
+    """
+    Genetic representation of the pedestrian section
+
+    :param List[PDAgent] pds: list of pedestrian representations
+    """
     pds: List[PDAgent]
 
     def add_agent(self, pd: PDAgent) -> bool:
+        '''
+        Adds an pedestrian representation to the section
+
+        :returns: True if successfully added, False otherwise
+        :rtype: bool
+        '''
         for p in self.pds:
             if p.cw_id == pd.cw_id:
                 return False
@@ -46,7 +79,13 @@ class PDSection:
         return True
 
     @staticmethod
-    def get_one():
+    def get_one() -> 'PDSection':
+        """
+        Randomly generates a pedestrian section
+
+        :returns: randomly generated section
+        :rtype: PDSection
+        """
         ma = MapParser.get_instance()
 
         num = randint(0, MAX_PD_COUNT)

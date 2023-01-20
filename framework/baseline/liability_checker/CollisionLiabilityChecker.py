@@ -10,11 +10,25 @@ from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 
 
 class CollisionType(Enum):
+    """
+    Type of collision
+    """
     DEFAULT = 0
+    """
+    Non-rear-end collision
+    """
     REAR_END = 1
+    """
+    Rear-end collision
+    """
 
 
 class CollisionLiabilityChecker:
+    """
+    Checker to see if a scenario includes rear-end collision
+
+    :param str record_path: filename of the record file
+    """
     record_obj: Record
 
     interesting_topics = {
@@ -28,6 +42,9 @@ class CollisionLiabilityChecker:
     collision_type_checking_result_dict = Dict[str, str]
 
     def __init__(self, record_path: str) -> None:
+        """
+        Constructor
+        """
         self.record_obj = Record(record_path)
 
         self.last_localization = None
@@ -36,13 +53,23 @@ class CollisionLiabilityChecker:
         self.collision_type_checking_result_dict = dict()
 
     def start(self):
+        """
+        Start to analyze the record file
+        """
         for topic, message, t in self.record_obj.read_messages():
             if topic not in self.interesting_topics:
                 continue
             self.on_new_message_callback(topic, message, t)
         return self.get_results()
 
-    def on_new_message_callback(self, topic: str, message, t):
+    def on_new_message_callback(self, topic: str, message, t: float):
+        """
+        Process a new record trace
+
+        :param str topic: channel of the trace
+        :param any message: the actual message from the trace
+        :param float t: the timestamp of the trace
+        """
         if topic == '/apollo/localization/pose':
             self.last_localization = message
         else:
@@ -56,10 +83,12 @@ class CollisionLiabilityChecker:
         if self.is_adc_completely_stopped():
             return
 
-        adc_polygon_pts = generate_adc_polygon(adc_pose.position, adc_pose.heading)
+        adc_polygon_pts = generate_adc_polygon(
+            adc_pose.position, adc_pose.heading)
         adc_polygon = Polygon([[x.x, x.y] for x in adc_polygon_pts])
 
-        adc_rear_line_string = LineString([[x.x, x.y] for x in (adc_polygon_pts[1], adc_polygon_pts[2])])
+        adc_rear_line_string = LineString(
+            [[x.x, x.y] for x in (adc_polygon_pts[1], adc_polygon_pts[2])])
 
         for obs in self.last_perception.perception_obstacle:
             # ignore this obs if it collided ego car before
@@ -74,6 +103,12 @@ class CollisionLiabilityChecker:
                     self.collision_type_checking_result_dict[obs.id] = CollisionType.DEFAULT
 
     def is_adc_completely_stopped(self) -> bool:
+        """
+        Check if the ADC is completely stopped
+
+        :returns: True if stopped, False otherwise
+        :rtype: bool
+        """
         adc_pose = self.last_localization.pose
         adc_velocity = calculate_velocity(adc_pose.linear_velocity)
 
@@ -81,7 +116,13 @@ class CollisionLiabilityChecker:
         # return adc_velocity <= self.MAX_ABS_SPEED_WHEN_STOPPED
         return adc_velocity == 0
 
-    def get_results(self):
+    def get_results(self) -> dict:
+        """
+        Get the result of this analysis
+
+        :returns: the analysis result
+        :rtype: dict
+        """
         if len(self.collision_type_checking_result_dict) > 0:
             result = list()
             for obs_id, collision_type in self.collision_type_checking_result_dict.items():

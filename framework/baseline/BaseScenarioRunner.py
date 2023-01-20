@@ -1,34 +1,52 @@
-from typing import Optional
+from typing import List, Optional, Tuple
 from apollo.ApolloContainer import ApolloContainer
 from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Topics
-from apollo.utils import PositionEstimate, clean_appolo_dir
+from apollo.utils import clean_appolo_dir
 from config import SCENARIO_UPPER_LIMIT
 from framework.baseline.DynamicObstacleManager import DynamicObstacleManager
 from framework.scenario import Scenario
 import time
 from framework.scenario.PedestrianManager import PedestrianManager
+from framework.scenario.ad_agents import ADAgent
 from modules.common.proto.header_pb2 import Header
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from utils import get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
 
 
 class BaseScenarioRunner:
+    """
+    Scenario runner for the baseline technique, i.e., 1 ADS instance with simulated
+    constant speed obstacle
+
+    :param ApolloContainer container: the Apollo container
+    """
     container: ApolloContainer
     runner: ApolloRunner
     curr_scenario: Optional[Scenario]
     is_initialized: bool
 
     def __init__(self, container: ApolloContainer) -> None:
+        """
+        Constructor
+        """
         self.container = container
         self.curr_scenario = None
         self.is_initialized = False
 
     def set_scenario(self, s: Scenario):
+        """
+        Set the scenario for the runner
+
+        :param Scenario s: scenario to be executed
+        """
         self.curr_scenario = s
         self.is_initialized = False
 
     def init_scenario(self):
+        """
+        Initialize the scenario
+        """
         adc = self.curr_scenario.ad_section.adcs[0]
         self.runner = ApolloRunner(
             nid=0,
@@ -41,7 +59,18 @@ class BaseScenarioRunner:
         clean_appolo_dir()
         self.is_initialized = True
 
-    def run_scenario(self, generation_name: str, scenario_name: str, save_record=False):
+    def run_scenario(self, generation_name: str,
+                     scenario_name: str, save_record=False) -> List[Tuple[int, ADAgent]]:
+        """
+        Main function to execute the scenario
+
+        :param str generation_name: generation name
+        :param str scenario_name: scenario name
+        :param bool save_record: if the record files should be saved
+
+        :returns: obstacles participated in the scenario, in the form (ID, ADAgent)
+        :rtype: List[Tuple[int, ADAgent]]
+        """
         runner_time = 0
         scenario_logger = get_scenario_logger()
         nids = random_numeric_id(len(self.curr_scenario.ad_section.adcs) - 1)

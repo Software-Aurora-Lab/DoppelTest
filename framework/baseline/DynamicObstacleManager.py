@@ -5,9 +5,16 @@ from apollo.utils import dynamic_obstacle_location_to_obstacle
 from framework.scenario.ad_agents import ADAgent
 from hdmap.MapParser import MapParser
 from modules.common.proto.geometry_pb2 import PointENU
+from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 
 
 class DynamicObstacleManager:
+    """
+    A simplified modeling of constant speed obstacles
+
+    :param List[ADAgent] obs: list of obstacles to be managed
+    :nids List[int]: list of ids
+    """
     obstacles: List[ADAgent]
     last_time: float
     obs_driving_time: List[float]
@@ -15,6 +22,9 @@ class DynamicObstacleManager:
     obs_nids: List[int]
 
     def __init__(self, obs: List[ADAgent], nids: List[int]) -> None:
+        """
+        Constructor
+        """
         self.obstacles = obs
         self.obs_driving_time = [0.0 for _ in range(len(obs))]
         self.obs_speed = [randint(10, 15) for _ in range(len(obs))]
@@ -22,6 +32,16 @@ class DynamicObstacleManager:
         self.last_time = 0.0
 
     def calculate_position(self, ad: ADAgent, speed: float, time_spent_driving: float) -> Tuple[PointENU, float]:
+        """
+        Calculate the position of the obstacle based on its speed and time spent driving
+
+        :param ADAgent ad: the obstacle representation
+        :param float speed: the speed of the obstacle
+        :param float time_spent_driving: the amount of time the obstacle has been traveling
+
+        :returns: the position and heading of the obstacle
+        :rtype: Tuple[PointENU, float]
+        """
         ma = MapParser.get_instance()
         dist = speed * time_spent_driving
         for index, lane_id in enumerate(ad.routing):
@@ -37,7 +57,15 @@ class DynamicObstacleManager:
                 else:
                     return ma.get_coordinate_and_heading(lane_id, lane_length)
 
-    def get_obstacles(self, curr_time: float):
+    def get_obstacles(self, curr_time: float) -> List[PerceptionObstacle]:
+        """
+        Get a list of PerceptionObstacle messages ready to be published
+
+        :param float curr_time: scenario time
+
+        :returns: list of PerceptionObstacle messages
+        :rtype: List[PerceptionObstacle]
+        """
         result = list()
         delta_t = curr_time - self.last_time
 

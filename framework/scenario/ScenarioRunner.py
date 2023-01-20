@@ -23,6 +23,11 @@ from config import SCENARIO_UPPER_LIMIT
 
 
 class ScenarioRunner:
+    """
+    Executes a scenario based on the specification
+
+    :param List[ApolloContainer] containers: containers to be used for scenario
+    """
     logger: Logger
     containers: List[ApolloContainer]
     curr_scenario: Optional[Scenario]
@@ -34,6 +39,9 @@ class ScenarioRunner:
     __runners: List[ApolloRunner]
 
     def __init__(self, containers: List[ApolloContainer]) -> None:
+        """
+        Constructor
+        """
         self.logger = get_logger('ScenarioRunner')
         self.containers = containers
         self.curr_scenario = None
@@ -41,14 +49,28 @@ class ScenarioRunner:
         ScenarioRunner.__instance = self
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> 'ScenarioRunner':
+        """
+        Returns the singleton instance
+
+        :returns: an instance of runner
+        :rtype: ScenarioRunner
+        """
         return ScenarioRunner.__instance
 
     def set_scenario(self, s: Scenario):
+        """
+        Set the scenario for this runner
+
+        :param Scenario s: scenario representation
+        """
         self.curr_scenario = s
         self.is_initialized = False
 
     def init_scenario(self):
+        """
+        Initialize the scenario
+        """
         nids = random_numeric_id(len(self.curr_scenario.ad_section.adcs))
         self.__runners = list()
         for i, c, a in zip(nids, self.containers, self.curr_scenario.ad_section.adcs):
@@ -83,6 +105,13 @@ class ScenarioRunner:
         self.is_initialized = True
 
     def run_scenario(self, generation_name: str, scenario_name: str, save_record=False) -> List[Tuple[ApolloRunner, ADAgent]]:
+        """
+        Execute the scenario based on the specification
+
+        :param str generation_name: name of the generation
+        :param str scenario_name: name of the scenario
+        :param bool save_record: whether to save records or not
+        """
         num_adc = len(self.curr_scenario.ad_section.adcs)
         self.logger.info(
             f'{num_adc} agents running a scenario G{self.curr_scenario.gid}S{self.curr_scenario.cid}.'
