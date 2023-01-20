@@ -45,8 +45,8 @@ Table of Contents
    :maxdepth: 1
    :caption: Tool reference
 
-   internals
    quickstart
+   internals
 
 
 .. toctree::
