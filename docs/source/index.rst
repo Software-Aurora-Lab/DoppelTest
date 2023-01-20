@@ -25,6 +25,13 @@ Known Issues
 1. DoppelTest is optimized for small maps. While we provide 7 HD maps
    in the release, its performance is significantly better on ``borregas_ave``.
 
+2. The initial analylsis of HD map may take more time to analyze. Its efficiency is
+   based on the number of lanes the map has. It mainly checks
+   the relation between each pair of lanes to determine whether a valid
+   path exists between them. You do not have to do this analysis if you trust the 
+   HD map provided. (More details in 
+   `Apollo Issue #14529 <https://github.com/ApolloAuto/apollo/issues/14529>`_)
+
 Table of Contents
 =================
 
