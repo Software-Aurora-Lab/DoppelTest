@@ -20,6 +20,11 @@ DoppelTest is implemented in Python 3.8.10 and depends on ``cyber_record``, ``DE
 
 DoppelTest was designed and implemented by Yuqi Huai, Yuntianyi Chen, Sumaya Almanee, Tuan Ngo, Xiang Liao, Ziwen Wan, Qi Alfred Chen and Joshua Garcia. If you have any problems using DoppelTest, please submit an issue to `our GitHub repository <https://github.com/YuqiHuai/DoppelTest>`_  or contact Yuqi at yhuai@uci.edu.
 
+Known Issues
+============
+1. DoppelTest is optimized for small maps. While we provide 7 HD maps
+   in the release, its performance is significantly better on ``borregas_ave``.
+
 Table of Contents
 =================
 
