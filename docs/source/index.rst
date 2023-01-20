@@ -5,11 +5,11 @@ DoppelTest is a scenario-based test generation framework for revealing bugs in a
 
 .. You can get started with Installation and then get an overview with the Quickstart. There is also more detailed Tutorial that shows how to use parts of DoppelTest to create new approaches. The rest of the docs describe each component of DoppelTest in detail, with a full reference in the Internals section.
 
-DoppelTest is implemented in Python 3.8.10 and depends on ``cyber_record``, ``DEAP``, ``docker_py``, ``NetworkX``, ``NumPy``, ``pandas``, ``protobuf``, ``Shapely``, and ``websocket-client``. More information for these libraries can be found at 
+DoppelTest is implemented in Python 3.8.10 and depends on ``cyber_record``, ``DEAP``, ``docker``, ``NetworkX``, ``NumPy``, ``pandas``, ``protobuf``, ``Shapely``, and ``websocket-client``. More information for these libraries can be found at 
 
 * `cyber_record - Apollo's cyberRT record file offline parse tool <https://pypi.org/project/cyber-record/>`_
 * `DEAP - Evolutionary computation framework <https://pypi.org/project/deap/>`_
-* `Docker - Docker Remote API <https://pypi.org/project/docker-py/>`_
+* `Docker - Docker Engine API <https://pypi.org/project/docker/>`_
 * `NetworkX - Creation, manipulation, and study of structure, dynamics, and functions of complex networks. <https://pypi.org/project/networkx/>`_
 * `NumPy - Scientific computing with Python <https://pypi.org/project/numpy/>`_
 * `pandas - Python data analysis toolkit <https://pypi.org/project/pandas/>`_
