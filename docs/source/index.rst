@@ -48,6 +48,11 @@ Table of Contents
    quickstart
    internals
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorials/new_oracle
 
 .. toctree::
    :maxdepth: 1
