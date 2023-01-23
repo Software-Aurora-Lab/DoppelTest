@@ -31,7 +31,8 @@ release = '1.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,3 +59,4 @@ html_static_path = [
 ]
 
 master_doc = 'index'
+autosectionlabel_prefix_document = True
