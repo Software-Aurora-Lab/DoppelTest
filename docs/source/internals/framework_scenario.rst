@@ -4,8 +4,8 @@ framework.scenario
 .. note:: For more detailed explanation of the genetic representation, 
   please refer to our main paper listed in :ref:`publication`.
 
-framework.scenario
-^^^^^^^^^^^^^^^^^^
+framework.scenario.__init__
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. automodule:: framework.scenario
     :members:
 
