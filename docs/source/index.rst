@@ -53,6 +53,7 @@ Table of Contents
    :caption: Tutorials
 
    tutorials/new_oracle
+   tutorials/cyber_bridge
 
 .. toctree::
    :maxdepth: 1
