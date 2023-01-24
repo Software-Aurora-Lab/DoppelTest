@@ -37,7 +37,7 @@ Installing Baidu Apollo
 
 1. Clone the forked version of Baidu Apollo 7.0 from https://github.com/YuqiHuai/apollo
 
-    | In this forked version, we made slight adjustments that are not related to the AD stack.
+    .. note:: In this forked version, we made slight adjustments that are not related to the AD stack.
 
 2. At the root directory of Baidu Apollo, start up an Apollo container via ``./docker/scripts/dev_start.sh -l``
 
@@ -45,16 +45,20 @@ Installing Baidu Apollo
 
 4. Enter the container in root mode via ``docker exec -it apollo_dev_your_name /bin/bash``
 
-    | Remember to replace ``apollo_dev_your_name`` with the container's actual name
+    .. note:: Remember to replace ``apollo_dev_your_name`` with the container's actual name
 
 5. In the container, build Apollo via ``./apollo.sh build``
 
 6. Exit the container and create directories ``data``, 
    ``data/log``, ``data/bag``, ``data/log``, ``data/core`` under Apollo's root directory.
 
-    | This step is necessary for DoppelTest running on the host machine to delete Apollo's log files.
+    .. note:: This step is necessary for DoppelTest running on the host machine to delete Apollo's log files.
       Our framework restarts modules being tested after every scenario, which creates a large number of
-      unnecessary log files.
+      unnecessary log files. 
+      
+      Since a lot of commands are executed as root
+      inside of the Docker container, if those directories are created inside of the container,
+      DoppelTest may not be able to remove those directories.
 
 Installing DoppelTest
 ---------------------
@@ -72,5 +76,5 @@ Installing DoppelTest
 
 4. Start the magic via ``python main_ga.py`` or ``python main_random.py``
 
-    | You should start seeing 2 Apollo instances being started and the scenario is visualizable via a browser.
+    .. note:: You should start seeing 2 Apollo instances being started and the scenario is visualizable via a browser.
       DoppelTest will provide the URL to visualize each instance in the terminal.
