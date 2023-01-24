@@ -3,7 +3,7 @@ Quickstart
 
 We discuss the overall structure of DoppelTest and describe what each 
 of the main and test scripts does. For more detailed documentation for
-each of the internal modules, please refer to :ref:`internals`.
+each of the internal modules, please refer to :ref:`internals:internals`.
 
 Directories
 -----------
@@ -46,7 +46,7 @@ Main scripts
 
   A version of DoppelTest with multiple ADS instances and genetic
   algorithm. 
-  Please refer to our main paper in :ref:`publication` 
+  Please refer to our main paper in :ref:`publication:publication` 
   for details with regard to the genetic algorithm 
   implemented.
 

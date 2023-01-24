@@ -2,7 +2,7 @@ framework.scenario
 ------------------
 
 .. note:: For more detailed explanation of the genetic representation, 
-  please refer to our main paper listed in :ref:`publication`.
+  please refer to our main paper listed in :ref:`publication:publication`.
 
 framework.scenario.__init__
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
