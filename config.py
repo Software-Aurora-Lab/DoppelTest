@@ -15,9 +15,9 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 
 
 # DIRECTORIES =======================================
-APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/BaiduApollo/DoppelTest_Apollo'
+APOLLO_ROOT = 'APOLLO_ROOT_DIR'
 """Root directory of Apollo 7.0"""
-DT_ROOT = '/home/yuqi/ResearchWorkspace/DoppelTest/tool'
+DT_ROOT = 'DOPPELTEST_ROOT_DIR'
 """Root directory of DoppelTest"""
 RECORDS_DIR = f'{DT_ROOT}/data/records'
 """Desired directory to save record files"""

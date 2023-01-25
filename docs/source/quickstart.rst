@@ -37,8 +37,8 @@ Main scripts
 
 * ``config.py``
 
-  .. note:: Please refer to ``apollo/modules/common/data/vehicle_param.pb.txt`` for size of the vehicle.
-  
+  .. note:: Please refer to ``apollo/modules/common/data/vehicle_param.pb.txt`` for size of the vehicle,
+    also remember to update ``APOLLO_ROOT`` and ``DT_ROOT``!
   .. automodule:: config
     :members:
 
