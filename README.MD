@@ -2,10 +2,7 @@
 
 ## Introduction
 
-DoppelTest is a Doppelganer Testing approach for automatically finding bug-revealing
-violations of autonomous driving systems. We recommend obtaining the artifact from
-GitHub at https://github.com/YuqiHuai/DoppelTest, we also make a version available
-via an archival repository at **URL TO BE ADDED**.
+DoppelTest is a Python framework implemented to evaluate a novel autonomous driving software (ADS) testing approach discussed in the paper titled Doppelganger Test Generation for Revealing Bugs in Autonomous Driving Software. This research artifact implements a framework that orchestrates multiple instances of the same ADS and generates virtual scenarios with those instances. Since all vehicles in the virtual scenario are controlled by different instances of the ADS under test, any actual violation that occurs by or among them inherently reveals ADS misbehavior, thus revealing ADS bugs.
 
 The DOI for this repository is: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575583.svg)](https://doi.org/10.5281/zenodo.7575583)
 
