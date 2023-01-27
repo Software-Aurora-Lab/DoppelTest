@@ -7,6 +7,7 @@ violations of autonomous driving systems. We recommend obtaining the artifact fr
 GitHub at https://github.com/YuqiHuai/DoppelTest, we also make a version available
 via an archival repository at **URL TO BE ADDED**.
 
+The DOI for this repository is: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575583.svg)](https://doi.org/10.5281/zenodo.7575583)
 
 ## Requirements
 
@@ -42,18 +43,17 @@ via an archival repository at **URL TO BE ADDED**.
 
 5. In the container, build Apollo via `./apollo.sh build`
 
-6. Exit the container and create directories `data`, `data/log`, `data/bag`, `data/log`, 
-`data/core` under Apollo's root directory.
+6. Exit the container and create directories `data`, `data/log`, `data/bag`, `data/log`,
+   `data/core` under Apollo's root directory.
 
 > This step is necessary for DoppelTest running on the host machine to delete Apollo's log files.
 > Our framework restarts modules being tested after every scenario, which creates a large number
 > of unnecessary log files.
 
-
 ### INSTALLING DoppelTest
 
 1. Install the required Python libraries: `numpy`, `Shapely`, `DEAP`, `pandas`, `networkx`,
-`docker`, and `cyber_record`
+   `docker`, and `cyber_record`
 
 2. Replace location of directories in `config.py`
 
