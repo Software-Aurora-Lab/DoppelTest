@@ -89,4 +89,5 @@ Installing DoppelTest
 4. Start the framework via ``python main_ga.py``
 
     .. note:: After running DoppelTest for extended period of time, you should
-      see record file of scenarios generated under ``data/records``.
+      see record file of scenarios generated under ``data/records``. This is also
+      the step to replicate the results presented in the paper.
