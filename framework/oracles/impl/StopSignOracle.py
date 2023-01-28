@@ -30,13 +30,14 @@ class StopSignOracle(OracleInterface):
     # Apollo: virtual_obstacle_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
     STOP_SIGN_VO_ID_PREFIX = "SS_"
 
-    checked = set()
+    checked: Set
 
     def __init__(self):
         self.violated_at_stop_sign_ids = set()
 
         self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance())
         self.reset_all_oracle_states()
+        self.checked = set()
 
     def get_interested_topics(self):
         """
