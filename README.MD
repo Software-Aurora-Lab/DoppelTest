@@ -44,6 +44,8 @@ DoppelTest on personal workstations with the following configuration:
 
 ## Installing
 
+In this section we will be discussing steps to replicate the results discussed in the paper
+
 ### INSTALLING Baidu Apollo
 
 1. Clone the forked version of Apollo 7.0 from https://github.com/YuqiHuai/apollo
@@ -82,7 +84,7 @@ DoppelTest on personal workstations with the following configuration:
 
 > You should start seeing 5 Apollo instances being started and the scenario is visualizable via a browser. DoppelTest will provide the URL to visualize each instance in the terminal.
 
-4. Start the magic via `python main_ga.py` or `python main_random.py`
+4. Start the framework via `python main_ga.py`
 
 > After running DoppelTest for extended period of time, you should see record file of scenarios generated under `data/records`. This is also the step to replicate the results presented in the paper.
 
