@@ -6,21 +6,39 @@ DoppelTest is a Python framework implemented to evaluate a novel autonomous driv
 
 The DOI for this repository is: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7575583.svg)](https://doi.org/10.5281/zenodo.7575583)
 
-## Requirements
+## Hardware and Software Requirements
 
-### HARDWARE:
+- Intel Core i9 12900K (16-core)
 
-1. CPU: Intel Core i9 12900K (24 Core)
-2. Memory: 32 GB DDR5 and above
-3. Graphics Card: NVIDIA RTX 3090 and above
+- 64 GB memory and above
 
-### SOFTWARE:
+- Ubuntu 18.04 and above
 
-1. Ubuntu 18.04 and above
-2. Docker-CE version 19.03 and above
-3. NVIDIA driver version 455.32.00 and above
-4. NVIDIA Container Toolkit (https://github.com/NVIDIA/nvidia-docker)
-5. Python 3.8.10 and above
+- Docker-CE version 19.03 and above
+
+- Python 3.8.10 and above
+
+- NVIDIA RTX 3090 and above **(Optional)**
+
+- NVIDIA driver version 455.32.00 and above **(Optional)**
+
+- NVIDIA Container Toolkit **(Optional)**
+
+### Additional Information
+
+Doppelganger Testing relies on simultaneously running multiple instances of
+the same ADS, therefore the requirement for running DoppelTest varies based
+on 1) the minimum requirement of the ADS and 2) number of instances you wish
+to run. Note the prerequisites listed above are mostly the same as the minimum
+requirements to run the ADS under test with the exception of better CPU and
+memory due to the need to concurrently run multiple instances. We have tested
+DoppelTest on personal workstations with the following configuration:
+
+- C1 - 5 instances on Intel Core i9 12900KF (16-core) with 32 GB DDR5 memory,
+  equipped with NVIDIA GeForce 3090 Ti.
+
+- C2 - 10 instances on Intel Core i9 12900K (16-core) with 128 GB DDR4 memory,
+  equipped with NVIDIA GeForce 3090.
 
 ## Installing
 
@@ -30,7 +48,7 @@ The DOI for this repository is: [![DOI](https://zenodo.org/badge/DOI/10.5281/zen
 
 > In this forked version, we made slight adjustments that are not related to the AD stack
 
-2. Start up Apollo container via `./docker/scripts/dev_start.sh -l`
+2. At the root directory of Baidu Apollo, start up Apollo container via `./docker scripts/dev_start.sh -l`
 
 3. Find the name of the container via `docker ps -a`
 
@@ -43,25 +61,28 @@ The DOI for this repository is: [![DOI](https://zenodo.org/badge/DOI/10.5281/zen
 6. Exit the container and create directories `data`, `data/log`, `data/bag`, `data/log`,
    `data/core` under Apollo's root directory.
 
-> This step is necessary for DoppelTest running on the host machine to delete Apollo's log files.
-> Our framework restarts modules being tested after every scenario, which creates a large number
-> of unnecessary log files.
+> This step is necessary for DoppelTest running on the host machine to delete Apollo's log files. Our framework restarts modules being tested after every scenario, which creates a large number of unnecessary log files.
+
+> Since a lot of commands are executed as root inside of the Docker container, if those directories are created inside of the container, DoppelTest may not be able to remove those directories.
 
 ### INSTALLING DoppelTest
 
-1. Install the required Python libraries: `numpy`, `Shapely`, `DEAP`, `pandas`, `networkx`,
-   `docker`, and `cyber_record`
+1. Install the required Python libraries via `pip install -r requirements.txt`
 
 2. Replace location of directories in `config.py`
 
+   ```python
+   APOLLO_ROOT  = '/xxx/xxx/apollo'
+   DT_ROOT      = '/xxx/xxx/DoppelTest'
+   ```
+
 3. Verify the framework is runnable via `python test_main.py`
 
-> You might be prompted to downgrade Python protobuf via `pip install protobuf==3.20.1`
+> You should start seeing 5 Apollo instances being started and the scenario is visualizable via a browser. DoppelTest will provide the URL to visualize each instance in the terminal.
 
 4. Start the magic via `python main_ga.py` or `python main_random.py`
 
-> You should start seeing 2 Apollo instances being started and the scenario is visualizable via
-> a browser. DoppelTest will provide the URL to visualize each instance.
+> After running DoppelTest for extended period of time, you should see record file of scenarios generated under `data/records`. This is also the step to replicate the results presented in the paper.
 
 ## Citing
 
