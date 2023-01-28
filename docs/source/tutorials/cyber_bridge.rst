@@ -9,8 +9,8 @@ reproduce a bug reported in `Issue #14551 <https://github.com/ApolloAuto/apollo/
 Step 0: Imports first!
 ----------------------
 
-Please use the following input statements to import the appropriate modules needed
-for this tutorial
+Create a python script at the root directory of DoppelTest and use the following input statements to 
+import the appropriate modules needed for this tutorial
 
 .. code-block:: python
 
