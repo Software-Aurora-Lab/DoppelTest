@@ -4,7 +4,7 @@ Random version of the framework, used to compare as base line.
 
 from datetime import datetime
 from main_ga import eval_scenario
-from config import APOLLO_ROOT, MAX_ADC_COUNT, RUN_FOR_HOUR
+from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT, RUN_FOR_HOUR
 from apollo.ApolloContainer import ApolloContainer
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
@@ -16,7 +16,7 @@ import pickle
 
 
 def main():
-    mp = MapParser('./data/maps/borregas_ave/base_map.bin')
+    mp = MapParser(HD_MAP_PATH)
 
     containers = [ApolloContainer(
         APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]

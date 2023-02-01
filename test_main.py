@@ -1,16 +1,14 @@
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, MAX_ADC_COUNT
+from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT
 from framework.scenario import Scenario
 from hdmap.MapParser import MapParser
 from framework.scenario.ScenarioRunner import ScenarioRunner
 
-ma = MapParser('./data/maps/borregas_ave/base_map.bin')
+ma = MapParser(HD_MAP_PATH)
 
 x = Scenario.get_one()
 x.gid = 0
 x.cid = 0
-
-mp = MapParser('./data/maps/borregas_ave/base_map.bin')
 
 containers = [ApolloContainer(
     APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]
