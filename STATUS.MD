@@ -27,9 +27,9 @@ The artifact deserves those badges because of the following reasons:
    purposes [^3].
 
 4. The authors have placed the artifact on a publicly accessible archival
-   repository [^4]. The DOI for this artifact is `10.5281/zenodo.7575583`.
+   repository [^4]. The DOI for this artifact is `10.5281/zenodo.7575582`.
 
-[^1]: https://figshare.com/s/1fb794037ee3aa189e3d
+[^1]: https://doi.org/10.5281/zenodo.7622731
 [^2]: https://www.ics.uci.edu/~yhuai/DoppelTest/tutorials/new_oracle.html
 [^3]: https://www.ics.uci.edu/~yhuai/DoppelTest/tutorials/cyber_bridge.html
-[^4]: https://doi.org/10.5281/zenodo.7575583
+[^4]: https://doi.org/10.5281/zenodo.7575582
