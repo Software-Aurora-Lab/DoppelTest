@@ -83,7 +83,7 @@ In this section we will be discussing steps to replicate the results discussed i
 
 3. Verify the framework is runnable via `python test_main.py`
 
-> You should start seeing 5 Apollo instances being started and the scenario is visualizable via a browser. DoppelTest will provide the URL to visualize each instance in the terminal.
+> You should start seeing 3 Apollo instances being started and the scenario is visualizable via a browser. DoppelTest will provide the URL to visualize each instance in the terminal.
 
 4. Start the framework via `python main_ga.py`
 
