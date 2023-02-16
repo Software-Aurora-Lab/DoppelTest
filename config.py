@@ -1,5 +1,5 @@
 import logging
-
+from pathlib import Path
 
 # APOLLO CONFIGURATION ==============================
 PERCEPTION_FREQUENCY = 25
@@ -17,7 +17,7 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 # DIRECTORIES =======================================
 APOLLO_ROOT = 'APOLLO_ROOT_DIR'
 """Root directory of Apollo 7.0"""
-DT_ROOT = 'DOPPELTEST_ROOT_DIR'
+DT_ROOT = Path(__file__).parent
 """Root directory of DoppelTest"""
 RECORDS_DIR = f'{DT_ROOT}/data/records'
 """Desired directory to save record files"""
