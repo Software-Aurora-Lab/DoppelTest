@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from framework.scenario.ad_agents import ADAgent, ADSection
 from framework.scenario.pd_agents import PDAgent, PDSection
 from framework.scenario.tc_config import TCSection
@@ -43,7 +43,7 @@ class Scenario:
 
     gid: int = -1  # generation id
     cid: int = -1  # scenario id
-    fitness: base.Fitness = ScenarioFitness()
+    fitness: base.Fitness = field(default_factory=ScenarioFitness)
 
     def to_dict(self) -> dict:
         """
