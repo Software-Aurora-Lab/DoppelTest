@@ -1,22 +1,25 @@
+import os
+import pickle
+import shutil
 from copy import deepcopy
 from datetime import datetime
-import pickle
-from random import random, sample, shuffle, randint
-import shutil
-from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT, MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR
+from random import randint, random, sample, shuffle
+
+import numpy as np
+from deap import algorithms, base, tools
+
 from apollo.ApolloContainer import ApolloContainer
+from config import (APOLLO_ROOT, HD_MAP, HD_MAP_PATH, MAX_ADC_COUNT,
+                    MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR)
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
+from framework.scenario.ad_agents import ADAgent, ADSection
+from framework.scenario.pd_agents import PDAgent, PDSection
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from framework.scenario.tc_config import TCSection
-from framework.scenario.pd_agents import PDAgent, PDSection
-from framework.scenario.ad_agents import ADAgent, ADSection
 from hdmap.MapParser import MapParser
-from deap import base, tools, algorithms
 from utils import get_logger, remove_record_files
-import os
-import numpy as np
 
 # EVALUATION (FITNESS)
 
@@ -72,7 +75,7 @@ def eval_scenario(ind: Scenario):
             ):
                 unique_violation += 1
 
-    ma = MapParser.get_instance()
+    ma = MapParser.get_instance(HD_MAP)
     conflict = ind.has_ad_conflict()
 
     if unique_violation == 0:

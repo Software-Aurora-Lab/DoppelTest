@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from random import randint, shuffle
 from typing import Dict
 
+from config import HD_MAP, SCENARIO_UPPER_LIMIT
 from hdmap.MapParser import MapParser
-from config import SCENARIO_UPPER_LIMIT
 
 
 @dataclass
@@ -69,7 +69,7 @@ class TCSection:
         :returns: a configuration in which preferred signals are green
         :rtype: Dict[str, str]
         """
-        ma = MapParser.get_instance()
+        ma = MapParser.get_instance(HD_MAP)
         result = dict()
         signals = list(ma.get_signals())
         shuffle(signals)

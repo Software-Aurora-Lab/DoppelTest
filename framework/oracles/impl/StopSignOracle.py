@@ -1,9 +1,10 @@
 import re
-from typing import List, Dict, Tuple, Set
+from typing import Dict, List, Set, Tuple
 
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import LineString, Polygon
 
 from apollo.utils import calculate_velocity, generate_adc_polygon
+from config import HD_MAP
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -35,7 +36,7 @@ class StopSignOracle(OracleInterface):
     def __init__(self):
         self.violated_at_stop_sign_ids = set()
 
-        self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance())
+        self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance(HD_MAP))
         self.reset_all_oracle_states()
         self.checked = set()
 

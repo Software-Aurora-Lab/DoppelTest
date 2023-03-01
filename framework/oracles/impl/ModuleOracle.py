@@ -1,4 +1,5 @@
-from typing import Optional, List, Tuple
+from typing import List, Optional, Tuple
+
 from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 

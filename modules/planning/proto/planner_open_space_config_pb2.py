@@ -2,20 +2,24 @@
 # source: modules/planning/proto/planner_open_space_config.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
-from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf.internal import enum_type_wrapper
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.planning.proto.math import fem_pos_deviation_smoother_config_pb2 as modules_dot_planning_dot_proto_dot_math_dot_fem__pos__deviation__smoother__config__pb2
-from modules.planning.proto import task_config_pb2 as modules_dot_planning_dot_proto_dot_task__config__pb2
-
+from modules.planning.proto import \
+    task_config_pb2 as modules_dot_planning_dot_proto_dot_task__config__pb2
+from modules.planning.proto.math import \
+    fem_pos_deviation_smoother_config_pb2 as \
+    modules_dot_planning_dot_proto_dot_math_dot_fem__pos__deviation__smoother__config__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/planning/proto/planner_open_space_config.proto',

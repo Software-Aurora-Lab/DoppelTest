@@ -2,22 +2,29 @@
 # source: modules/data/proto/static_info.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.canbus.proto import canbus_conf_pb2 as modules_dot_canbus_dot_proto_dot_canbus__conf__pb2
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.common.configs.proto import vehicle_config_pb2 as modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
-from modules.control.proto import control_conf_pb2 as modules_dot_control_dot_proto_dot_control__conf__pb2
-from modules.routing.proto import routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
-
+from modules.canbus.proto import \
+    canbus_conf_pb2 as modules_dot_canbus_dot_proto_dot_canbus__conf__pb2
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.common.configs.proto import \
+    vehicle_config_pb2 as \
+    modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
+from modules.control.proto import \
+    control_conf_pb2 as modules_dot_control_dot_proto_dot_control__conf__pb2
+from modules.routing.proto import \
+    routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/data/proto/static_info.proto',

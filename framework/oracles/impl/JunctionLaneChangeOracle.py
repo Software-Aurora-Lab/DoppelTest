@@ -1,14 +1,16 @@
-from framework.oracles.OracleInterface import OracleInterface
 from typing import List
-from shapely.geometry import Polygon, Point
 
+from shapely.geometry import Point, Polygon
+
+from config import HD_MAP
+from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 
 
 class JunctionLaneChangeOracle(OracleInterface):
     def __init__(self) -> None:
         super().__init__()
-        self.mp = MapParser.get_instance()
+        self.mp = MapParser.get_instance(HD_MAP)
         self.junctions = list()
         for j_id in self.mp.get_junctions():
             j_obj = self.mp.get_junction_by_id(j_id)

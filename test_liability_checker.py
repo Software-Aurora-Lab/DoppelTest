@@ -1,10 +1,11 @@
 from collections import defaultdict
 
 from framework.baseline.liability_checker import CollisionLiabilityChecker
-from framework.baseline.liability_checker.CollisionLiabilityChecker import CollisionType
+from framework.baseline.liability_checker.CollisionLiabilityChecker import \
+    CollisionType
 from framework.oracles import RecordAnalyzer
 from hdmap.MapParser import MapParser
-from utils import get_logger, find_all_files_by_wildcard, get_current_timestamp
+from utils import find_all_files_by_wildcard, get_current_timestamp, get_logger
 
 logger = get_logger(__name__)
 

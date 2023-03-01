@@ -2,26 +2,36 @@
 # source: modules/planning/proto/planning.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
-from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf.internal import enum_type_wrapper
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.common.proto import drive_state_pb2 as modules_dot_common_dot_proto_dot_drive__state__pb2
-from modules.common.proto import geometry_pb2 as modules_dot_common_dot_proto_dot_geometry__pb2
-from modules.common.proto import header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
-from modules.common.proto import pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
-from modules.map.proto import map_id_pb2 as modules_dot_map_dot_proto_dot_map__id__pb2
-from modules.planning.proto import decision_pb2 as modules_dot_planning_dot_proto_dot_decision__pb2
-from modules.planning.proto import planning_internal_pb2 as modules_dot_planning_dot_proto_dot_planning__internal__pb2
-
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.common.proto import \
+    drive_state_pb2 as modules_dot_common_dot_proto_dot_drive__state__pb2
+from modules.common.proto import \
+    geometry_pb2 as modules_dot_common_dot_proto_dot_geometry__pb2
+from modules.common.proto import \
+    header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
+from modules.common.proto import \
+    pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
+from modules.map.proto import \
+    map_id_pb2 as modules_dot_map_dot_proto_dot_map__id__pb2
+from modules.planning.proto import \
+    decision_pb2 as modules_dot_planning_dot_proto_dot_decision__pb2
+from modules.planning.proto import \
+    planning_internal_pb2 as \
+    modules_dot_planning_dot_proto_dot_planning__internal__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/planning/proto/planning.proto',

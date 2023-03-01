@@ -2,19 +2,23 @@
 # source: modules/drivers/proto/racobit_radar.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.common.proto import header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
-from modules.drivers.radar.racobit_radar.proto import racobit_radar_conf_pb2 as modules_dot_drivers_dot_radar_dot_racobit__radar_dot_proto_dot_racobit__radar__conf__pb2
-
+from modules.common.proto import \
+    header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
+from modules.drivers.radar.racobit_radar.proto import \
+    racobit_radar_conf_pb2 as \
+    modules_dot_drivers_dot_radar_dot_racobit__radar_dot_proto_dot_racobit__radar__conf__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/drivers/proto/racobit_radar.proto',

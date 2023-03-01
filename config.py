@@ -48,3 +48,4 @@ The HD map you are currently using
 :note: you also need to update ``apollo/modules/common/data/global_flagfile.txt``
   to match the HD map you are using
 """
+HD_MAP = 'san_mateo'

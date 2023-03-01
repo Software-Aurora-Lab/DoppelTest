@@ -1,10 +1,5 @@
-from typing import List
-from framework.scenario import Scenario
-from apollo.ApolloContainer import ApolloContainer
-
-
-import time
 import threading
+import time
 from logging import Logger
 from typing import List, Optional, Tuple
 
@@ -12,14 +7,15 @@ from apollo.ApolloContainer import ApolloContainer
 from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Topics
 from apollo.MessageBroker import MessageBroker
-from modules.map.proto.map_pb2 import Map
+from apollo.utils import clean_appolo_dir
+from config import SCENARIO_UPPER_LIMIT
+from framework.scenario import Scenario
+from framework.scenario.ad_agents import ADAgent
 from framework.scenario.PedestrianManager import PedestrianManager
 from framework.scenario.TrafficControlManager import TrafficControlManager
-from apollo.utils import clean_appolo_dir
-from utils import get_logger, get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
-from framework.scenario.ad_agents import ADAgent
-
-from config import SCENARIO_UPPER_LIMIT
+from modules.map.proto.map_pb2 import Map
+from utils import (get_logger, get_scenario_logger, random_numeric_id,
+                   save_record_files_and_chromosome)
 
 
 class ScenarioRunner:

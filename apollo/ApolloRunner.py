@@ -1,19 +1,20 @@
-from logging import Logger
 import time
+from logging import Logger
 from typing import List, Optional, Set, Tuple
-from apollo.CyberBridge import Topics
+
 from apollo.ApolloContainer import ApolloContainer
+from apollo.CyberBridge import Topics
+from apollo.utils import PositionEstimate, extract_main_decision
+from config import HD_MAP, USE_SIM_CONTROL_STANDALONE
 from hdmap.MapParser import MapParser
-from modules.common.proto.header_pb2 import Header
 from modules.common.proto.geometry_pb2 import Point3D
+from modules.common.proto.header_pb2 import Header
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.localization.proto.pose_pb2 import Pose
 from modules.map.proto.map_pb2 import Map
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import LaneWaypoint, RoutingRequest
 from utils import get_logger
-from config import USE_SIM_CONTROL_STANDALONE
-from apollo.utils import PositionEstimate, extract_main_decision
 
 
 class ApolloRunner:
@@ -143,7 +144,7 @@ class ApolloRunner:
         Send the instance's initial location to cyberRT
         """
         self.logger.debug('Sending initial localization')
-        ma = MapParser.get_instance()
+        ma = MapParser.get_instance(HD_MAP)
         coord, heading = ma.get_coordinate_and_heading(
             self.start.lane_id, self.start.s)
 
@@ -174,7 +175,7 @@ class ApolloRunner:
         self.logger.debug(
             f'Sending routing request to {self.container.container_name}')
         self.routing_started = True
-        ma = MapParser.get_instance()
+        ma = MapParser.get_instance(HD_MAP)
         coord, heading = ma.get_coordinate_and_heading(
             self.start.lane_id, self.start.s)
 

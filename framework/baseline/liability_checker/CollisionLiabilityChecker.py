@@ -1,12 +1,14 @@
 from enum import Enum
-from typing import Optional, Tuple, Set, Dict
+from typing import Dict, Optional, Set, Tuple
 
 from cyber_record.record import Record
 from shapely.geometry import LineString, Polygon
 
-from apollo.utils import calculate_velocity, generate_adc_rear_vertices, generate_adc_polygon
+from apollo.utils import (calculate_velocity, generate_adc_polygon,
+                          generate_adc_rear_vertices)
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
+from modules.perception.proto.perception_obstacle_pb2 import \
+    PerceptionObstacles
 
 
 class CollisionType(Enum):

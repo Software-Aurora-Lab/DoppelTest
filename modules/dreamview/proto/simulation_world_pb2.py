@@ -2,24 +2,35 @@
 # source: modules/dreamview/proto/simulation_world.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.common.monitor_log.proto import monitor_log_pb2 as modules_dot_common_dot_monitor__log_dot_proto_dot_monitor__log__pb2
-from modules.common.proto import pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
-from modules.perception.proto import perception_obstacle_pb2 as modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
-from modules.planning.proto import planning_internal_pb2 as modules_dot_planning_dot_proto_dot_planning__internal__pb2
-from modules.prediction.proto import feature_pb2 as modules_dot_prediction_dot_proto_dot_feature__pb2
-from modules.routing.proto import routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
-
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.common.monitor_log.proto import \
+    monitor_log_pb2 as \
+    modules_dot_common_dot_monitor__log_dot_proto_dot_monitor__log__pb2
+from modules.common.proto import \
+    pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
+from modules.perception.proto import \
+    perception_obstacle_pb2 as \
+    modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
+from modules.planning.proto import \
+    planning_internal_pb2 as \
+    modules_dot_planning_dot_proto_dot_planning__internal__pb2
+from modules.prediction.proto import \
+    feature_pb2 as modules_dot_prediction_dot_proto_dot_feature__pb2
+from modules.routing.proto import \
+    routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/dreamview/proto/simulation_world.proto',

@@ -2,19 +2,23 @@
 # source: modules/prediction/proto/prediction_conf.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.perception.proto import perception_obstacle_pb2 as modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
-from modules.prediction.proto import feature_pb2 as modules_dot_prediction_dot_proto_dot_feature__pb2
-
+from modules.perception.proto import \
+    perception_obstacle_pb2 as \
+    modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
+from modules.prediction.proto import \
+    feature_pb2 as modules_dot_prediction_dot_proto_dot_feature__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/prediction/proto/prediction_conf.proto',

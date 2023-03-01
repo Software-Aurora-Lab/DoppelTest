@@ -1,13 +1,15 @@
+import socket
 from collections import defaultdict
 from dataclasses import dataclass
-import socket
 from threading import Thread
 from typing import DefaultDict, List, Set
 
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection
+from modules.perception.proto.perception_obstacle_pb2 import \
+    PerceptionObstacles
+from modules.perception.proto.traffic_light_detection_pb2 import \
+    TrafficLightDetection
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.routing.proto.routing_pb2 import RoutingRequest
 

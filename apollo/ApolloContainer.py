@@ -1,11 +1,12 @@
-import time
-import docker
 import subprocess
+import time
+
+import docker
 
 from apollo.CyberBridge import CyberBridge
 from apollo.Dreamview import Dreamview
-from utils import get_logger
 from config import USE_SIM_CONTROL_STANDALONE
+from utils import get_logger
 
 
 class ApolloContainer:

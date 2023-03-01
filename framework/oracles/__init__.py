@@ -1,20 +1,22 @@
+import time
+from typing import List, Tuple
+
 from cyber_record.record import Record
 
-from framework.oracles.OracleManager import OracleManager
 from framework.oracles.impl.CollisionOracle import CollisionOracle
 from framework.oracles.impl.ComfortOracle import ComfortOracle
 from framework.oracles.impl.EStopOracle import EStopOracle
+from framework.oracles.impl.JunctionLaneChangeOracle import \
+    JunctionLaneChangeOracle
 from framework.oracles.impl.ModuleOracle import ModuleOracle
 from framework.oracles.impl.PlanningCrashOracle import PlanningCrashOracle
+from framework.oracles.impl.SpeedingOracle import SpeedingOracle
 from framework.oracles.impl.StopSignOracle import StopSignOracle
 from framework.oracles.impl.TrafficSignalOracle import TrafficSignalOracle
+from framework.oracles.impl.UnsafeLaneChangeOracle import \
+    UnsafeLaneChangeOracle
 from framework.oracles.impl.UUStopOracle import UUStopOracle
-from framework.oracles.impl.UnsafeLaneChangeOracle import UnsafeLaneChangeOracle
-from framework.oracles.impl.SpeedingOracle import SpeedingOracle
-from framework.oracles.impl.JunctionLaneChangeOracle import JunctionLaneChangeOracle
-
-from typing import List, Tuple
-import time
+from framework.oracles.OracleManager import OracleManager
 
 
 class RecordAnalyzer:

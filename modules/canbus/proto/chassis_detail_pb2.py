@@ -2,27 +2,39 @@
 # source: modules/canbus/proto/chassis_detail.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.common.configs.proto import vehicle_config_pb2 as modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.canbus.proto import ch_pb2 as modules_dot_canbus_dot_proto_dot_ch__pb2
-from modules.canbus.proto import devkit_pb2 as modules_dot_canbus_dot_proto_dot_devkit__pb2
-from modules.canbus.proto import ge3_pb2 as modules_dot_canbus_dot_proto_dot_ge3__pb2
-from modules.canbus.proto import lexus_pb2 as modules_dot_canbus_dot_proto_dot_lexus__pb2
-from modules.canbus.proto import transit_pb2 as modules_dot_canbus_dot_proto_dot_transit__pb2
-from modules.canbus.proto import wey_pb2 as modules_dot_canbus_dot_proto_dot_wey__pb2
-from modules.canbus.proto import zhongyun_pb2 as modules_dot_canbus_dot_proto_dot_zhongyun__pb2
-from modules.canbus.proto import neolix_edu_pb2 as modules_dot_canbus_dot_proto_dot_neolix__edu__pb2
-
+from modules.canbus.proto import \
+    ch_pb2 as modules_dot_canbus_dot_proto_dot_ch__pb2
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.canbus.proto import \
+    devkit_pb2 as modules_dot_canbus_dot_proto_dot_devkit__pb2
+from modules.canbus.proto import \
+    ge3_pb2 as modules_dot_canbus_dot_proto_dot_ge3__pb2
+from modules.canbus.proto import \
+    lexus_pb2 as modules_dot_canbus_dot_proto_dot_lexus__pb2
+from modules.canbus.proto import \
+    neolix_edu_pb2 as modules_dot_canbus_dot_proto_dot_neolix__edu__pb2
+from modules.canbus.proto import \
+    transit_pb2 as modules_dot_canbus_dot_proto_dot_transit__pb2
+from modules.canbus.proto import \
+    wey_pb2 as modules_dot_canbus_dot_proto_dot_wey__pb2
+from modules.canbus.proto import \
+    zhongyun_pb2 as modules_dot_canbus_dot_proto_dot_zhongyun__pb2
+from modules.common.configs.proto import \
+    vehicle_config_pb2 as \
+    modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/canbus/proto/chassis_detail.proto',

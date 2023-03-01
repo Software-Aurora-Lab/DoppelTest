@@ -1,11 +1,11 @@
 from apollo.ApolloContainer import ApolloContainer
 from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT
 from framework.scenario import Scenario
-from hdmap.MapParser import MapParser
-from framework.scenario.ScenarioRunner import ScenarioRunner
-from framework.scenario.ad_agents import ADSection, ADAgent
+from framework.scenario.ad_agents import ADAgent, ADSection
 from framework.scenario.pd_agents import PDSection
+from framework.scenario.ScenarioRunner import ScenarioRunner
 from framework.scenario.tc_config import TCSection
+from hdmap.MapParser import MapParser
 
 ma = MapParser(HD_MAP_PATH)
 

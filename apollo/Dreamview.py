@@ -1,5 +1,6 @@
-from websocket import create_connection
 import json
+
+from websocket import create_connection
 
 
 class Dreamview:

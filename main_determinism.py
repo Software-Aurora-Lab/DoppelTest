@@ -2,13 +2,13 @@
 Random version of the framework, used to compare as base line.
 """
 
-from main_ga import eval_scenario
-from config import APOLLO_ROOT, MAX_ADC_COUNT
 from apollo.ApolloContainer import ApolloContainer
+from config import APOLLO_ROOT, MAX_ADC_COUNT
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from hdmap.MapParser import MapParser
+from main_ga import eval_scenario
 
 
 def main():

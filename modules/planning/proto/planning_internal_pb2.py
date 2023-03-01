@@ -2,29 +2,46 @@
 # source: modules/planning/proto/planning_internal.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.common.proto import geometry_pb2 as modules_dot_common_dot_proto_dot_geometry__pb2
-from modules.common.proto import header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.common.proto import pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
-from modules.localization.proto import localization_pb2 as modules_dot_localization_dot_proto_dot_localization__pb2
-from modules.dreamview.proto import chart_pb2 as modules_dot_dreamview_dot_proto_dot_chart__pb2
-from modules.map.relative_map.proto import navigation_pb2 as modules_dot_map_dot_relative__map_dot_proto_dot_navigation__pb2
-from modules.routing.proto import routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
-from modules.perception.proto import traffic_light_detection_pb2 as modules_dot_perception_dot_proto_dot_traffic__light__detection__pb2
-from modules.planning.proto import sl_boundary_pb2 as modules_dot_planning_dot_proto_dot_sl__boundary__pb2
-from modules.planning.proto import decision_pb2 as modules_dot_planning_dot_proto_dot_decision__pb2
-from modules.planning.proto import planning_config_pb2 as modules_dot_planning_dot_proto_dot_planning__config__pb2
-
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.common.proto import \
+    geometry_pb2 as modules_dot_common_dot_proto_dot_geometry__pb2
+from modules.common.proto import \
+    header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
+from modules.common.proto import \
+    pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
+from modules.dreamview.proto import \
+    chart_pb2 as modules_dot_dreamview_dot_proto_dot_chart__pb2
+from modules.localization.proto import \
+    localization_pb2 as \
+    modules_dot_localization_dot_proto_dot_localization__pb2
+from modules.map.relative_map.proto import \
+    navigation_pb2 as \
+    modules_dot_map_dot_relative__map_dot_proto_dot_navigation__pb2
+from modules.perception.proto import \
+    traffic_light_detection_pb2 as \
+    modules_dot_perception_dot_proto_dot_traffic__light__detection__pb2
+from modules.planning.proto import \
+    decision_pb2 as modules_dot_planning_dot_proto_dot_decision__pb2
+from modules.planning.proto import \
+    planning_config_pb2 as \
+    modules_dot_planning_dot_proto_dot_planning__config__pb2
+from modules.planning.proto import \
+    sl_boundary_pb2 as modules_dot_planning_dot_proto_dot_sl__boundary__pb2
+from modules.routing.proto import \
+    routing_pb2 as modules_dot_routing_dot_proto_dot_routing__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/planning/proto/planning_internal.proto',

@@ -2,20 +2,25 @@
 # source: modules/v2x/proto/v2x_car_status.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.localization.proto import localization_pb2 as modules_dot_localization_dot_proto_dot_localization__pb2
-from modules.canbus.proto import chassis_detail_pb2 as modules_dot_canbus_dot_proto_dot_chassis__detail__pb2
-from modules.v2x.proto import v2x_junction_pb2 as modules_dot_v2x_dot_proto_dot_v2x__junction__pb2
-
+from modules.canbus.proto import \
+    chassis_detail_pb2 as modules_dot_canbus_dot_proto_dot_chassis__detail__pb2
+from modules.localization.proto import \
+    localization_pb2 as \
+    modules_dot_localization_dot_proto_dot_localization__pb2
+from modules.v2x.proto import \
+    v2x_junction_pb2 as modules_dot_v2x_dot_proto_dot_v2x__junction__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/v2x/proto/v2x_car_status.proto',

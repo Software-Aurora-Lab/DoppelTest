@@ -1,7 +1,9 @@
-from config import FORCE_INVALID_TRAFFIC_CONTROL
-from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection, TrafficLight
 from time import time
+
+from config import FORCE_INVALID_TRAFFIC_CONTROL
 from framework.scenario.tc_config import TCSection
+from modules.perception.proto.traffic_light_detection_pb2 import (
+    TrafficLight, TrafficLightDetection)
 
 
 class TrafficControlManager:

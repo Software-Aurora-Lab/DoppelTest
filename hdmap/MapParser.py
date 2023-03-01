@@ -1,16 +1,21 @@
+import math
+import pickle
 from collections import defaultdict
+from pathlib import Path
 from typing import List, Set, Tuple
-from hdmap import load_hd_map
-from modules.map.proto.map_pb2 import Map
-from modules.map.proto.map_junction_pb2 import Junction
-from modules.map.proto.map_lane_pb2 import Lane
-from modules.map.proto.map_crosswalk_pb2 import Crosswalk
-from modules.map.proto.map_signal_pb2 import Signal
-from modules.map.proto.map_stop_sign_pb2 import StopSign
+
 import networkx as nx
 from shapely.geometry import LineString, Point
+
+from config import DT_ROOT
+from hdmap import load_hd_map
 from modules.common.proto.geometry_pb2 import PointENU
-import math
+from modules.map.proto.map_crosswalk_pb2 import Crosswalk
+from modules.map.proto.map_junction_pb2 import Junction
+from modules.map.proto.map_lane_pb2 import Lane
+from modules.map.proto.map_pb2 import Map
+from modules.map.proto.map_signal_pb2 import Signal
+from modules.map.proto.map_stop_sign_pb2 import StopSign
 
 
 class MapParser:
@@ -34,7 +39,7 @@ class MapParser:
     __signal_relations: nx.Graph
     __lane_nx: nx.DiGraph
 
-    __instance = None
+    __instance = dict()
 
     def __init__(self, filename: str) -> None:
         """
@@ -49,15 +54,38 @@ class MapParser:
         self.parse_relations()
         self.parse_signal_relations()
         self.parse_lane_relations()
-        MapParser.__instance = self
+        # MapParser.__instance = self
 
     @staticmethod
-    def get_instance():
+    def get_instance(map_name: str) -> 'MapParser':
         """
         Get the singleton instance of MapParser
         """
-        assert not MapParser.__instance is None
-        return MapParser.__instance
+        map_dir = Path(DT_ROOT, 'data', 'maps')
+        assert map_name in list(x.name for x in map_dir.iterdir()), f'map {map_name} does not exist'
+        map_file = Path(map_dir, map_name, 'base_map.bin')
+        map_pickle = Path(map_file.parent, 'map.pickle')
+        
+        assert map_file.exists(), f'HD map {map_name} does not exist!'
+        if map_name in MapParser.__instance:
+            print('found in cache')
+            return MapParser.__instance[map_name]
+        elif map_pickle.exists():
+            print('found pickle')
+            with open(map_pickle, 'rb') as fp:
+                instance = pickle.load(fp)
+                MapParser.__instance[map_name] = instance
+                return instance
+        else:
+            print('reloading')
+            instance = MapParser(map_file)
+            with open(map_pickle, 'wb') as fp:
+                pickle.dump(instance, fp)
+            MapParser.__instance[map_name] = instance
+            return instance
+
+        # # assert not MapParser.__instance is None
+        # return MapParser.__instance
 
     def load_junctions(self):
         """
@@ -105,21 +133,21 @@ class MapParser:
         lanes and junctions, and lanes and signals
         """
         # load signals at junction
-        self.__signals_at_junction = defaultdict(lambda: list())
+        self.__signals_at_junction = defaultdict(list)
         for sigk, sigv in self.__signals.items():
             for junk, junv in self.__junctions.items():
                 if self.__is_overlap(sigv, junv):
                     self.__signals_at_junction[junk].append(sigk)
 
         # load lanes at junction
-        self.__lanes_at_junction = defaultdict(lambda: list())
+        self.__lanes_at_junction = defaultdict(list)
         for lank, lanv in self.__lanes.items():
             for junk, junv in self.__junctions.items():
                 if self.__is_overlap(lanv, junv):
                     self.__lanes_at_junction[junk].append(lank)
 
         # load lanes controlled by signal
-        self.__lanes_controlled_by_signal = defaultdict(lambda: list())
+        self.__lanes_controlled_by_signal = defaultdict(list)
         for junk, junv in self.__junctions.items():
             signal_ids = self.__signals_at_junction[junk]
             lane_ids = self.__lanes_at_junction[junk]

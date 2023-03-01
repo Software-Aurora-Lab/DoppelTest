@@ -1,9 +1,12 @@
 from typing import List, Optional, Tuple
+
+from shapely.geometry import Polygon
+
+from apollo.utils import calculate_velocity, generate_adc_polygon
 from framework.oracles.OracleInterface import OracleInterface
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from apollo.utils import generate_adc_polygon, calculate_velocity
-from shapely.geometry import Polygon
+from modules.perception.proto.perception_obstacle_pb2 import \
+    PerceptionObstacles
 
 
 class CollisionOracle(OracleInterface):

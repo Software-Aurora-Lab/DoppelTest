@@ -2,17 +2,19 @@
 Random version of the framework, used to compare as base line.
 """
 
+import pickle
 from datetime import datetime
-from main_ga import eval_scenario
-from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT, RUN_FOR_HOUR
+
+import numpy as np
+from deap import tools
+
 from apollo.ApolloContainer import ApolloContainer
+from config import APOLLO_ROOT, HD_MAP_PATH, MAX_ADC_COUNT, RUN_FOR_HOUR
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from hdmap.MapParser import MapParser
-from deap import tools
-import numpy as np
-import pickle
+from main_ga import eval_scenario
 
 
 def main():

@@ -2,19 +2,23 @@
 # source: modules/canbus/proto/vehicle_parameter.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.canbus.proto import chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
-from modules.common.configs.proto import vehicle_config_pb2 as modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
-
+from modules.canbus.proto import \
+    chassis_pb2 as modules_dot_canbus_dot_proto_dot_chassis__pb2
+from modules.common.configs.proto import \
+    vehicle_config_pb2 as \
+    modules_dot_common_dot_configs_dot_proto_dot_vehicle__config__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/canbus/proto/vehicle_parameter.proto',

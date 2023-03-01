@@ -2,22 +2,29 @@
 # source: modules/map/relative_map/proto/navigation.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.common.proto import header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
-from modules.common.proto import pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
-from modules.localization.proto import localization_pb2 as modules_dot_localization_dot_proto_dot_localization__pb2
+from modules.common.proto import \
+    header_pb2 as modules_dot_common_dot_proto_dot_header__pb2
+from modules.common.proto import \
+    pnc_point_pb2 as modules_dot_common_dot_proto_dot_pnc__point__pb2
+from modules.localization.proto import \
+    localization_pb2 as \
+    modules_dot_localization_dot_proto_dot_localization__pb2
 from modules.map.proto import map_pb2 as modules_dot_map_dot_proto_dot_map__pb2
-from modules.perception.proto import perception_obstacle_pb2 as modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
-
+from modules.perception.proto import \
+    perception_obstacle_pb2 as \
+    modules_dot_perception_dot_proto_dot_perception__obstacle__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/map/relative_map/proto/navigation.proto',

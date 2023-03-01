@@ -2,30 +2,46 @@
 # source: modules/map/proto/map.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.map.proto import map_clear_area_pb2 as modules_dot_map_dot_proto_dot_map__clear__area__pb2
-from modules.map.proto import map_crosswalk_pb2 as modules_dot_map_dot_proto_dot_map__crosswalk__pb2
-from modules.map.proto import map_junction_pb2 as modules_dot_map_dot_proto_dot_map__junction__pb2
-from modules.map.proto import map_lane_pb2 as modules_dot_map_dot_proto_dot_map__lane__pb2
-from modules.map.proto import map_overlap_pb2 as modules_dot_map_dot_proto_dot_map__overlap__pb2
-from modules.map.proto import map_signal_pb2 as modules_dot_map_dot_proto_dot_map__signal__pb2
-from modules.map.proto import map_speed_bump_pb2 as modules_dot_map_dot_proto_dot_map__speed__bump__pb2
-from modules.map.proto import map_stop_sign_pb2 as modules_dot_map_dot_proto_dot_map__stop__sign__pb2
-from modules.map.proto import map_yield_sign_pb2 as modules_dot_map_dot_proto_dot_map__yield__sign__pb2
-from modules.map.proto import map_road_pb2 as modules_dot_map_dot_proto_dot_map__road__pb2
-from modules.map.proto import map_parking_space_pb2 as modules_dot_map_dot_proto_dot_map__parking__space__pb2
-from modules.map.proto import map_pnc_junction_pb2 as modules_dot_map_dot_proto_dot_map__pnc__junction__pb2
-from modules.map.proto import map_rsu_pb2 as modules_dot_map_dot_proto_dot_map__rsu__pb2
-
+from modules.map.proto import \
+    map_clear_area_pb2 as modules_dot_map_dot_proto_dot_map__clear__area__pb2
+from modules.map.proto import \
+    map_crosswalk_pb2 as modules_dot_map_dot_proto_dot_map__crosswalk__pb2
+from modules.map.proto import \
+    map_junction_pb2 as modules_dot_map_dot_proto_dot_map__junction__pb2
+from modules.map.proto import \
+    map_lane_pb2 as modules_dot_map_dot_proto_dot_map__lane__pb2
+from modules.map.proto import \
+    map_overlap_pb2 as modules_dot_map_dot_proto_dot_map__overlap__pb2
+from modules.map.proto import \
+    map_parking_space_pb2 as \
+    modules_dot_map_dot_proto_dot_map__parking__space__pb2
+from modules.map.proto import \
+    map_pnc_junction_pb2 as \
+    modules_dot_map_dot_proto_dot_map__pnc__junction__pb2
+from modules.map.proto import \
+    map_road_pb2 as modules_dot_map_dot_proto_dot_map__road__pb2
+from modules.map.proto import \
+    map_rsu_pb2 as modules_dot_map_dot_proto_dot_map__rsu__pb2
+from modules.map.proto import \
+    map_signal_pb2 as modules_dot_map_dot_proto_dot_map__signal__pb2
+from modules.map.proto import \
+    map_speed_bump_pb2 as modules_dot_map_dot_proto_dot_map__speed__bump__pb2
+from modules.map.proto import \
+    map_stop_sign_pb2 as modules_dot_map_dot_proto_dot_map__stop__sign__pb2
+from modules.map.proto import \
+    map_yield_sign_pb2 as modules_dot_map_dot_proto_dot_map__yield__sign__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/map/proto/map.proto',

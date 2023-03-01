@@ -1,9 +1,9 @@
 import glob
 import json
-import shutil
-import os
 import logging
+import os
 import random
+import shutil
 import time
 from typing import List
 

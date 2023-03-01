@@ -1,12 +1,13 @@
-from datetime import datetime
 import os
+from datetime import datetime
+
 from apollo.ApolloContainer import ApolloContainer
 from config import APOLLO_ROOT, HD_MAP_PATH, RECORDS_DIR, RUN_FOR_HOUR
 from framework.baseline.BaseScenarioRunner import BaseScenarioRunner
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
-from hdmap.MapParser import MapParser
 from framework.scenario import Scenario
+from hdmap.MapParser import MapParser
 from utils import remove_record_files
 
 

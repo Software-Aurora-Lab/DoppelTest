@@ -1,10 +1,14 @@
 
-from framework.oracles.OracleInterface import OracleInterface
 from typing import List
-from apollo.utils import calculate_velocity
-from hdmap.MapParser import MapParser
-from shapely.geometry import Point
+
 import numpy as np
+from shapely.geometry import Point
+
+from apollo.utils import calculate_velocity
+from config import HD_MAP
+from framework.oracles.OracleInterface import OracleInterface
+from hdmap.MapParser import MapParser
+
 
 class SpeedingOracle(OracleInterface):
 
@@ -12,7 +16,7 @@ class SpeedingOracle(OracleInterface):
 
     def __init__(self) -> None:
         self.result = None
-        self.mp = MapParser.get_instance()
+        self.mp = MapParser.get_instance(HD_MAP)
         self.lanes = dict()
 
         self.min_speed_limit = None

@@ -2,20 +2,25 @@
 # source: modules/control/proto/lat_controller_conf.proto
 
 import sys
+
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from modules.control.proto import gain_scheduler_conf_pb2 as modules_dot_control_dot_proto_dot_gain__scheduler__conf__pb2
-from modules.control.proto import leadlag_conf_pb2 as modules_dot_control_dot_proto_dot_leadlag__conf__pb2
-from modules.control.proto import mrac_conf_pb2 as modules_dot_control_dot_proto_dot_mrac__conf__pb2
-
+from modules.control.proto import \
+    gain_scheduler_conf_pb2 as \
+    modules_dot_control_dot_proto_dot_gain__scheduler__conf__pb2
+from modules.control.proto import \
+    leadlag_conf_pb2 as modules_dot_control_dot_proto_dot_leadlag__conf__pb2
+from modules.control.proto import \
+    mrac_conf_pb2 as modules_dot_control_dot_proto_dot_mrac__conf__pb2
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='modules/control/proto/lat_controller_conf.proto',

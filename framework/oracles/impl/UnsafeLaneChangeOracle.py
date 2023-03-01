@@ -1,18 +1,22 @@
+from datetime import datetime
 from itertools import groupby
-from typing import List, Dict, Set, Tuple, Optional
+from typing import Dict, List, Optional, Set, Tuple
+
 from shapely.geometry import Polygon
-from apollo.utils import generate_adc_polygon, \
-    construct_lane_boundary_linestring, generate_adc_polygon
+
+from apollo.utils import (construct_lane_boundary_linestring,
+                          generate_adc_polygon)
+from config import HD_MAP
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
-from datetime import datetime
+
 
 class UnsafeLaneChangeOracle(OracleInterface):
     ADC_INTERSECTING_LANE_BOUNDARY_MAX_LOOK_BACK_FRAMES_IN_SECOND = 5.0
     PRUNE_DISTANCE = 150
 
     def __init__(self) -> None:
-        self.mp = MapParser.get_instance()
+        self.mp = MapParser.get_instance(HD_MAP)
         self.boundaries = dict()
         self.get_boundaries()
         self.boundary_ids = sorted(self.boundaries.keys())

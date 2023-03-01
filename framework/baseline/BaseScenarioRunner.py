@@ -1,4 +1,6 @@
+import time
 from typing import List, Optional, Tuple
+
 from apollo.ApolloContainer import ApolloContainer
 from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Topics
@@ -6,12 +8,13 @@ from apollo.utils import clean_appolo_dir
 from config import SCENARIO_UPPER_LIMIT
 from framework.baseline.DynamicObstacleManager import DynamicObstacleManager
 from framework.scenario import Scenario
-import time
-from framework.scenario.PedestrianManager import PedestrianManager
 from framework.scenario.ad_agents import ADAgent
+from framework.scenario.PedestrianManager import PedestrianManager
 from modules.common.proto.header_pb2 import Header
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from utils import get_scenario_logger, random_numeric_id, save_record_files_and_chromosome
+from modules.perception.proto.perception_obstacle_pb2 import \
+    PerceptionObstacles
+from utils import (get_scenario_logger, random_numeric_id,
+                   save_record_files_and_chromosome)
 
 
 class BaseScenarioRunner:

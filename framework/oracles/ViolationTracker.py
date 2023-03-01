@@ -1,7 +1,9 @@
+import os
 from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set, Tuple
+
 import pandas as pd
-import os
+
 from config import RECORDS_DIR
 
 

@@ -3,11 +3,13 @@ from typing import Dict, List, Optional, Set, Tuple
 
 from shapely.geometry import LineString, Polygon
 
-from apollo.utils import generate_adc_polygon, calculate_velocity
+from apollo.utils import calculate_velocity, generate_adc_polygon
+from config import HD_MAP
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.traffic_light_detection_pb2 import TrafficLightDetection, TrafficLight
+from modules.perception.proto.traffic_light_detection_pb2 import (
+    TrafficLight, TrafficLightDetection)
 from modules.planning.proto.decision_pb2 import STOP_REASON_SIGNAL
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 
@@ -37,7 +39,7 @@ class TrafficSignalOracle(OracleInterface):
         self.last_planning = None
 
         self.parse_traffic_signal_stop_line_string_on_map(
-            MapParser.get_instance())
+            MapParser.get_instance(HD_MAP))
 
     def get_interested_topics(self):
         """

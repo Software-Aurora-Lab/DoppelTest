@@ -3,17 +3,20 @@ import math
 import os
 import subprocess
 import time
+from dataclasses import dataclass
+from typing import List, Set, Tuple
+
+from shapely.geometry import LineString, Polygon
+
+from config import (APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH,
+                    APOLLO_VEHICLE_WIDTH, HD_MAP,
+                    APOLLO_VEHICLE_back_edge_to_center)
+from hdmap.MapParser import MapParser
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
-from config import APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH, \
-    APOLLO_VEHICLE_back_edge_to_center
-from dataclasses import dataclass
-from shapely.geometry import Polygon, LineString
-from typing import List, Set, Tuple
-from modules.planning.proto.planning_pb2 import ADCTrajectory
 from modules.map.proto.map_lane_pb2 import Lane, LaneBoundary
-from hdmap.MapParser import MapParser
+from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
+from modules.planning.proto.planning_pb2 import ADCTrajectory
 
 
 @dataclass
@@ -38,7 +41,7 @@ class PositionEstimate:
         :rtype: bool
         """
         # 2 vehicles are too close if their distance is less than 5 meters
-        ma = MapParser.get_instance()
+        ma = MapParser.get_instance(HD_MAP)
         adc1 = generate_adc_polygon(
             *ma.get_coordinate_and_heading(self.lane_id, self.s))
         adc2 = generate_adc_polygon(

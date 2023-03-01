@@ -1,11 +1,13 @@
-from shapely.geometry import MultiLineString, LineString
-from modules.common.proto.geometry_pb2 import Point3D
-from apollo.utils import pedestrian_location_to_obstacle
-from framework.scenario.pd_agents import PDAgent, PDSection
-from typing import List, Optional, Tuple
 import math
+from typing import List, Optional, Tuple
 
+from shapely.geometry import LineString, MultiLineString
+
+from apollo.utils import pedestrian_location_to_obstacle
+from config import HD_MAP
+from framework.scenario.pd_agents import PDAgent, PDSection
 from hdmap.MapParser import MapParser
+from modules.common.proto.geometry_pb2 import Point3D
 
 
 class PedestrianManager:
@@ -49,7 +51,7 @@ class PedestrianManager:
         '''
         # heading is calculated by which segment the pedestrian is on (from the polygon) and then using atan2
         distance = pd.speed * time_spent_walking
-        ma = MapParser.get_instance()
+        ma = MapParser.get_instance(HD_MAP)
         cw = ma.get_crosswalk_by_id(pd.cw_id)
         cw_boundary = cw.polygon.point
         line_list = []
