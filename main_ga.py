@@ -9,7 +9,7 @@ import numpy as np
 from deap import algorithms, base, tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import (APOLLO_ROOT, HD_MAP, HD_MAP_PATH, MAX_ADC_COUNT,
+from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT,
                     MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR)
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -275,7 +275,7 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 
 def main():
     logger = get_logger('MAIN')
-    mp = MapParser(HD_MAP_PATH)
+    mp = MapParser.get_instance(HD_MAP)
 
     containers = [ApolloContainer(
         APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]

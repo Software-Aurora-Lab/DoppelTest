@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, HD_MAP_PATH, RECORDS_DIR, RUN_FOR_HOUR
+from config import APOLLO_ROOT, RECORDS_DIR, RUN_FOR_HOUR, HD_MAP
 from framework.baseline.BaseScenarioRunner import BaseScenarioRunner
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -59,7 +59,7 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
 
 
 def main():
-    ma = MapParser(HD_MAP_PATH)
+    ma = MapParser.get_instance(HD_MAP)
     ctn = ApolloContainer(APOLLO_ROOT, 'ROUTE_0')
     ctn.start_instance()
     ctn.start_dreamview()

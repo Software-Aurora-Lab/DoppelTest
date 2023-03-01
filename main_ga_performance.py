@@ -11,7 +11,7 @@ import numpy as np
 from deap import algorithms, base, tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import (APOLLO_ROOT, HD_MAP, HD_MAP_PATH, MAX_ADC_COUNT,
+from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT,
                     MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR)
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -292,7 +292,7 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 def main():
     logger = get_logger('MAIN')
     __t_map_analysis_start = datetime.now()
-    mp = MapParser(HD_MAP_PATH)
+    mp = MapParser.get_instance(HD_MAP)
     __t_map_analysis_finish = datetime.now()
     performance_tracker['map_parser'].append((__t_map_analysis_finish - __t_map_analysis_start).total_seconds())
 

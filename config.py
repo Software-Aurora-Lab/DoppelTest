@@ -41,11 +41,11 @@ MAX_PD_COUNT = 5
 """Number of pedestrians you wish to include in simulations"""
 RUN_FOR_HOUR = 12
 """Number of hours you wish to run"""
-HD_MAP_PATH = f'{DT_ROOT}/data/maps/borregas_ave/base_map.bin'
-"""
-The HD map you are currently using
+# HD_MAP_PATH = f'{DT_ROOT}/data/maps/borregas_ave/base_map.bin'
+# """
+# The HD map you are currently using
 
-:note: you also need to update ``apollo/modules/common/data/global_flagfile.txt``
-  to match the HD map you are using
-"""
+# :note: you also need to update ``apollo/modules/common/data/global_flagfile.txt``
+#   to match the HD map you are using
+# """
 HD_MAP = 'san_mateo'
