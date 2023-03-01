@@ -68,16 +68,13 @@ class MapParser:
         
         assert map_file.exists(), f'HD map {map_name} does not exist!'
         if map_name in MapParser.__instance:
-            print('found in cache')
             return MapParser.__instance[map_name]
         elif map_pickle.exists():
-            print('found pickle')
             with open(map_pickle, 'rb') as fp:
                 instance = pickle.load(fp)
                 MapParser.__instance[map_name] = instance
                 return instance
         else:
-            print('reloading')
             instance = MapParser(map_file)
             with open(map_pickle, 'wb') as fp:
                 pickle.dump(instance, fp)

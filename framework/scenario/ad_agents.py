@@ -165,7 +165,6 @@ class ADSection:
         for ad in self.adcs:
             ad_start = PositionEstimate(ad.routing[0], ad.start_s)
             if ad_start.is_too_close(adc_start):
-                print(ad_start, adc_start, 'too close')
                 return False
         self.adcs.append(adc)
         return True
