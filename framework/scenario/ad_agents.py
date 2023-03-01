@@ -67,7 +67,7 @@ class ADAgent:
         return '->'.join(self.routing)
 
     @staticmethod
-    def get_one() -> 'ADAgent':
+    def get_one(must_start_from_junction=True) -> 'ADAgent':
         """
         Randomly generates an ADS instance representation
 
@@ -75,7 +75,10 @@ class ADAgent:
         :rtype: ADAgent
         """
         ma = MapParser.get_instance(HD_MAP)
-        allowed_start = list(ma.get_lanes_not_in_junction())
+        if must_start_from_junction:
+            allowed_start = list(ma.get_lanes_not_in_junction())
+        else:
+            allowed_start = list(ma.get_lanes())
         start_r = ''
         routing = None
         while True:
@@ -162,6 +165,7 @@ class ADSection:
         for ad in self.adcs:
             ad_start = PositionEstimate(ad.routing[0], ad.start_s)
             if ad_start.is_too_close(adc_start):
+                print(ad_start, adc_start, 'too close')
                 return False
         self.adcs.append(adc)
         return True
@@ -190,8 +194,12 @@ class ADSection:
         """
         num = randint(2, MAX_ADC_COUNT)
         result = ADSection([])
-
+        restrict_junction_start = True
+        trial_count = 0
         while len(result.adcs) < num:
-            result.add_agent(ADAgent.get_one())
+            result.add_agent(ADAgent.get_one(restrict_junction_start))
+            if trial_count > 3 * num:
+                restrict_junction_start = False
+            
         result.adjust_time()
         return result

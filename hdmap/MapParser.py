@@ -425,7 +425,10 @@ class MapParser:
         """
         target_lanes = self.get_lanes_not_in_junction()
         reachable = self.__get_reachable_from(lane_id)
-        return [p for p in reachable if p[-1] in target_lanes]
+        result = [p for p in reachable if p[-1] in target_lanes]
+        if len(result) > 0:
+            return result
+        return reachable
 
     def __get_reachable_from(self, lane_id: str, depth=5) -> List[List[str]]:
         """
