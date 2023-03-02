@@ -122,7 +122,7 @@ def mut_ad_section(ind: ADSection):
         if mut_counter == 5:
             # mutation kept failing, dont mutate
             ind.add_agent(original_adc)
-            pass
+            break
     ind.adjust_time()
     return ind
 
