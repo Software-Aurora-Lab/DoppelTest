@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, RECORDS_DIR, RUN_FOR_HOUR, HD_MAP
+from config import APOLLO_ROOT, HD_MAP, RECORDS_DIR, RUN_FOR_HOUR
 from framework.baseline.BaseScenarioRunner import BaseScenarioRunner
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker

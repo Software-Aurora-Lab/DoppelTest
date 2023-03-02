@@ -11,8 +11,8 @@ import numpy as np
 from deap import algorithms, base, tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT,
-                    MAX_PD_COUNT, RECORDS_DIR, RUN_FOR_HOUR)
+from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT, MAX_PD_COUNT,
+                    RECORDS_DIR, RUN_FOR_HOUR)
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
@@ -115,10 +115,13 @@ def mut_ad_section(ind: ADSection):
         return ind
 
     # add a random 1
+    trial = 0
     if mut_pb < 0.4 and len(ind.adcs) < MAX_ADC_COUNT:
         while True:
-            new_ad = ADAgent.get_one()
+            new_ad = ADAgent.get_one(trial < 15)
             if ind.has_conflict(new_ad) and ind.add_agent(new_ad):
+                break
+            elif trial > 15 and ind.add_agent(new_ad):
                 break
         ind.adjust_time()
         return ind
@@ -234,10 +237,12 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
 
     while len(result1.adcs) > MAX_ADC_COUNT:
         result1.adcs.pop()
-
+    trial = 0
     while len(result1.adcs) < 2:
-        new_ad = ADAgent.get_one()
+        new_ad = ADAgent.get_one(trial < 15)
         if result1.has_conflict(new_ad) and result1.add_agent(new_ad):
+            break
+        elif trial > 15 and result1.add_agent(new_ad):
             break
     result1.adjust_time()
     return result1, ind2
