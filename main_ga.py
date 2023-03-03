@@ -107,6 +107,7 @@ def mut_ad_section(ind: ADSection):
                 break
             elif trial > 15 and ind.add_agent(new_ad):
                 break
+            trial += 1
         ind.adjust_time()
         return ind
 
@@ -228,6 +229,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
             break
         elif trial > 15 and result1.add_agent(new_ad):
             break
+        trial += 1
     result1.adjust_time()
     return result1, ind2
 
