@@ -196,7 +196,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
                     adc1.start_s = adc2.start_s
                 else:
                     adc1.start_t = adc2.start_t
-                mutated = True
+                cxed = True
     if cxed:
         ind1.adjust_time()
         return ind1, ind2

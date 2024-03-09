@@ -66,9 +66,9 @@ def main():
     vt = ViolationTracker()
     POP_SIZE = 10
 
-    s = Scenario.get_one()
-    s.gid = 0
-    s.sid = 0
+    # s = Scenario.get_one()
+    # s.gid = 0
+    # s.sid = 0
 
     start_time = datetime.now()
 
