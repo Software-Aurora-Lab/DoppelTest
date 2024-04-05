@@ -15,7 +15,7 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 
 
 # DIRECTORIES =======================================
-APOLLO_ROOT = 'APOLLO_ROOT_DIR'
+APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/AV_Research/Baidu_Apollo/apollo-doppeltest'
 """Root directory of Apollo 7.0"""
 DT_ROOT = Path(__file__).parent
 """Root directory of DoppelTest"""

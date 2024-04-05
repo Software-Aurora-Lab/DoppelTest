@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "doppeltest"
+version = "0.1.0"
+description = ""
+authors = ["Yuqi Huai <yhuai@uci.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.26.4"
+docker = "^7.0.0"
+deap = "^1.4.1"
+cyber-record = "^0.1.12"
+networkx = "^3.2.1"
+pandas = "^2.2.1"
+shapely = "^2.0.3"
+websocket-client = "^1.7.0"
+protobuf = "3.19.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
