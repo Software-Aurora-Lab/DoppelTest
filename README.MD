@@ -102,3 +102,7 @@ If you use the project in your work, please consider citing the following work:
 	year = {2023},
 }
 ```
+
+## Known Issues
+
+1. CPU overclocking has caused segmentation faults, freezing, and failure to build Apollo. See [DoppelTest/Issue#5](https://github.com/Software-Aurora-Lab/DoppelTest/issues/5). Many thanks to Lejin Li from Kyushu University for the investigation.
