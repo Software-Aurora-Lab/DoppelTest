@@ -429,8 +429,9 @@ class MapParser:
 
     def __get_reachable_from(self, lane_id: str, depth=5) -> List[List[str]]:
         """
-        Recursive method to compute paths no more than ``depth`` lanes from
-        the starting lane.
+        New implementation of finding paths from a starting lane
+
+        # clarification: depth==1 -> str[self], not conventional Graph theory self.depth==0
 
         :param str lane_id: ID of the starting lane
         :param int depth: maximum number of lanes traveled
@@ -438,11 +439,33 @@ class MapParser:
         :returns: list of possible paths
         :rtype: List[List[str]]
         """
-        if depth == 1:
-            return [[lane_id]]
-        result = list()
-        for u, v in self.__lane_nx.edges(lane_id):
-            result.append([u, v])
-            for rp in self.__get_reachable_from(v, depth-1):
-                result.append([u] + rp)
-        return result
+        
+        depth -= 1
+
+        def dfs(current_node: str, current_path: List[str], current_length: int) -> None:
+            """
+            Depth-first search to find all paths from a starting lane
+
+            :param str current_node: ID of the current lane
+            :param List[str] current_path: current path
+            :param int current_length: current length of the path
+            """
+
+            if current_length > depth:
+                return
+            
+            current_path.append(current_node)
+            if len(current_path) > 1:
+                paths.append(list(current_path))
+            
+            for neighbor in self.__lane_nx.successors(current_node):
+                if current_length < depth:
+                    # Only continue DFS if current length is less than max length
+                    dfs(neighbor, current_path, current_length + 1)
+            
+            # Backtrack
+            current_path.pop()
+
+        paths = []
+        dfs(lane_id, [], 0)
+        return paths
