@@ -15,10 +15,10 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 
 
 # DIRECTORIES =======================================
-APOLLO_ROOT = '/home/yuqi/ResearchWorkspace/AV_Research/Baidu_Apollo/apollo-doppeltest'
-"""Root directory of Apollo 7.0"""
 DT_ROOT = Path(__file__).parent
 """Root directory of DoppelTest"""
+APOLLO_ROOT = Path(DT_ROOT, "apollo-doppeltest")
+"""Root directory of Apollo 7.0"""
 RECORDS_DIR = f'{DT_ROOT}/data/records'
 """Desired directory to save record files"""
 LOG_DIR = f'{DT_ROOT}/data/Logs'
@@ -41,9 +41,6 @@ MAX_PD_COUNT = 5
 """Number of pedestrians you wish to include in simulations"""
 RUN_FOR_HOUR = 12
 """Number of hours you wish to run"""
-# HD_MAP_PATH = f'{DT_ROOT}/data/maps/borregas_ave/base_map.bin'
-# """
-# The HD map you are currently using
 
 # :note: you also need to update ``apollo/modules/common/data/global_flagfile.txt``
 #   to match the HD map you are using
