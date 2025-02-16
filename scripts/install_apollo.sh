@@ -14,6 +14,8 @@ fi
 bash $PARENT_DIRECTORY/apollo-doppeltest/docker/scripts/dev_start.sh
 
 # Build Apollo
-docker exec -u $USER apollo_dev_$USER bash apollo.sh build 
+docker exec -u $USER apollo_dev_yuqi \
+    bash -c \
+    "source /apollo/scripts/apollo.bashrc && bash /apollo/apollo.sh build"
 
 echo -e "\033[0;32mApollo is now built.\033[0m"
