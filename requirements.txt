@@ -9,3 +9,5 @@ Shapely==1.7.1
 websocket_client==1.4.2
 sphinx==1.8.5
 sphinx_rtd_theme==1.1.1
+pyyaml
+typeguard
