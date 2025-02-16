@@ -98,7 +98,7 @@ class ApolloContainer:
         }
         op_name, op_cmd, op_success_info = ops[op]
         self.logger.debug(f'{op_name} Dreamview')
-        cmd = f"docker exec {self.container_name} ./scripts/bootstrap.sh {op_cmd}"
+        cmd = f"docker exec -u {self.username} {self.container_name} ./scripts/bootstrap.sh {op_cmd}"
         subprocess.run(cmd.split(), stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
         if op == 'stop':
@@ -134,7 +134,7 @@ class ApolloContainer:
         """
         if not self.__is_bridge_started():
             self.logger.debug('Starting bridge')
-            cmd = f"docker exec -d {self.container_name} ./scripts/bridge.sh"
+            cmd = f"docker exec -u {self.username} -d {self.container_name} ./scripts/bridge.sh"
             subprocess.run(cmd.split())
         else:
             self.logger.debug('Bridge already running')
@@ -187,7 +187,7 @@ class ApolloContainer:
         op_name, op_cmd, op_success_info = ops[op]
 
         self.logger.debug(f"{op_name} required modules")
-        cmd = f"docker exec {self.container_name} ./scripts/bootstrap_maggie.sh {op_cmd}"
+        cmd = f"docker exec -u {self.username} {self.container_name} ./scripts/bootstrap_maggie.sh {op_cmd}"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.logger.debug(f'Modules {op_success_info}')
@@ -217,7 +217,7 @@ class ApolloContainer:
         :param str record_id: the name of the record file
         """
         self.logger.debug(f"Starting recorder")
-        cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
+        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
@@ -228,7 +228,7 @@ class ApolloContainer:
         Stops cyber_recorder
         """
         self.logger.debug(f"Stopping recorder")
-        cmd = f"docker exec {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node stop"
+        cmd = f"docker exec-u {self.username} {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node stop"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
@@ -238,7 +238,7 @@ class ApolloContainer:
         Starts SimControlStandalone module
         """
         self.logger.debug(f"Starting sim_control_standalone")
-        cmd = f"docker exec -d {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_main"
+        cmd = f"docker exec -u {self.username} -d {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_main"
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
@@ -249,7 +249,7 @@ class ApolloContainer:
         Stops SimControlStandalone module
         """
         self.logger.debug(f"Stopping sim_control_standalone")
-        cmd = f"docker exec {self.container_name} /apollo/modules/sim_control/script.sh stop"
+        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/modules/sim_control/script.sh stop"
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
