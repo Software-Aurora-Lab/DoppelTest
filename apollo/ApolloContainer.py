@@ -217,10 +217,11 @@ class ApolloContainer:
         :param str record_id: the name of the record file
         """
         self.logger.debug(f"Starting recorder")
-        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node start {self.container_name}.{record_id}"
+        cyber_recorder = "/apollo/bazel-bin/cyber/tools/cyber_recorder/cyber_recorder"
+        cmd = (f"docker exec -d -u {self.username} {self.container_name} "
+               f"{cyber_recorder} record -a -i 600 -o /apollo/records/{self.container_name}.{record_id}")
         subprocess.run(
-            cmd.split(),
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
     def stop_recorder(self):
@@ -228,9 +229,9 @@ class ApolloContainer:
         Stops cyber_recorder
         """
         self.logger.debug(f"Stopping recorder")
-        cmd = f"docker exec-u {self.username} {self.container_name} /apollo/bazel-bin/modules/custom_nodes/record_node stop"
+        cmd = f"docker exec -d -u {self.username} {self.container_name} pkill --signal SIGINT -f 'cyber_recorder record'"
         subprocess.run(
-            cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
     def start_sim_control_standalone(self):
