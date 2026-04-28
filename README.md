@@ -72,7 +72,7 @@ In this section we will be discussing steps to replicate the results discussed i
 
 ### INSTALLING DoppelTest
 
-> You can now use `uv install` to setup DoppelTest's Python dependencies!
+> You can now use `uv sync` to setup DoppelTest's Python dependencies!
 
 1. Install the required Python libraries via `pip install -r requirements.txt`
 
