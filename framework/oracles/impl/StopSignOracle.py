@@ -4,7 +4,7 @@ from typing import Dict, List, Set, Tuple
 from shapely.geometry import LineString, Polygon
 
 from apollo.utils import calculate_velocity, generate_adc_polygon
-from config import HD_MAP
+import config
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -36,7 +36,7 @@ class StopSignOracle(OracleInterface):
     def __init__(self):
         self.violated_at_stop_sign_ids = set()
 
-        self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance(HD_MAP))
+        self.parse_stop_sign_stop_line_string_on_map(MapParser.get_instance(config.HD_MAP))
         self.reset_all_oracle_states()
         self.checked = set()
 
@@ -212,7 +212,7 @@ class StopSignOracle(OracleInterface):
         """
         total_localization_message_number = len(self.past_localization_list)
         if total_localization_message_number > 200:
-            # based on PERCEPTION_FREQUENCY = 25 == 125 messages sent per 5 seconds
+            # based on config.PERCEPTION_FREQUENCY = 25 == 125 messages sent per 5 seconds
             self.past_localization_list = self.past_localization_list[1:]
 
         total_planning_message_number = len(self.past_planning_list)

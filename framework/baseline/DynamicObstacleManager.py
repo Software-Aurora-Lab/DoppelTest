@@ -2,7 +2,7 @@ from random import randint
 from typing import List, Tuple
 
 from apollo.utils import dynamic_obstacle_location_to_obstacle
-from config import HD_MAP
+import config
 from framework.scenario.ad_agents import ADAgent
 from hdmap.MapParser import MapParser
 from modules.common.proto.geometry_pb2 import PointENU
@@ -43,7 +43,7 @@ class DynamicObstacleManager:
         :returns: the position and heading of the obstacle
         :rtype: Tuple[PointENU, float]
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         dist = speed * time_spent_driving
         for index, lane_id in enumerate(ad.routing):
             lane_length = ma.get_lane_length(lane_id)

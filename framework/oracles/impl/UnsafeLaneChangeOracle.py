@@ -6,7 +6,7 @@ from shapely.geometry import Polygon
 
 from apollo.utils import (construct_lane_boundary_linestring,
                           generate_adc_polygon)
-from config import HD_MAP
+import config
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 
@@ -16,7 +16,7 @@ class UnsafeLaneChangeOracle(OracleInterface):
     PRUNE_DISTANCE = 150
 
     def __init__(self) -> None:
-        self.mp = MapParser.get_instance(HD_MAP)
+        self.mp = MapParser.get_instance(config.HD_MAP)
         self.boundaries = dict()
         self.get_boundaries()
         self.boundary_ids = sorted(self.boundaries.keys())

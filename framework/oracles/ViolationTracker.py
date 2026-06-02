@@ -4,7 +4,7 @@ from typing import DefaultDict, Dict, List, Set, Tuple
 
 import pandas as pd
 
-from config import RECORDS_DIR
+import config
 
 
 class ViolationTracker:
@@ -60,7 +60,7 @@ class ViolationTracker:
 
     def save_to_file(self):
         """
-        Save the tracked violations to a csv file in ``f'{RECORDS_DIR}/summary.csv'``
+        Save the tracked violations to a csv file in ``f'{config.RECORDS_DIR}/summary.csv'``
         """
         column_names = ['scenario_id', "main_type",
                         "sub_type", "data", "record_path"]
@@ -69,7 +69,7 @@ class ViolationTracker:
             df.loc[len(df.index)] = [
                 *scenario
             ]
-        df.to_csv(os.path.join(RECORDS_DIR, "summary.csv"))
+        df.to_csv(os.path.join(config.RECORDS_DIR, "summary.csv"))
 
     def clear(self):
         """

@@ -1,6 +1,6 @@
 from time import time
 
-from config import FORCE_INVALID_TRAFFIC_CONTROL
+import config
 from framework.scenario.tc_config import TCSection
 from modules.perception.proto.traffic_light_detection_pb2 import (
     TrafficLight, TrafficLightDetection)
@@ -30,24 +30,24 @@ class TrafficControlManager:
         :returns: traffic light detection message
         :rtype: TrafficLightDetection
         """
-        if FORCE_INVALID_TRAFFIC_CONTROL:
-            config = self.tc.get_config_with_color('GREEN')
+        if config.FORCE_INVALID_TRAFFIC_CONTROL:
+            traffic_config = self.tc.get_config_with_color('GREEN')
         elif self.tc.initial == self.tc.final:
-            config = self.tc.initial
+            traffic_config = self.tc.initial
         else:
             if curr_t <= self.tc.duration_g:
                 # green duration
-                config = self.tc.initial
+                traffic_config = self.tc.initial
                 pass
             elif curr_t <= self.tc.duration_g + self.tc.duration_y:
-                config = self.tc.calculate_transition()
+                traffic_config = self.tc.calculate_transition()
                 # yellow duration
                 pass
             elif curr_t <= self.tc.duration_g + self.tc.duration_y + self.tc.duration_b:
                 # buffer duration
-                config = self.tc.get_config_with_color('RED')
+                traffic_config = self.tc.get_config_with_color('RED')
             else:
-                config = self.tc.final
+                traffic_config = self.tc.final
 
         tld = TrafficLightDetection()
         tld.header.timestamp_sec = time()
@@ -55,14 +55,14 @@ class TrafficControlManager:
         tld.header.sequence_num = self.sequence_num
         self.sequence_num += 1
 
-        for k in config:
+        for k in traffic_config:
             tl = tld.traffic_light.add()
             tl.id = k
             tl.confidence = 1
 
-            if config[k] == 'GREEN':
+            if traffic_config[k] == 'GREEN':
                 tl.color = TrafficLight.GREEN
-            elif config[k] == 'YELLOW':
+            elif traffic_config[k] == 'YELLOW':
                 tl.color = TrafficLight.YELLOW
             else:
                 tl.color = TrafficLight.RED

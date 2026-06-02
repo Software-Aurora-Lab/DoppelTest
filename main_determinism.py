@@ -2,8 +2,10 @@
 Random version of the framework, used to compare as base line.
 """
 
+from absl import app
+
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, MAX_ADC_COUNT
+import config
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
@@ -11,11 +13,11 @@ from hdmap.MapParser import MapParser
 from main_ga import eval_scenario
 
 
-def main():
+def main(_: list) -> None:
     mp = MapParser('./data/maps/borregas_ave/base_map.bin')
 
     containers = [ApolloContainer(
-        APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]
+        config.APOLLO_ROOT, f'ROUTE_{x}') for x in range(config.MAX_ADC_COUNT)]
     for ctn in containers:
         ctn.start_instance()
         ctn.start_dreamview()
@@ -40,4 +42,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)

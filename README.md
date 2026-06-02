@@ -78,11 +78,13 @@ In this section we will be discussing steps to replicate the results discussed i
 
 > If you run into issues when installing Shapely library, please first run `sudo apt-get install libgeos-dev` to install its dependencies.
 
-2. Replace location of directories in `config.py`
+2. Set installation-specific directories with command-line flags when running
+   DoppelTest. For example:
 
-   ```python
-   APOLLO_ROOT  = '/xxx/xxx/apollo'
-   DT_ROOT      = '/xxx/xxx/DoppelTest'
+   ```bash
+   python main_ga.py \
+     --apollo_root=/xxx/xxx/apollo \
+     --dt_root=/xxx/xxx/DoppelTest
    ```
 
 3. Verify the framework is runnable via `python test_main.py`
@@ -92,6 +94,10 @@ In this section we will be discussing steps to replicate the results discussed i
 4. Start the framework via `python main_ga.py`
 
 > After running DoppelTest for extended period of time, you should see record file of scenarios generated under `data/records`. This is also the step to replicate the results presented in the paper.
+
+Use `python main_ga.py --help` to list all configurable settings. The same
+flags are available for the other `main_*.py` entry points and
+`run_scenario.py`.
 
 ## Citing
 

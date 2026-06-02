@@ -7,7 +7,7 @@ from typing import List, Set, Tuple
 import networkx as nx
 from shapely.geometry import LineString, Point
 
-from config import DT_ROOT
+import config
 from hdmap import load_hd_map
 from modules.common.proto.geometry_pb2 import PointENU
 from modules.map.proto.map_crosswalk_pb2 import Crosswalk
@@ -61,7 +61,7 @@ class MapParser:
         """
         Get the singleton instance of MapParser
         """
-        map_dir = Path(DT_ROOT, 'data', 'maps')
+        map_dir = Path(config.DT_ROOT, 'data', 'maps')
         assert map_name in list(x.name for x in map_dir.iterdir()), f'map {map_name} does not exist'
         map_file = Path(map_dir, map_name, 'base_map.bin')
         map_pickle = Path(map_file.parent, 'map.pickle')

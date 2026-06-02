@@ -5,7 +5,7 @@ from typing import List, Optional, Set, Tuple
 from apollo.ApolloContainer import ApolloContainer
 from apollo.CyberBridge import Topics
 from apollo.utils import PositionEstimate, extract_main_decision
-from config import HD_MAP, USE_SIM_CONTROL_STANDALONE
+import config
 from hdmap.MapParser import MapParser
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.common.proto.header_pb2 import Header
@@ -111,7 +111,7 @@ class ApolloRunner:
         self.container.reset()
         self.register_publishers()
         self.send_initial_localization()
-        if not USE_SIM_CONTROL_STANDALONE:
+        if not config.USE_SIM_CONTROL_STANDALONE:
             self.container.dreamview.start_sim_control()
 
         # initialize class variables
@@ -144,7 +144,7 @@ class ApolloRunner:
         Send the instance's initial location to cyberRT
         """
         self.logger.debug('Sending initial localization')
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         coord, heading = ma.get_coordinate_and_heading(
             self.start.lane_id, self.start.s)
 
@@ -175,7 +175,7 @@ class ApolloRunner:
         self.logger.debug(
             f'Sending routing request to {self.container.container_name}')
         self.routing_started = True
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         coord, heading = ma.get_coordinate_and_heading(
             self.start.lane_id, self.start.s)
 

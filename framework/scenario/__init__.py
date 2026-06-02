@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 
 from deap import base
 
-from config import HD_MAP
+import config
 from framework.scenario.ad_agents import ADAgent, ADSection
 from framework.scenario.pd_agents import PDAgent, PDSection
 from framework.scenario.tc_config import TCSection
@@ -131,7 +131,7 @@ class Scenario:
         :returns: number of conflicts
         :rtype: int
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         conflict = set()
         for ad in self.ad_section.adcs:
             for bd in self.ad_section.adcs:

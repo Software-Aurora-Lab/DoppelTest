@@ -3,7 +3,7 @@ from typing import Dict, Optional, Set
 from shapely.geometry import LineString, Point
 
 from apollo.utils import calculate_velocity, construct_lane_polygon
-from config import HD_MAP
+import config
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -33,7 +33,7 @@ class PlanningCrashOracle(OracleInterface):
 
         self.is_adc_started_to_drive = False
 
-        self.parse_lane_polygon_on_map(MapParser.get_instance(HD_MAP))
+        self.parse_lane_polygon_on_map(MapParser.get_instance(config.HD_MAP))
 
     def get_interested_topics(self):
         return [

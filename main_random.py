@@ -6,10 +6,11 @@ import pickle
 from datetime import datetime
 
 import numpy as np
+from absl import app
 from deap import tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT, RUN_FOR_HOUR
+import config
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
@@ -17,11 +18,11 @@ from hdmap.MapParser import MapParser
 from main_ga import eval_scenario
 
 
-def main():
-    mp = MapParser.get_instance(HD_MAP)
+def main(_: list) -> None:
+    mp = MapParser.get_instance(config.HD_MAP)
 
     containers = [ApolloContainer(
-        APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]
+        config.APOLLO_ROOT, f'ROUTE_{x}') for x in range(config.MAX_ADC_COUNT)]
     for ctn in containers:
         ctn.start_instance()
         ctn.start_dreamview()
@@ -65,9 +66,9 @@ def main():
         vt.save_to_file()
         curr_time = datetime.now()
         tdelta = (curr_time - start_time).total_seconds()
-        if tdelta / 3600 > RUN_FOR_HOUR:
+        if tdelta / 3600 > config.RUN_FOR_HOUR:
             break
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)

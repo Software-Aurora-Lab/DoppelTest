@@ -3,7 +3,7 @@ from random import randint, uniform
 from secrets import choice
 from typing import List
 
-from config import HD_MAP, MAX_PD_COUNT, SCENARIO_UPPER_LIMIT
+import config
 from hdmap.MapParser import MapParser
 
 
@@ -29,13 +29,13 @@ class PDAgent:
         :returns: a pedestrian representation
         :rtype: PDAgent
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         cws = list(ma.get_crosswalks())
         cw = choice(cws)
         return PDAgent(
             cw_id=cw,
             speed=round(uniform(1.25, 3), 1),
-            start_t=randint(0, SCENARIO_UPPER_LIMIT)
+            start_t=randint(0, config.SCENARIO_UPPER_LIMIT)
         )
 
     @staticmethod
@@ -48,11 +48,11 @@ class PDAgent:
         :returns: a pedestrian representation
         :rtype: PDAgent
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         return PDAgent(
             cw_id=cw_id,
             speed=round(uniform(1.25, 3), 1),
-            start_t=randint(0, SCENARIO_UPPER_LIMIT)
+            start_t=randint(0, config.SCENARIO_UPPER_LIMIT)
         )
 
 
@@ -86,9 +86,9 @@ class PDSection:
         :returns: randomly generated section
         :rtype: PDSection
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
 
-        num = randint(0, MAX_PD_COUNT)
+        num = randint(0, config.MAX_PD_COUNT)
         num = min(len(ma.get_crosswalks()), num)
         result = PDSection([])
         while len(result.pds) < num:

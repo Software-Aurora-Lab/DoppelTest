@@ -38,7 +38,8 @@ Main scripts
 * ``config.py``
 
   .. note:: Please refer to ``apollo/modules/common/data/vehicle_param.pb.txt`` for size of the vehicle,
-    also remember to update ``APOLLO_ROOT`` and ``DT_ROOT``!
+    and use ``--apollo_root`` and ``--dt_root`` to select your installation directories.
+    Run ``python main_ga.py --help`` to list the available command-line settings.
   .. automodule:: config
     :members:
 

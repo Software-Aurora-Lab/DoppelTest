@@ -8,9 +8,7 @@ from typing import List, Set, Tuple
 
 from shapely.geometry import LineString, Polygon
 
-from config import (APOLLO_ROOT, APOLLO_VEHICLE_HEIGHT, APOLLO_VEHICLE_LENGTH,
-                    APOLLO_VEHICLE_WIDTH, HD_MAP,
-                    APOLLO_VEHICLE_back_edge_to_center)
+import config
 from hdmap.MapParser import MapParser
 from modules.common.proto.geometry_pb2 import Point3D
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -41,7 +39,7 @@ class PositionEstimate:
         :rtype: bool
         """
         # 2 vehicles are too close if their distance is less than 5 meters
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         adc1 = generate_adc_polygon(
             *ma.get_coordinate_and_heading(self.lane_id, self.s))
         adc2 = generate_adc_polygon(
@@ -101,9 +99,9 @@ def generate_adc_polygon(position: Point3D, theta: float) -> List[Point3D]:
     """
 
     points = []
-    half_w = APOLLO_VEHICLE_WIDTH / 2.0
-    front_l = APOLLO_VEHICLE_LENGTH - APOLLO_VEHICLE_back_edge_to_center
-    back_l = -1 * APOLLO_VEHICLE_back_edge_to_center
+    half_w = config.APOLLO_VEHICLE_WIDTH / 2.0
+    front_l = config.APOLLO_VEHICLE_LENGTH - config.APOLLO_VEHICLE_back_edge_to_center
+    back_l = -1 * config.APOLLO_VEHICLE_back_edge_to_center
     sin_h = math.sin(theta)
     cos_h = math.cos(theta)
     vectors = [(front_l * cos_h - half_w * sin_h,
@@ -135,8 +133,8 @@ def generate_adc_rear_vertices(position: Point3D, theta: float):
     :rtype: List[Point3D]
     """
     points = []
-    half_w = APOLLO_VEHICLE_WIDTH / 2.0
-    back_l = -1 * APOLLO_VEHICLE_back_edge_to_center
+    half_w = config.APOLLO_VEHICLE_WIDTH / 2.0
+    back_l = -1 * config.APOLLO_VEHICLE_back_edge_to_center
     sin_h = math.sin(theta)
     cos_h = math.cos(theta)
     vectors = [(back_l * cos_h - half_w * sin_h,
@@ -221,14 +219,14 @@ def dynamic_obstacle_location_to_obstacle(_id: int, speed: float, loc: Point3D, 
         theta=heading,
         velocity=velocity,
         acceleration=Point3D(x=0, y=0, z=0),
-        length=APOLLO_VEHICLE_LENGTH,
-        width=APOLLO_VEHICLE_WIDTH,
-        height=APOLLO_VEHICLE_HEIGHT,
+        length=config.APOLLO_VEHICLE_LENGTH,
+        width=config.APOLLO_VEHICLE_WIDTH,
+        height=config.APOLLO_VEHICLE_HEIGHT,
         type=PerceptionObstacle.VEHICLE,
         timestamp=time.time(),
         tracking_time=1.0,
         polygon_point=generate_polygon(
-            position, heading, APOLLO_VEHICLE_LENGTH, APOLLO_VEHICLE_WIDTH)
+            position, heading, config.APOLLO_VEHICLE_LENGTH, config.APOLLO_VEHICLE_WIDTH)
     )
     return obs
 
@@ -270,9 +268,9 @@ def localization_to_obstacle(_id: int, data: LocalizationEstimate) -> Perception
         theta=data.pose.heading,
         velocity=velocity,
         acceleration=acceleration,
-        length=APOLLO_VEHICLE_LENGTH,
-        width=APOLLO_VEHICLE_WIDTH,
-        height=APOLLO_VEHICLE_HEIGHT,
+        length=config.APOLLO_VEHICLE_LENGTH,
+        width=config.APOLLO_VEHICLE_WIDTH,
+        height=config.APOLLO_VEHICLE_HEIGHT,
         type=PerceptionObstacle.VEHICLE,
         timestamp=data.header.timestamp_sec,
         tracking_time=1.0,
@@ -344,22 +342,22 @@ def clean_appolo_dir():
     Removes Apollo's log files to save disk space
     """
     # remove data dir
-    subprocess.run(f"rm -rf {APOLLO_ROOT}/data".split())
+    subprocess.run(f"rm -rf {config.APOLLO_ROOT}/data".split())
 
     # remove records dir
-    subprocess.run(f"rm -rf {APOLLO_ROOT}/records".split())
+    subprocess.run(f"rm -rf {config.APOLLO_ROOT}/records".split())
 
     # remove logs
-    fileList = glob.glob(f'{APOLLO_ROOT}/*.log.*')
+    fileList = glob.glob(f'{config.APOLLO_ROOT}/*.log.*')
     for filePath in fileList:
         os.remove(filePath)
 
     # create data dir
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/bag".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/log".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/data/core".split())
-    subprocess.run(f"mkdir {APOLLO_ROOT}/records".split())
+    subprocess.run(f"mkdir {config.APOLLO_ROOT}/data".split())
+    subprocess.run(f"mkdir {config.APOLLO_ROOT}/data/bag".split())
+    subprocess.run(f"mkdir {config.APOLLO_ROOT}/data/log".split())
+    subprocess.run(f"mkdir {config.APOLLO_ROOT}/data/core".split())
+    subprocess.run(f"mkdir {config.APOLLO_ROOT}/records".split())
 
 
 def calculate_velocity(linear_velocity: Point3D) -> float:

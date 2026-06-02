@@ -6,7 +6,7 @@ from typing import List
 from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Channel, Topics
 from apollo.utils import localization_to_obstacle, obstacle_to_polygon
-from config import PERCEPTION_FREQUENCY
+import config
 from framework.scenario.PedestrianManager import PedestrianManager
 from modules.common.proto.header_pb2 import Header
 from modules.perception.proto.perception_obstacle_pb2 import \
@@ -95,8 +95,8 @@ class MessageBroker:
                 for o in _obs:
                     runner.set_min_distance(_adc.distance(o))
             header_sequence_num += 1
-            time.sleep(1/PERCEPTION_FREQUENCY)
-            curr_time += 1/PERCEPTION_FREQUENCY
+            time.sleep(1/config.PERCEPTION_FREQUENCY)
+            curr_time += 1/config.PERCEPTION_FREQUENCY
 
     def spin(self):
         """

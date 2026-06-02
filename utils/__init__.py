@@ -7,7 +7,7 @@ import shutil
 import time
 from typing import List
 
-from config import APOLLO_ROOT, RECORDS_DIR, STREAM_LOGGING_LEVEL
+import config
 
 
 def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
@@ -26,7 +26,7 @@ def get_logger(name, filename=None, log_to_file=False) -> logging.Logger:
         return logger
     logger.setLevel(logging.INFO)
     ch = logging.StreamHandler()
-    ch.setLevel(STREAM_LOGGING_LEVEL)
+    ch.setLevel(config.STREAM_LOGGING_LEVEL)
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     ch.setFormatter(formatter)
@@ -76,7 +76,7 @@ def create_dir_for_scenario(generation_name: str, scenario_name: str):
     :param str generation_name: name of the generation
     :param str scenario_name: name of the scenario
     """
-    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    dest = os.path.join(config.RECORDS_DIR, generation_name, scenario_name)
     if not os.path.exists(dest):
         os.makedirs(dest)
     else:
@@ -92,14 +92,14 @@ def save_record_files_and_chromosome(generation_name: str, scenario_name: str, c
     :param str scenario_name: name of the scenario
     :param dict ch: the genetic representation
     """
-    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    dest = os.path.join(config.RECORDS_DIR, generation_name, scenario_name)
     if not os.path.exists(dest):
         os.makedirs(dest)
     else:
         shutil.rmtree(dest)
         os.makedirs(dest)
 
-    fileList = glob.glob(f'{APOLLO_ROOT}/records/*')
+    fileList = glob.glob(f'{config.APOLLO_ROOT}/records/*')
     for filePath in fileList:
         shutil.copy2(filePath, dest)
 
@@ -115,7 +115,7 @@ def remove_record_files(generation_name: str, scenario_name: str):
     :param str generation_name: name of the generation
     :param str scenario_name: name of the scenario
     """
-    dest = os.path.join(RECORDS_DIR, generation_name, scenario_name)
+    dest = os.path.join(config.RECORDS_DIR, generation_name, scenario_name)
     shutil.rmtree(dest)
 
 

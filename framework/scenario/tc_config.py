@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from random import randint, shuffle
 from typing import Dict
 
-from config import HD_MAP, SCENARIO_UPPER_LIMIT
+import config
 from hdmap.MapParser import MapParser
 
 
@@ -69,7 +69,7 @@ class TCSection:
         :returns: a configuration in which preferred signals are green
         :rtype: Dict[str, str]
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         result = dict()
         signals = list(ma.get_signals())
         shuffle(signals)
@@ -108,7 +108,7 @@ class TCSection:
         return TCSection(
             initial=init,
             final=final,
-            duration_g=randint(5, int(SCENARIO_UPPER_LIMIT/2)),
+            duration_g=randint(5, int(config.SCENARIO_UPPER_LIMIT/2)),
             duration_y=3,
             duration_b=2
         )
@@ -121,4 +121,4 @@ class TCSection:
         :returns: green light duration
         :rtype: int
         """
-        return randint(5, int(SCENARIO_UPPER_LIMIT/2))
+        return randint(5, int(config.SCENARIO_UPPER_LIMIT/2))

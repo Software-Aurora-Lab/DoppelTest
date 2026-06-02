@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Set, Tuple
 from shapely.geometry import LineString, Polygon
 
 from apollo.utils import calculate_velocity, generate_adc_polygon
-from config import HD_MAP
+import config
 from framework.oracles.OracleInterface import OracleInterface
 from hdmap.MapParser import MapParser
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -39,7 +39,7 @@ class TrafficSignalOracle(OracleInterface):
         self.last_planning = None
 
         self.parse_traffic_signal_stop_line_string_on_map(
-            MapParser.get_instance(HD_MAP))
+            MapParser.get_instance(config.HD_MAP))
 
     def get_interested_topics(self):
         """

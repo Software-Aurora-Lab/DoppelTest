@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
 
+from absl import app
+
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, HD_MAP, RECORDS_DIR, RUN_FOR_HOUR
+import config
 from framework.baseline.BaseScenarioRunner import BaseScenarioRunner
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
@@ -22,7 +24,7 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
     for x, y in obs:
         obs_routing[x] = y.routing_str
     r_name = f"{ctn.container_name}.{s_name}.00000"
-    record_path = os.path.join(RECORDS_DIR, g_name, s_name, r_name)
+    record_path = os.path.join(config.RECORDS_DIR, g_name, s_name, r_name)
     ra = RecordAnalyzer(record_path)
     ra.analyze()
 
@@ -58,9 +60,9 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
         print(ra.get_results())
 
 
-def main():
-    ma = MapParser.get_instance(HD_MAP)
-    ctn = ApolloContainer(APOLLO_ROOT, 'ROUTE_0')
+def main(_: list) -> None:
+    ma = MapParser.get_instance(config.HD_MAP)
+    ctn = ApolloContainer(config.APOLLO_ROOT, 'ROUTE_0')
     ctn.start_instance()
     ctn.start_dreamview()
     vt = ViolationTracker()
@@ -90,9 +92,9 @@ def main():
         vt.save_to_file()
         curr_time = datetime.now()
         tdelta = (curr_time - start_time).total_seconds()
-        if tdelta / 3600 > RUN_FOR_HOUR:
+        if tdelta / 3600 > config.RUN_FOR_HOUR:
             break
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)

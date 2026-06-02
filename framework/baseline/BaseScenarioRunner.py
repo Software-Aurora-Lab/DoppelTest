@@ -5,7 +5,7 @@ from apollo.ApolloContainer import ApolloContainer
 from apollo.ApolloRunner import ApolloRunner
 from apollo.CyberBridge import Topics
 from apollo.utils import clean_appolo_dir
-from config import SCENARIO_UPPER_LIMIT
+import config
 from framework.baseline.DynamicObstacleManager import DynamicObstacleManager
 from framework.scenario import Scenario
 from framework.scenario.ad_agents import ADAgent
@@ -112,7 +112,7 @@ class BaseScenarioRunner:
                 scenario_logger.info(
                     f'Scenario time: {round(runner_time / 1000, 1)}.')
             # Check if scenario exceeded upper limit
-            if runner_time / 1000 >= SCENARIO_UPPER_LIMIT:
+            if runner_time / 1000 >= config.SCENARIO_UPPER_LIMIT:
                 scenario_logger.info('\n')
                 break
 

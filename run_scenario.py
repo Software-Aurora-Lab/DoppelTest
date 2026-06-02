@@ -1,16 +1,18 @@
-import sys
 import json
+import sys
 import traceback
 
+from absl import app
+import docker
+
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, HD_MAP
+import config
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
 from hdmap.MapParser import MapParser
-import docker
 
 def run_scenario(scenario_json: str, g_name: str, s_name: str):
-    MapParser.get_instance(HD_MAP)
+    MapParser.get_instance(config.HD_MAP)
 
     scenario = Scenario.from_json(scenario_json)
     scenario.gid = 0
@@ -21,7 +23,7 @@ def run_scenario(scenario_json: str, g_name: str, s_name: str):
     num_ad_agents = len(scenario.ad_section.adcs)
 
     containers = [
-        ApolloContainer(APOLLO_ROOT, f'ROUTE_{i}')
+        ApolloContainer(config.APOLLO_ROOT, f'ROUTE_{i}')
         for i in range(num_ad_agents)
     ]
 
@@ -49,23 +51,21 @@ def run_scenario(scenario_json: str, g_name: str, s_name: str):
 
 
 
-# CLI entrypoint
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python script.py <scenario_json> <g_name> <s_name>", file=sys.stderr)
-        sys.exit(2)
-
-    scenario_json, g_name, s_name = sys.argv[1:]
+def main(argv: list) -> None:
+    if len(argv) != 4:
+        raise app.UsageError(
+            "Expected arguments: <scenario_json> <g_name> <s_name>"
+        )
 
     try:
-        run_scenario(scenario_json, g_name, s_name)
+        run_scenario(*argv[1:])
 
-    except Exception as e:
+    except Exception as exc:
         # Structured error output (very useful for subprocess caller)
         error_payload = {
             "status": "error",
-            "error_type": type(e).__name__,
-            "message": str(e),
+            "error_type": type(exc).__name__,
+            "message": str(exc),
             "traceback": traceback.format_exc()
         }
 
@@ -77,3 +77,8 @@ if __name__ == "__main__":
         # Optional success signal
         print(json.dumps({"status": "success"}))
         sys.exit(0)
+
+
+# CLI entrypoint
+if __name__ == "__main__":
+    app.run(main)

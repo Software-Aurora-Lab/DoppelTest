@@ -4,7 +4,7 @@ from secrets import choice
 from typing import List
 
 from apollo.utils import PositionEstimate
-from config import HD_MAP, INSTANCE_MAX_WAIT_TIME, MAX_ADC_COUNT
+import config
 from hdmap.MapParser import MapParser
 
 
@@ -74,7 +74,7 @@ class ADAgent:
         :returns: an ADS instance representation
         :rtype: ADAgent
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         if must_start_from_junction:
             allowed_start = list(ma.get_lanes_not_in_junction())
         else:
@@ -100,7 +100,7 @@ class ADAgent:
             routing=routing,
             start_s=start_s,
             dest_s=round(dest_length / 2, 1),
-            start_t=randint(0, INSTANCE_MAX_WAIT_TIME)
+            start_t=randint(0, config.INSTANCE_MAX_WAIT_TIME)
         )
 
     @staticmethod
@@ -114,7 +114,7 @@ class ADAgent:
         :rtype: ADAgent
         """
         start_r = routing[0]
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         start_length = ma.get_lane_length(start_r)
         dest_length = ma.get_lane_length(routing[-1])
 
@@ -127,7 +127,7 @@ class ADAgent:
             routing=routing,
             start_s=start_s,
             dest_s=round(dest_length / 2, 1),
-            start_t=randint(0, INSTANCE_MAX_WAIT_TIME)
+            start_t=randint(0, config.INSTANCE_MAX_WAIT_TIME)
         )
 
 
@@ -177,7 +177,7 @@ class ADSection:
         :returns: True if conflict exists, False otherwise
         :rtype: bool
         """
-        ma = MapParser.get_instance(HD_MAP)
+        ma = MapParser.get_instance(config.HD_MAP)
         for ad in self.adcs:
             if ma.is_conflict_lanes(adc.routing, ad.routing):
                 return True
@@ -191,7 +191,7 @@ class ADSection:
         :returns: randomly generated section
         :rtype: ADSection
         """
-        num = randint(2, MAX_ADC_COUNT)
+        num = randint(2, config.MAX_ADC_COUNT)
         result = ADSection([])
         restrict_junction_start = True
         trial_count = 0

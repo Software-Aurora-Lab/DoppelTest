@@ -6,11 +6,11 @@ from datetime import datetime
 from random import randint, random, sample, shuffle
 
 import numpy as np
+from absl import app
 from deap import algorithms, base, tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT, MAX_PD_COUNT,
-                    RECORDS_DIR, RUN_FOR_HOUR)
+import config
 from framework.oracles import RecordAnalyzer
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
@@ -45,7 +45,7 @@ def eval_scenario(ind: Scenario):
         decisions.update(a.get_decisions())
         c_name = a.container.container_name
         r_name = f"{c_name}.{s_name}.00000"
-        record_path = os.path.join(RECORDS_DIR, g_name, s_name, r_name)
+        record_path = os.path.join(config.RECORDS_DIR, g_name, s_name, r_name)
         ra = RecordAnalyzer(record_path)
         ra.analyze()
         for v in ra.get_results():
@@ -75,7 +75,7 @@ def eval_scenario(ind: Scenario):
             ):
                 unique_violation += 1
 
-    ma = MapParser.get_instance(HD_MAP)
+    ma = MapParser.get_instance(config.HD_MAP)
     conflict = ind.has_ad_conflict()
 
     if unique_violation == 0:
@@ -100,7 +100,7 @@ def mut_ad_section(ind: ADSection):
 
     # add a random 1
     trial = 0
-    if mut_pb < 0.4 and len(ind.adcs) < MAX_ADC_COUNT:
+    if mut_pb < 0.4 and len(ind.adcs) < config.MAX_ADC_COUNT:
         while True:
             new_ad = ADAgent.get_one(trial < 15)
             if ind.has_conflict(new_ad) and ind.add_agent(new_ad):
@@ -142,7 +142,7 @@ def mut_pd_section(ind: PDSection):
         return ind
 
     # add a random
-    if mut_pb < 0.4 and len(ind.pds) <= MAX_PD_COUNT:
+    if mut_pb < 0.4 and len(ind.pds) <= config.MAX_PD_COUNT:
         ind.pds.append(PDAgent.get_one())
         return ind
 
@@ -201,7 +201,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
         ind1.adjust_time()
         return ind1, ind2
 
-    if len(ind1.adcs) < MAX_ADC_COUNT:
+    if len(ind1.adcs) < config.MAX_ADC_COUNT:
         for adc in ind2.adcs:
             if ind1.has_conflict(adc) and ind1.add_agent(deepcopy(adc)):
                 # add an agent from parent 2 to parent 1 if there exists a conflict
@@ -212,7 +212,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
     # combine to make a new populations
     available_adcs = ind1.adcs + ind2.adcs
     shuffle(available_adcs)
-    split_index = randint(2, min(len(available_adcs), MAX_ADC_COUNT))
+    split_index = randint(2, min(len(available_adcs), config.MAX_ADC_COUNT))
 
     result1 = ADSection([])
     for x in available_adcs[:split_index]:
@@ -220,7 +220,7 @@ def cx_ad_section(ind1: ADSection, ind2: ADSection):
 
     # make sure offspring adc count is valid
 
-    while len(result1.adcs) > MAX_ADC_COUNT:
+    while len(result1.adcs) > config.MAX_ADC_COUNT:
         result1.adcs.pop()
     trial = 0
     while len(result1.adcs) < 2:
@@ -242,9 +242,9 @@ def cx_pd_section(ind1: PDSection, ind2: PDSection):
     available_pds = ind1.pds + ind2.pds
 
     result1 = PDSection(
-        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
+        sample(available_pds, k=randint(0, min(config.MAX_PD_COUNT, len(available_pds)))))
     result2 = PDSection(
-        sample(available_pds, k=randint(0, min(MAX_PD_COUNT, len(available_pds)))))
+        sample(available_pds, k=randint(0, min(config.MAX_PD_COUNT, len(available_pds)))))
     return result1, result2
 
 
@@ -280,12 +280,12 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 
 # MAIN
 
-def main():
+def main(_: list) -> None:
     logger = get_logger('MAIN')
-    mp = MapParser.get_instance(HD_MAP)
+    mp = MapParser.get_instance(config.HD_MAP)
 
     containers = [ApolloContainer(
-        APOLLO_ROOT, f'ROUTE_{x}') for x in range(MAX_ADC_COUNT)]
+        config.APOLLO_ROOT, f'ROUTE_{x}') for x in range(config.MAX_ADC_COUNT)]
     for ctn in containers:
         ctn.start_instance()
         ctn.start_dreamview()
@@ -366,9 +366,9 @@ def main():
 
         curr_time = datetime.now()
         tdelta = (curr_time - start_time).total_seconds()
-        if tdelta / 3600 > RUN_FOR_HOUR:
+        if tdelta / 3600 > config.RUN_FOR_HOUR:
             break
 
 
 if __name__ == '__main__':
-    main()
+    app.run(main)
