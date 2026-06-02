@@ -1,3 +1,4 @@
+from pathlib import Path
 import subprocess
 import time
 
@@ -70,6 +71,37 @@ class ApolloContainer:
         container.remove()
         self.logger.debug(f'Removed container {self.container_name}')
 
+    def install_map(self, map_name: str) -> str:
+        self.logger.debug(f'Installing HD map {map_name}')
+        print(f"Installing HD map {map_name}")
+        map_dir = Path(config.DT_ROOT, 'data', 'maps')
+
+        map_bin = Path(map_dir, map_name, 'base_map.bin')
+        map_txt = Path(map_dir, map_name, 'base_map.txt')
+
+        assert map_bin.exists() or map_txt.exists(), f'map {map_name} does not exist'
+
+        map_file = str(map_bin) if map_bin.exists() else str(map_txt)
+        self.logger.debug(f'Found map file {map_file}')
+
+        randomized_map_name = f'{map_name}_{int(time.time())}'.replace("/", "_")
+        map_file = str(map_bin) if map_bin.exists() else str(map_txt)
+        # create directory and move map file there
+        # /apollo/modules/map/data/{randomized_map_name}/base_map.bin|txt
+        cmd = f"docker exec -u {self.username} {self.container_name} mkdir -p /apollo/modules/map/data/{randomized_map_name}"
+        subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = f"docker cp {map_file} {self.container_name}:/apollo/modules/map/data/{randomized_map_name}/"
+        subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.logger.debug(f'Installed map {map_name} as {randomized_map_name} in container {self.container_name}')
+
+        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/scripts/generate_routing_topo_graph.sh --map_dir /apollo/modules/map/data/{randomized_map_name}"
+        subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/bazel-bin/modules/map/tools/sim_map_generator --map_dir=/apollo/modules/map/data/{randomized_map_name} --output_dir=/apollo/modules/map/data/{randomized_map_name}"
+        subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.logger.debug(f'Generated routing_map and sim_map for map {randomized_map_name} in container {self.container_name}')
+
+        return randomized_map_name
+
     @property
     def ip(self) -> str:
         """
@@ -79,7 +111,7 @@ class ApolloContainer:
         """
         assert self.is_running(), f'Container {self.container_name} is not running.'
         ctn = docker.from_env().containers.get(self.container_name)
-        
+
         ip_address = ""
         try:
             ip_address = ctn.attrs['NetworkSettings']['Networks']['bridge']['IPAddress']
