@@ -369,6 +369,10 @@ def main(_: list) -> None:
         if tdelta / 3600 > config.RUN_FOR_HOUR:
             break
 
+    for ctn in containers:
+        ctn.stop_container()
+        ctn.remove_container()
+
 
 if __name__ == '__main__':
     app.run(main)

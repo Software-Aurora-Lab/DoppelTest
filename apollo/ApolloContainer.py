@@ -52,6 +52,24 @@ class ApolloContainer:
         except:
             return False
 
+    def stop_container(self) -> None:
+        """
+        Stop the Docker container for this Apollo instance.
+        """
+        self.logger.debug(f'Stopping container {self.container_name}')
+        container = docker.from_env().containers.get(self.container_name)
+        container.stop()
+        self.logger.debug(f'Stopped container {self.container_name}')
+
+    def remove_container(self) -> None:
+        """
+        Remove the Docker container for this Apollo instance.
+        """
+        self.logger.debug(f'Removing container {self.container_name}')
+        container = docker.from_env().containers.get(self.container_name)
+        container.remove()
+        self.logger.debug(f'Removed container {self.container_name}')
+
     @property
     def ip(self) -> str:
         """
