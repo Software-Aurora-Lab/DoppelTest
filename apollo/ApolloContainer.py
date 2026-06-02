@@ -100,6 +100,12 @@ class ApolloContainer:
         subprocess.run(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.logger.debug(f'Generated routing_map and sim_map for map {randomized_map_name} in container {self.container_name}')
 
+        # write line to /apollo/modules/common/data/global_flagfile.txt
+        flagfile_line = f'--map_dir=/apollo/modules/map/data/{randomized_map_name}'
+        cmd = f"docker exec -u {self.username} {self.container_name} bash -c 'echo {flagfile_line} >> /apollo/modules/common/data/global_flagfile.txt'"
+        subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.logger.debug(f'Updated global_flagfile.txt with map {randomized_map_name}')
+
         return randomized_map_name
 
     @property
