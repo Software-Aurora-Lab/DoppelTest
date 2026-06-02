@@ -31,6 +31,8 @@ class PDAgent:
         """
         ma = MapParser.get_instance(config.HD_MAP)
         cws = list(ma.get_crosswalks())
+        if len(cws) == 0:
+            raise ValueError("No crosswalks in the map, cannot generate pedestrian representation")
         cw = choice(cws)
         return PDAgent(
             cw_id=cw,
@@ -92,5 +94,8 @@ class PDSection:
         num = min(len(ma.get_crosswalks()), num)
         result = PDSection([])
         while len(result.pds) < num:
-            result.add_agent(PDAgent.get_one())
+            try:
+                result.add_agent(PDAgent.get_one())
+            except ValueError as e:
+                print(f"Error occurred while generating pedestrian: {e}")
         return result
