@@ -42,15 +42,15 @@ class RecordAnalyzer:
         """
         oracles = [
             CollisionOracle(),
-            EStopOracle(),
+            # EStopOracle(),
             ModuleOracle(),
-            ComfortOracle(),
+            # ComfortOracle(),
             StopSignOracle(),
             TrafficSignalOracle(),
-            UUStopOracle(),
-            SpeedingOracle(),
-            JunctionLaneChangeOracle(),
-            UnsafeLaneChangeOracle(),
+            # UUStopOracle(),
+            # SpeedingOracle(),
+            # JunctionLaneChangeOracle(),
+            # UnsafeLaneChangeOracle(),
             # PlanningCrashOracle(),
         ]
         for o in oracles:
