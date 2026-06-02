@@ -62,11 +62,14 @@ class MapParser:
         Get the singleton instance of MapParser
         """
         map_dir = Path(config.DT_ROOT, 'data', 'maps')
-        assert map_name in list(x.name for x in map_dir.iterdir()), f'map {map_name} does not exist'
-        map_file = Path(map_dir, map_name, 'base_map.bin')
-        map_pickle = Path(map_file.parent, 'map.pickle')
-        
-        assert map_file.exists(), f'HD map {map_name} does not exist!'
+
+        map_bin = Path(map_dir, map_name, 'base_map.bin')
+        map_txt = Path(map_dir, map_name, 'base_map.txt')
+        map_pickle = Path(map_bin.parent, 'map.pickle')
+
+        assert map_bin.exists() or map_txt.exists(), f'map {map_name} does not exist'
+        map_file = str(map_bin) if map_bin.exists() else str(map_txt)
+
         if map_name in MapParser.__instance:
             return MapParser.__instance[map_name]
         elif map_pickle.exists():

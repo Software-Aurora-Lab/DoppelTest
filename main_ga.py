@@ -288,6 +288,10 @@ def main(_: list) -> None:
         config.APOLLO_ROOT, f'ROUTE_{x}') for x in range(config.MAX_ADC_COUNT)]
     for ctn in containers:
         ctn.start_instance()
+
+    ctn.install_map(config.HD_MAP)
+
+    for ctn in containers:
         ctn.start_dreamview()
         print(f'Dreamview at http://{ctn.ip}:{ctn.port}')
 
