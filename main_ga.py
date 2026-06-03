@@ -129,7 +129,12 @@ def mut_ad_section(ind: ADSection):
 
 
 def mut_pd_section(ind: PDSection):
+    mp = MapParser.get_instance(config.HD_MAP)
 
+    # no pd section if there is no crosswalk
+    if len(mp.get_crosswalks()) == 0:
+        return ind
+    
     if len(ind.pds) == 0:
         ind.add_agent(PDAgent.get_one())
         return ind
