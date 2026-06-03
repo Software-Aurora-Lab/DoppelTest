@@ -303,12 +303,6 @@ def main(_: list) -> None:
     srunner = ScenarioRunner(containers)
     vt = ViolationTracker()
 
-    # GA Hyperparameters
-    POP_SIZE = 10  # number of population
-    OFF_SIZE = 10  # number of offspring to produce
-    CXPB = 0.8  # crossover probablitiy
-    MUTPB = 0.2  # mutation probability
-
     toolbox = base.Toolbox()
     toolbox.register("evaluate", eval_scenario)
     toolbox.register("mate", cx_scenario)
@@ -317,7 +311,7 @@ def main(_: list) -> None:
 
     # start GA
     start_time = datetime.now()
-    population = [Scenario.get_conflict_one() for _ in range(POP_SIZE)]
+    population = [Scenario.get_conflict_one() for _ in range(config.POP_SIZE)]
     for index, c in enumerate(population):
         c.gid = 0
         c.cid = index
@@ -345,7 +339,7 @@ def main(_: list) -> None:
         logger.info(f' ====== GA Generation {curr_gen} ====== ')
         # Vary the population
         offspring = algorithms.varOr(
-            population, toolbox, OFF_SIZE, CXPB, MUTPB)
+            population, toolbox, config.OFF_SIZE, config.CXPB, config.MUTPB)
 
         # update chromosome gid and cid
         for index, c in enumerate(offspring):
@@ -361,7 +355,7 @@ def main(_: list) -> None:
         hof.update(offspring)
 
         # Select the next generation population
-        population[:] = toolbox.select(population + offspring, POP_SIZE)
+        population[:] = toolbox.select(population + offspring, config.POP_SIZE)
 
         record = stats.compile(population)
         logbook.record(gen=curr_gen, **record)

@@ -95,6 +95,18 @@ flags.DEFINE_integer(
 flags.DEFINE_float(
     "run_for_hour", 12.0, "Number of hours to run.", lower_bound=0.0,
 )
+flags.DEFINE_integer(
+    "pop_size", 10, "Number of individuals in the GA population.", lower_bound=1,
+)
+flags.DEFINE_integer(
+    "off_size", 10, "Number of offspring to produce per GA generation.", lower_bound=1,
+)
+flags.DEFINE_float(
+    "cxpb", 0.8, "GA crossover probability.", lower_bound=0.0, upper_bound=1.0,
+)
+flags.DEFINE_float(
+    "mutpb", 0.2, "GA mutation probability.", lower_bound=0.0, upper_bound=1.0,
+)
 
 # Also update ``apollo/modules/common/data/global_flagfile.txt`` to match the
 # HD map selected here.
@@ -118,6 +130,10 @@ _FLAG_NAMES: Dict[str, str] = {
     "MAX_ADC_COUNT": "max_adc_count",
     "MAX_PD_COUNT": "max_pd_count",
     "RUN_FOR_HOUR": "run_for_hour",
+    "POP_SIZE": "pop_size",
+    "OFF_SIZE": "off_size",
+    "CXPB": "cxpb",
+    "MUTPB": "mutpb",
     "HD_MAP": "hd_map",
 }
 
