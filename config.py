@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from pathlib import Path
 
 # APOLLO CONFIGURATION ==============================
@@ -19,8 +20,12 @@ DT_ROOT = Path(__file__).parent
 """Root directory of DoppelTest"""
 APOLLO_ROOT = Path(DT_ROOT, "apollo-doppeltest")
 """Root directory of Apollo 7.0 (YuqiHuai/BaiduApollo, branch ``v7_mozart``)"""
-RECORDS_DIR = f'{DT_ROOT}/data/records'
-"""Desired directory to save record files"""
+RUN_ID = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+"""Identifier for this run, evaluated once when the process starts"""
+RECORDS_ROOT = f'{DT_ROOT}/data/records'
+"""Directory holding the output of every run"""
+RECORDS_DIR = f'{RECORDS_ROOT}/{RUN_ID}'
+"""Desired directory to save this run's record files"""
 LOG_DIR = f'{DT_ROOT}/data/Logs'
 """Desired directory to save log files"""
 

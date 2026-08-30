@@ -69,6 +69,7 @@ class ViolationTracker:
             df.loc[len(df.index)] = [
                 *scenario
             ]
+        os.makedirs(RECORDS_DIR, exist_ok=True)
         df.to_csv(os.path.join(RECORDS_DIR, "summary.csv"))
 
     def clear(self):

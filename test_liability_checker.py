@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from config import RECORDS_ROOT
 from framework.baseline.liability_checker import CollisionLiabilityChecker
 from framework.baseline.liability_checker.CollisionLiabilityChecker import \
     CollisionType
@@ -11,8 +12,11 @@ logger = get_logger(__name__)
 
 
 def analyze_record_files():
-    base_record_dir = "./data/records"
-    all_record_file_paths = find_all_files_by_wildcard(base_record_dir, "Generation_*/Scenario_*/apollo_dev_*")
+    base_record_dir = RECORDS_ROOT
+    # ``**`` matches zero or more directories, so this finds records both
+    # directly under data/records and under a per-run subdirectory.
+    all_record_file_paths = find_all_files_by_wildcard(
+        base_record_dir, "**/Generation_*/Scenario_*/apollo_dev_*", recursive=True)
     record_file_count = len(all_record_file_paths)
     violation_type_counter = defaultdict(int)
     not_rear_end_files = set()

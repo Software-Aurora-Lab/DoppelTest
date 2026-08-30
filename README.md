@@ -123,7 +123,7 @@ steps below:
 
 4. Start the framework via `python main_ga.py`
 
-> After running DoppelTest for extended period of time, you should see record file of scenarios generated under `data/records`. This is also the step to replicate the results presented in the paper.
+> After running DoppelTest for extended period of time, you should see record file of scenarios generated under `data/records/<YYYY-MM-DD_HH-MM-SS>`, one directory per run (named after the time the process started). This is also the step to replicate the results presented in the paper.
 
 ## Citing
 
