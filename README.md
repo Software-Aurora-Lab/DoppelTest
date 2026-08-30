@@ -50,25 +50,57 @@ In this section we will be discussing steps to replicate the results discussed i
 
 > You can now use `scripts/install_apollo.sh` to automatically install Apollo!
 
-1. Download the DoppelTest version of Apollo 7.0 from https://doi.org/10.5281/zenodo.7622089
+DoppelTest runs against the `v7_mozart` branch of
+[YuqiHuai/BaiduApollo](https://github.com/YuqiHuai/BaiduApollo/tree/v7_mozart),
+a fork of Apollo 7.0 that ships the cyber bridge and the standalone SimControl
+this framework depends on. The DoppelTest-specific pieces that branch does not
+carry live in `apollo_patches/` in this repository and are copied into the
+Apollo checkout at install time. `scripts/install_apollo.sh` performs all of the
+steps below:
 
-> In this forked version, we made slight adjustments that are not related to the AD stack
+1. Clone the fork into this repository's root as `apollo-doppeltest`
 
-2. At the root directory of Baidu Apollo, create directories `data`, `data/log`, `data/bag`, `data/core` by running `mkdir data data/log data/bag data/core`
+   ```bash
+   git clone https://github.com/YuqiHuai/BaiduApollo.git \
+     --branch v7_mozart --depth 1 apollo-doppeltest
+   ```
+
+2. At the root directory of Baidu Apollo, create directories `data/log`, `data/bag`, `data/core`, and `records`
 
 > This step is necessary for DoppelTest running on the host machine to delete Apollo's log files. Our framework restarts modules being tested after every scenario, which creates a large number of unnecessary log files.
 
 > Since a lot of commands are executed as root inside of the Docker container, if those directories are created inside of the container, DoppelTest may not be able to remove those directories.
 
-3. At the root directory of Baidu Apollo, start up Apollo container via `./docker/scripts/dev_start.sh -l`
+3. Copy the contents of `apollo_patches/` into the Apollo checkout
 
-4. Find the name of the container via `docker ps -a`
+   ```bash
+   cp -a apollo_patches/. apollo-doppeltest/
+   ```
 
-5. Enter the container in root mode via `docker exec -it apollo_dev_your_name /bin/bash`
+> This installs three things: `scripts/bootstrap_doppeltest.sh` (starts/stops routing, prediction, planning, and `simplified_planning`; invoked by `apollo/ApolloContainer.py`); `modules/custom_nodes/`, whose `simplified_planning` node republishes a trimmed `ADCTrajectory` on `/apollo/planning/simplified` (the full planning message does not fit the cyber bridge client's single-`recv` framing, so DoppelTest subscribes to the simplified channel instead); and `modules/sim_control/main.cc`, which drops the branch's boot-time `sim_control_->Start()`. DoppelTest enables SimControl by publishing each instance's initial localization, and starting it at boot would latch a dummy map start point and make that a no-op.
 
-> Remember to replace `apollo_dev_your_name` with the container's actual name
+> This must happen before the build so bazel picks up `//modules/custom_nodes` and the patched `sim_control_main`.
 
-6. In the container, build Apollo via `./apollo.sh build`
+4. At the root directory of Baidu Apollo, start a container dedicated to building
+
+   ```bash
+   DEV_CONTAINER=doppeltest_installer ./docker/scripts/dev_start.sh -l -y --fastest
+   ```
+
+> The build container is named `doppeltest_installer` so it cannot collide with `apollo_dev_$USER`, which other projects on the same machine use. DoppelTest starts its own `apollo_dev_ROUTE_*` containers at run time.
+
+> `--fastest` skips the map and other Docker volumes. Those volumes are mounted over `modules/map/data/<map>` and would shadow the HD maps installed by `scripts/install_hd_maps.sh`.
+
+5. In the container, build Apollo
+
+   ```bash
+   docker exec -u $USER doppeltest_installer \
+     bash -c "source /apollo/scripts/apollo.bashrc && bash /apollo/apollo.sh build"
+   ```
+
+6. Remove the build container via `docker rm -f doppeltest_installer`
+
+> The build output lives in `apollo-doppeltest/.cache` on the host, so the container is disposable.
 
 ### INSTALLING DoppelTest
 

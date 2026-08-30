@@ -82,7 +82,7 @@ class ApolloContainer:
         if not restart and self.is_running():
             self.logger.debug(f'Already running at {self.ip}')
             return
-        cmd = f'{self.apollo_root}/docker/scripts/dev_start.sh -l -y'
+        cmd = f'{self.apollo_root}/docker/scripts/dev_start.sh -l -y --fastest'
         subprocess.run(
             cmd.split(),
             env={
@@ -195,7 +195,7 @@ class ApolloContainer:
         op_name, op_cmd, op_success_info = ops[op]
 
         self.logger.debug(f"{op_name} required modules")
-        cmd = f"docker exec -u {self.username} {self.container_name} ./scripts/bootstrap_maggie.sh {op_cmd}"
+        cmd = f"docker exec -u {self.username} {self.container_name} ./scripts/bootstrap_doppeltest.sh {op_cmd}"
         subprocess.run(
             cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.logger.debug(f'Modules {op_success_info}')

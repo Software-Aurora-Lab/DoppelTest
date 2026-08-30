@@ -37,6 +37,8 @@ if [[ ! -d "$MAP_PATH" ]]; then
 fi
 
 # ---- set HD map ----
+# Drop any --map_dir previously appended so repeated runs do not pile up.
+sed -i '/^--map_dir=/d' "$FLAGFILE"
 printf "\n--map_dir=/apollo/modules/map/data/%s\n" "$MAP_NAME" \
   >> "$FLAGFILE"
 

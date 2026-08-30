@@ -20,21 +20,20 @@ fi
 
 # Check map data
 if [[ ! -d "$MAP_SRC" ]]; then
-  echo -e "${RED}Error: Apollo map data not found at ../data/apollo_map${NC}"
+  echo -e "${RED}Error: Apollo map data not found at ../data/maps${NC}"
   exit 1
 fi
 
-# Remove existing map data directory
-if [[ -e "$MAP_DST" ]]; then
-  echo "Removing existing map data at $MAP_DST"
-  rm -rf "$MAP_DST"
-fi
+mkdir -p "$MAP_DST"
 
-# Recreate destination parent directory
-mkdir -p "$(dirname "$MAP_DST")"
-
-# Copy map data
-cp -a "$MAP_SRC" "$MAP_DST"
+# Copy each map individually. The destination directory itself is left in
+# place: it holds Apollo's BUILD file, which bazel targets such as
+# //modules/map/data:borregas_ave depend on.
+for map_path in "$MAP_SRC"/*/; do
+  map_name="$(basename "$map_path")"
+  rm -rf "${MAP_DST:?}/$map_name"
+  cp -a "$map_path" "$MAP_DST/$map_name"
+done
 
 echo -e "${GREEN}Map data successfully copied.${NC}"
 echo

@@ -18,7 +18,7 @@ APOLLO_VEHICLE_back_edge_to_center = 1.043
 DT_ROOT = Path(__file__).parent
 """Root directory of DoppelTest"""
 APOLLO_ROOT = Path(DT_ROOT, "apollo-doppeltest")
-"""Root directory of Apollo 7.0"""
+"""Root directory of Apollo 7.0 (YuqiHuai/BaiduApollo, branch ``v7_mozart``)"""
 RECORDS_DIR = f'{DT_ROOT}/data/records'
 """Desired directory to save record files"""
 LOG_DIR = f'{DT_ROOT}/data/Logs'
