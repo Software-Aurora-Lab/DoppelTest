@@ -8,6 +8,11 @@ from apollo.Dreamview import Dreamview
 from config import USE_SIM_CONTROL_STANDALONE
 from utils import get_logger
 
+SIM_CONTROL_BIN = '/apollo/bazel-bin/modules/sim_control_standalone/main'
+"""Standalone SimControl binary shipped by the ``v7_mozart`` Apollo branch"""
+SIM_CONTROL_PATTERN = 'sim_control'
+"""Pattern matching any SimControl process, used to stop leftover instances"""
+
 
 class ApolloContainer:
     """
@@ -112,11 +117,33 @@ class ApolloContainer:
         if op == 'stop':
             self.dreamview = None
         else:
-            self.dreamview = Dreamview(self.ip, self.port)
+            self.dreamview = self.__connect_dreamview()
             self.logger.debug(
                 f'Dreamview running at http://{self.ip}:{self.port}')
 
         self.logger.debug(op_success_info)
+
+    def __connect_dreamview(self, timeout: float = 300.0) -> Dreamview:
+        """
+        Connect to Dreamview's websocket, waiting for it to accept connections
+
+        ``bootstrap.sh start`` returns before Dreamview is listening, so
+        connecting right after it can be refused.
+
+        :param float timeout: seconds to keep retrying before giving up
+
+        :returns: a connected Dreamview client
+        :rtype: Dreamview
+        """
+        deadline = time.time() + timeout
+        while True:
+            try:
+                return Dreamview(self.ip, self.port)
+            except (ConnectionRefusedError, OSError):
+                if time.time() >= deadline:
+                    raise
+                self.logger.debug('Waiting for Dreamview to accept connections')
+                time.sleep(1)
 
     def start_dreamview(self):
         """
@@ -242,26 +269,61 @@ class ApolloContainer:
             cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
 
-    def start_sim_control_standalone(self):
+    def start_sim_control_standalone(self, x: float, y: float, heading: float):
         """
-        Starts SimControlStandalone module
+        Starts SimControlStandalone module at the given start pose
+
+        ``sim_control_standalone`` latches the pose passed on its command line
+        when it starts and ignores it afterwards, so it has to be restarted for
+        every scenario with that scenario's initial position.
+
+        :param float x: x coordinate the instance should spawn at
+        :param float y: y coordinate the instance should spawn at
+        :param float heading: heading the instance should spawn with
         """
-        self.logger.debug(f"Starting sim_control_standalone")
-        cmd = f"docker exec -u {self.username} -d {self.container_name} /apollo/bazel-bin/modules/sim_control/sim_control_main"
+        self.logger.debug(
+            f"Starting sim_control_standalone at ({x}, {y}, {heading})")
+        cmd = (f"docker exec -u {self.username} -d {self.container_name} "
+               f"{SIM_CONTROL_BIN} {x} {y} {heading}")
         subprocess.run(
             cmd.split(),
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
 
+    def __sim_control_pids(self) -> str:
+        """
+        Lists the pids of any SimControl process running in the container
+
+        :returns: whitespace separated pids, empty if none are running
+        :rtype: str
+        """
+        cmd = ["docker", "exec", "-u", self.username, self.container_name,
+               "pgrep", "-f", SIM_CONTROL_PATTERN]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+        return result.stdout.decode().split()
+
     def stop_sim_control_standalone(self):
         """
         Stops SimControlStandalone module
+
+        Kills the process directly instead of going through
+        ``modules/sim_control/script.sh``: that script is not executable in the
+        Apollo checkout, so the ``docker exec`` invoking it failed silently and
+        left SimControl running with a stale start pose across scenarios.
         """
         self.logger.debug(f"Stopping sim_control_standalone")
-        cmd = f"docker exec -u {self.username} {self.container_name} /apollo/modules/sim_control/script.sh stop"
-        subprocess.run(
-            cmd.split(),
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        cmd = ["docker", "exec", "-u", self.username, self.container_name,
+               "pkill", "-9", "-f", SIM_CONTROL_PATTERN]
+        subprocess.run(cmd, stdout=subprocess.DEVNULL,
+                       stderr=subprocess.DEVNULL)
+        for _ in range(20):
+            if not self.__sim_control_pids():
+                return
+            time.sleep(0.5)
+        self.logger.error(
+            'SimControl is still running after stop, '
+            'the next scenario will start from a stale pose'
         )
 
     def stop_all(self):
@@ -288,5 +350,5 @@ class ApolloContainer:
         self.start_bridge()
         self.reset_bridge_connection()
         self.start_modules()
-        if USE_SIM_CONTROL_STANDALONE:
-            self.start_sim_control_standalone()
+        # SimControl is not started here: it needs the scenario's start pose,
+        # so ApolloRunner.initialize starts it once that pose is known.

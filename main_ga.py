@@ -78,10 +78,10 @@ def eval_scenario(ind: Scenario):
     ma = MapParser.get_instance(HD_MAP)
     conflict = ind.has_ad_conflict()
 
-    if unique_violation == 0:
-        # no unique violation, remove records
-        remove_record_files(g_name, s_name)
-        pass
+    # Records for every scenario are kept. To reclaim disk space instead,
+    # uncomment the following to drop scenarios with no unique violation.
+    # if unique_violation == 0:
+    #     remove_record_files(g_name, s_name)
 
     return min(min_distance), len(decisions), conflict, unique_violation
 
@@ -282,6 +282,7 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 
 def main():
     logger = get_logger('MAIN')
+    logger.info(f'Saving records to {RECORDS_DIR}')
     mp = MapParser.get_instance(HD_MAP)
 
     containers = [ApolloContainer(

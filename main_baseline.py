@@ -59,6 +59,7 @@ def eval_scenario(ctn: ApolloContainer, s: Scenario):
 
 
 def main():
+    print(f'Saving records to {RECORDS_DIR}')
     ma = MapParser.get_instance(HD_MAP)
     ctn = ApolloContainer(APOLLO_ROOT, 'ROUTE_0')
     ctn.start_instance()

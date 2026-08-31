@@ -296,6 +296,7 @@ def cx_scenario(ind1: Scenario, ind2: Scenario):
 
 def main():
     logger = get_logger('MAIN')
+    logger.info(f'Saving records to {RECORDS_DIR}')
     __t_map_analysis_start = datetime.now()
     mp = MapParser.get_instance(HD_MAP)
     __t_map_analysis_finish = datetime.now()

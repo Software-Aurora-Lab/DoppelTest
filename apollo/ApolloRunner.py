@@ -110,9 +110,6 @@ class ApolloRunner:
         # initialize container
         self.container.reset()
         self.register_publishers()
-        self.send_initial_localization()
-        if not USE_SIM_CONTROL_STANDALONE:
-            self.container.dreamview.start_sim_control()
 
         # initialize class variables
         self.routing_started = False
@@ -125,8 +122,43 @@ class ApolloRunner:
 
         self.container.bridge.spin()
 
+        if USE_SIM_CONTROL_STANDALONE:
+            # SimControlStandalone spawns the ADC where it is told to on the
+            # command line. Passing the pose is what puts the instance on its
+            # route: it does not pick up localization published afterwards.
+            ma = MapParser.get_instance(HD_MAP)
+            coord, heading = ma.get_coordinate_and_heading(
+                self.start.lane_id, self.start.s)
+            self.container.start_sim_control_standalone(
+                coord.x, coord.y, heading)
+        else:
+            self.send_initial_localization()
+            self.container.dreamview.start_sim_control()
+
+        self.wait_for_localization()
+
         self.logger.debug(
             f'Initialized container {self.container.container_name}')
+
+    def wait_for_localization(self, timeout: float = 15.0):
+        """
+        Block until SimControl publishes this instance's localization
+
+        Without a localization the instance is not actually in the scenario:
+        planning cannot build a reference line and the ADC never moves.
+
+        :param float timeout: seconds to wait before giving up
+        """
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if self.localization is not None:
+                self.logger.debug('SimControl localization received')
+                return
+            time.sleep(0.1)
+        self.logger.error(
+            f'No localization after {timeout}s, '
+            'SimControl is likely not running for this instance'
+        )
 
     def should_send_routing(self, t: float) -> bool:
         """

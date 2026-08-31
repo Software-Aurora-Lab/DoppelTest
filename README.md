@@ -77,7 +77,9 @@ steps below:
    cp -a apollo_patches/. apollo-doppeltest/
    ```
 
-> This installs three things: `scripts/bootstrap_doppeltest.sh` (starts/stops routing, prediction, planning, and `simplified_planning`; invoked by `apollo/ApolloContainer.py`); `modules/custom_nodes/`, whose `simplified_planning` node republishes a trimmed `ADCTrajectory` on `/apollo/planning/simplified` (the full planning message does not fit the cyber bridge client's single-`recv` framing, so DoppelTest subscribes to the simplified channel instead); and `modules/sim_control/main.cc`, which drops the branch's boot-time `sim_control_->Start()`. DoppelTest enables SimControl by publishing each instance's initial localization, and starting it at boot would latch a dummy map start point and make that a no-op.
+> This installs two things: `scripts/bootstrap_doppeltest.sh` (starts/stops routing, prediction, planning, and `simplified_planning`; invoked by `apollo/ApolloContainer.py`) and `modules/custom_nodes/`, whose `simplified_planning` node republishes a trimmed `ADCTrajectory` on `/apollo/planning/simplified` (the full planning message does not fit the cyber bridge client's single-`recv` framing, so DoppelTest subscribes to the simplified channel instead).
+
+> SimControl itself needs no patch. DoppelTest runs the branch's `modules/sim_control_standalone`, restarting it for every scenario with that instance's start pose on the command line (`main <x> <y> <heading>`). The older `modules/sim_control` binary latches the first localization it ever sees and ignores every later one, so it must not be used.
 
 > This must happen before the build so bazel picks up `//modules/custom_nodes` and the patched `sim_control_main`.
 

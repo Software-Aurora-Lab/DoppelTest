@@ -35,7 +35,6 @@ mkdir -p $APOLLO_DIR/data/log $APOLLO_DIR/data/bag $APOLLO_DIR/data/core $APOLLO
 # Install the DoppelTest-specific files the v7_mozart branch does not carry:
 #   scripts/bootstrap_doppeltest.sh - starts/stops the modules under test
 #   modules/custom_nodes            - simplified_planning node
-#   modules/sim_control/main.cc     - do not enable SimControl at boot
 # This must happen before the build so bazel picks up the changes.
 cp -a $PARENT_DIRECTORY/apollo_patches/. $APOLLO_DIR/
 chmod +x $APOLLO_DIR/scripts/bootstrap_doppeltest.sh

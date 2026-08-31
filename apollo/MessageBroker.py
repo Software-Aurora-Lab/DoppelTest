@@ -56,7 +56,7 @@ class MessageBroker:
             locations = dict()
             for runner in self.runners:
                 loc = runner.localization
-                if loc and loc.header.module_name == 'SimControl':
+                if loc and loc.header.module_name in ('SimControl', 'SimControlStandalone'):
                     locations[runner.nid] = runner.localization
 
             # convert localization into obstacles

@@ -9,7 +9,8 @@ import numpy as np
 from deap import tools
 
 from apollo.ApolloContainer import ApolloContainer
-from config import APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT, RUN_FOR_HOUR
+from config import (APOLLO_ROOT, HD_MAP, MAX_ADC_COUNT, RECORDS_DIR,
+                    RUN_FOR_HOUR)
 from framework.oracles.ViolationTracker import ViolationTracker
 from framework.scenario import Scenario
 from framework.scenario.ScenarioRunner import ScenarioRunner
@@ -18,6 +19,7 @@ from main_ga import eval_scenario
 
 
 def main():
+    print(f'Saving records to {RECORDS_DIR}')
     mp = MapParser.get_instance(HD_MAP)
 
     containers = [ApolloContainer(
