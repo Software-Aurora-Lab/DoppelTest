@@ -1,0 +1,132 @@
+{
+    "ad_section": {
+        "adcs": [
+            {
+                "routing": [
+                    "lane_13",
+                    "lane_36",
+                    "lane_15"
+                ],
+                "start_s": 10.8,
+                "dest_s": 13.0,
+                "start_t": 2.0
+            },
+            {
+                "routing": [
+                    "lane_12",
+                    "lane_39",
+                    "lane_6"
+                ],
+                "start_s": 20.9,
+                "dest_s": 24.1,
+                "start_t": 2.0
+            },
+            {
+                "routing": [
+                    "lane_10",
+                    "lane_47",
+                    "lane_30",
+                    "lane_18",
+                    "lane_26"
+                ],
+                "start_s": 3.0,
+                "dest_s": 26.2,
+                "start_t": 4.0
+            },
+            {
+                "routing": [
+                    "lane_3",
+                    "lane_32",
+                    "lane_30",
+                    "lane_18"
+                ],
+                "start_s": 24.9,
+                "dest_s": 108.9,
+                "start_t": 6.0
+            },
+            {
+                "routing": [
+                    "lane_28",
+                    "lane_58",
+                    "lane_24"
+                ],
+                "start_s": 6.0,
+                "dest_s": 99.9,
+                "start_t": 6.0
+            }
+        ]
+    },
+    "pd_section": {
+        "pds": [
+            {
+                "cw_id": "CW_5",
+                "speed": 2.8,
+                "start_t": 11
+            },
+            {
+                "cw_id": "CW_0",
+                "speed": 2.6,
+                "start_t": 10
+            },
+            {
+                "cw_id": "CW_1",
+                "speed": 1.5,
+                "start_t": 16
+            },
+            {
+                "cw_id": "CW_2",
+                "speed": 2.3,
+                "start_t": 6
+            },
+            {
+                "cw_id": "CW_4",
+                "speed": 1.6,
+                "start_t": 5
+            },
+            {
+                "cw_id": "CW_0",
+                "speed": 2.6,
+                "start_t": 6
+            }
+        ]
+    },
+    "tc_section": {
+        "initial": {
+            "signal_3": "GREEN",
+            "signal_0": "RED",
+            "signal_1": "RED",
+            "signal_2": "RED",
+            "signal_4": "GREEN",
+            "signal_5": "RED",
+            "signal_6": "RED",
+            "signal_7": "GREEN",
+            "signal_8": "GREEN",
+            "signal_9": "RED",
+            "signal_10": "RED",
+            "signal_11": "RED",
+            "signal_12": "RED",
+            "signal_13": "RED",
+            "signal_14": "RED"
+        },
+        "final": {
+            "signal_14": "GREEN",
+            "signal_0": "GREEN",
+            "signal_1": "RED",
+            "signal_2": "RED",
+            "signal_3": "RED",
+            "signal_4": "RED",
+            "signal_5": "RED",
+            "signal_6": "RED",
+            "signal_7": "RED",
+            "signal_8": "RED",
+            "signal_9": "GREEN",
+            "signal_10": "RED",
+            "signal_11": "RED",
+            "signal_12": "RED",
+            "signal_13": "GREEN"
+        },
+        "duration_g": 11,
+        "duration_y": 3,
+        "duration_b": 2
+    }
+}
